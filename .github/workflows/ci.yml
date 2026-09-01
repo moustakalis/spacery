@@ -80,15 +80,24 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Plugin Check inspects the distributed plugin, so it must run against
-      # built assets rather than sources.
+      # Plugin Check must inspect the artifact that would be published, not the
+      # repository. The repo root carries dev config the directory rejects:
+      # dotfiles, .github, and *.dist files (a blocked "application file"
+      # extension). `plugin-zip` packs only what package.json#files declares.
       - name: Build
         run: pnpm run build
+
+      - name: Pack the distributable
+        run: |
+          pnpm run plugin-zip
+          mkdir -p dist
+          unzip -q spacery.zip -d dist
+          echo "Distribution contents:"
+          find dist -type f | sort
 
       - name: Run Plugin Check
         uses: WordPress/plugin-check-action@v1
         with:
           slug: spacery
-          build-dir: '.'
+          build-dir: ./dist/spacery
           wp-version: '7.1'
-          exclude-directories: 'node_modules,vendor,tests,docs,assets'

@@ -5,6 +5,13 @@
 	"author": "Nickos Moustakas (https://github.com/moustakalis)",
 	"license": "GPL-2.0-or-later",
 	"private": true,
+	"files": [
+		"spacery.php",
+		"includes",
+		"build",
+		"readme.txt",
+		"LICENSE"
+	],
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/moustakalis/spacery.git"

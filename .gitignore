@@ -4,6 +4,7 @@ vendor/
 
 # Build output
 build/
+dist/
 *.zip
 
 # Tooling caches
