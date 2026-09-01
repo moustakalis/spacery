@@ -117,6 +117,16 @@ function apply_filters( string $hook, $value, ...$args ) {
 	return $value;
 }
 
+/**
+ * Stub of __(). Returns the source string, as an untranslated site does.
+ *
+ * @param string $text   Source string.
+ * @param string $domain Text domain.
+ */
+function __( string $text, string $domain = 'default' ): string {
+	return $text;
+}
+
 require_once __DIR__ . '/../../includes/Autoloader.php';
 
 Spacery\Autoloader::register();

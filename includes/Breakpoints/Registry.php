@@ -50,6 +50,56 @@ final class Registry {
 	);
 
 	/**
+	 * Translated labels for tiers Spacery names itself.
+	 *
+	 * These are Spacery's own strings, so they belong in the POT file. Labels
+	 * for tiers a theme invents cannot be — there is no source string a
+	 * translator could have translated — and fall back to
+	 * `BreakpointSet::machine_label()` instead.
+	 *
+	 * Built in a method rather than a constant because `__()` cannot run at
+	 * constant-definition time, and because translations must not be requested
+	 * before `init`. Nothing resolves the registry that early: `register()`
+	 * only attaches hooks.
+	 *
+	 * @return array<string, string>
+	 */
+	private function labels(): array {
+		return array(
+			'desktop' => __( 'Desktop', 'spacery' ),
+			'laptop'  => __( 'Laptop', 'spacery' ),
+			'tablet'  => __( 'Tablet', 'spacery' ),
+			'mobile'  => __( 'Mobile', 'spacery' ),
+		);
+	}
+
+	/**
+	 * Attaches a translated label to a tier when Spacery is the one naming it.
+	 *
+	 * @param array<string, string> $boundaries Slug => boundary.
+	 * @return array<int, array{slug: string, label: string, max: string}>
+	 */
+	private function with_labels( array $boundaries ): array {
+		$labels = $this->labels();
+		$tiers  = array();
+
+		foreach ( $boundaries as $slug => $max ) {
+			$tier = array(
+				'slug' => $slug,
+				'max'  => $max,
+			);
+
+			if ( isset( $labels[ $slug ] ) ) {
+				$tier['label'] = $labels[ $slug ];
+			}
+
+			$tiers[] = $tier;
+		}
+
+		return $tiers;
+	}
+
+	/**
 	 * Resolved set for this request.
 	 */
 	private ?BreakpointSet $resolved = null;
@@ -170,10 +220,24 @@ final class Registry {
 	 * Spacery's built-in set.
 	 */
 	public function preset(): BreakpointSet {
-		$set = BreakpointSet::from_array( self::PRESET );
+		$set = BreakpointSet::from_array( $this->with_labels( self::PRESET ) );
 
 		if ( ! $set instanceof BreakpointSet ) {
-			// Unreachable: the constant is validated by the test suite.
+			/*
+			 * Deliberately fatal, and deliberately the only place in this class
+			 * that is.
+			 *
+			 * Everywhere else handles bad data totally, because everywhere else
+			 * the data is external: a theme.json someone else wrote, an option
+			 * someone hand-edited. Falling back there is right, because the site
+			 * is not at fault and should keep working.
+			 *
+			 * PRESET is internal. If it is invalid, Spacery has been edited
+			 * wrongly, and every fallback would be a guess at what the developer
+			 * meant while quietly serving the wrong breakpoints. A test asserts
+			 * this branch is unreachable; if it ever runs, the loud failure is
+			 * the useful behaviour.
+			 */
 			throw new \LogicException( 'Spacery: the built-in breakpoint preset is invalid.' );
 		}
 
@@ -199,7 +263,7 @@ final class Registry {
 			return null;
 		}
 
-		return BreakpointSet::from_array( $viewport );
+		return BreakpointSet::from_array( $this->with_labels( $viewport ) );
 	}
 
 	/**

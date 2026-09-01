@@ -21,6 +21,17 @@ defined( 'ABSPATH' ) || exit;
 final class BreakpointSet {
 
 	/**
+	 * Most tiers a set may hold.
+	 *
+	 * Not a technical limit. Every tier is a row in the inspector, a band in the
+	 * generated stylesheet, and a decision the author has to make for each
+	 * property. Beyond a dozen the feature stops being useful and starts being
+	 * a way to make a page slow, so a runaway theme.json or a fat-fingered
+	 * settings save is rejected rather than honoured.
+	 */
+	public const MAX_BREAKPOINTS = 12;
+
+	/**
 	 * Tiers, ordered widest boundary first.
 	 *
 	 * @var Breakpoint[]
@@ -48,7 +59,7 @@ final class BreakpointSet {
 	 * @return BreakpointSet|null
 	 */
 	public static function from_array( array $raw ): ?BreakpointSet {
-		if ( array() === $raw ) {
+		if ( array() === $raw || count( $raw ) > self::MAX_BREAKPOINTS ) {
 			return null;
 		}
 
@@ -58,11 +69,11 @@ final class BreakpointSet {
 			if ( is_string( $value ) ) {
 				// Shorthand form: a slug mapped straight to its boundary.
 				$slug  = (string) $key;
-				$label = self::humanize( $slug );
+				$label = self::machine_label( $slug );
 				$max   = $value;
 			} elseif ( is_array( $value ) ) {
 				$slug  = (string) ( $value['slug'] ?? $key );
-				$label = (string) ( $value['label'] ?? self::humanize( $slug ) );
+				$label = (string) ( $value['label'] ?? self::machine_label( $slug ) );
 				$max   = (string) ( $value['max'] ?? '' );
 			} else {
 				return null;
@@ -105,11 +116,22 @@ final class BreakpointSet {
 	}
 
 	/**
-	 * Turns a slug into a fallback label: `two-xl` becomes `Two Xl`.
+	 * Last-resort label for a tier whose author supplied none.
+	 *
+	 * Deliberately not translated, and not translatable. The input is a slug
+	 * some theme or site owner invented, so there is no source string for a
+	 * translator to have translated; running it through `__()` would only
+	 * produce a msgid nobody can ever supply. Title-casing it is a machine
+	 * fallback and is presented as one.
+	 *
+	 * Tiers Spacery itself defines carry real translated labels — see
+	 * `Registry::preset()` and its reading of `settings.viewport`. Themes that
+	 * care about wording should pass an explicit `label`, which is passed
+	 * through untouched.
 	 *
 	 * @param string $slug Machine name.
 	 */
-	private static function humanize( string $slug ): string {
+	private static function machine_label( string $slug ): string {
 		return ucwords( str_replace( '-', ' ', $slug ) );
 	}
 
@@ -191,6 +213,41 @@ final class BreakpointSet {
 		}
 
 		return $queries;
+	}
+
+	/**
+	 * Expands authored values into an effective value for every band.
+	 *
+	 * Bands are disjoint (see {@see BreakpointSet::media_queries()}), so a value
+	 * authored at one tier would otherwise stop applying at the next one down.
+	 * Authors think in a cascade: setting `laptop` means "this and everything
+	 * narrower". This walks widest to narrowest carrying the last authored value
+	 * forward, which is the desktop-first resolution `responsive-state`'s
+	 * `pick( …, { fallbackDirection: 'down' } )` performs in the editor. The two
+	 * must agree, or the preview lies about the frontend.
+	 *
+	 * Slugs that are not tiers in this set are ignored rather than rejected: an
+	 * old attribute referring to a tier the site has since renamed should lose
+	 * that value, not break the block.
+	 *
+	 * @param array<string, mixed> $authored Values keyed by tier slug.
+	 * @return array<string, mixed> Effective value per tier, widest first.
+	 */
+	public function materialize( array $authored ): array {
+		$effective = array();
+		$carried   = null;
+
+		foreach ( $this->breakpoints as $breakpoint ) {
+			if ( array_key_exists( $breakpoint->slug, $authored ) ) {
+				$carried = $authored[ $breakpoint->slug ];
+			}
+
+			if ( null !== $carried ) {
+				$effective[ $breakpoint->slug ] = $carried;
+			}
+		}
+
+		return $effective;
 	}
 
 	/**

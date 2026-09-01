@@ -341,4 +341,103 @@ final class RegistryTest extends TestCase {
 		$this->assertSame( '782px', $preset->get( 'tablet' )?->max, "core's tablet value" );
 		$this->assertSame( '480px', $preset->get( 'mobile' )?->max, "core's mobile value" );
 	}
+
+	// -- Labels ------------------------------------------------------------
+
+	/**
+	 * Tiers Spacery names itself carry translated labels.
+	 */
+	public function test_preset_labels_are_translatable_strings(): void {
+		$preset = ( new Registry() )->preset();
+
+		$this->assertSame( 'Desktop', $preset->get( 'desktop' )?->label );
+		$this->assertSame( 'Laptop', $preset->get( 'laptop' )?->label );
+		$this->assertSame( 'Tablet', $preset->get( 'tablet' )?->label );
+		$this->assertSame( 'Mobile', $preset->get( 'mobile' )?->label );
+	}
+
+	/**
+	 * Core's viewport slugs are Spacery's own vocabulary too, so they are
+	 * labelled rather than machine-cased.
+	 */
+	public function test_viewport_derived_tiers_are_labelled(): void {
+		$this->given_theme_settings(
+			array(
+				'viewport' => array(
+					'mobile' => '480px',
+					'tablet' => '782px',
+				),
+			)
+		);
+
+		$set = ( new Registry() )->resolve();
+
+		$this->assertSame( 'Tablet', $set->get( 'tablet' )?->label );
+		$this->assertSame( 'Mobile', $set->get( 'mobile' )?->label );
+	}
+
+	/**
+	 * A theme's invented slug has no translatable source string, so it gets the
+	 * machine fallback and is not pretended to be translated.
+	 */
+	public function test_theme_invented_slugs_get_the_machine_fallback(): void {
+		$this->given_theme_settings(
+			array(
+				'custom' => array(
+					'spacery' => array(
+						'breakpoints' => array( 'grand-ecran' => '1400px' ),
+					),
+				),
+			)
+		);
+
+		$this->assertSame(
+			'Grand Ecran',
+			( new Registry() )->resolve()->get( 'grand-ecran' )?->label
+		);
+	}
+
+	public function test_theme_supplied_labels_pass_through_untouched(): void {
+		$this->given_theme_settings(
+			array(
+				'custom' => array(
+					'spacery' => array(
+						'breakpoints' => array(
+							array(
+								'slug'  => 'wide',
+								'label' => 'Grand écran',
+								'max'   => '1400px',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertSame(
+			'Grand écran',
+			( new Registry() )->resolve()->get( 'wide' )?->label
+		);
+	}
+
+	// -- Internal invariant ------------------------------------------------
+
+	/**
+	 * Guards the one deliberately fatal branch in the class.
+	 *
+	 * Registry::preset() throws if PRESET is invalid, unlike every other path,
+	 * which falls back. The distinction is intentional: external data (a
+	 * theme.json, an option) must never break a site, while an invalid internal
+	 * constant is a programming error that should be loud. This test is what
+	 * makes the throw unreachable in practice.
+	 */
+	public function test_the_built_in_preset_is_valid(): void {
+		$preset = ( new Registry() )->preset();
+
+		$this->assertSame( array( 'desktop', 'laptop', 'tablet', 'mobile' ), $preset->slugs() );
+		$this->assertLessThanOrEqual(
+			\Spacery\Breakpoints\BreakpointSet::MAX_BREAKPOINTS,
+			$preset->count()
+		);
+	}
 }

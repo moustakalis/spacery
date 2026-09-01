@@ -28,6 +28,18 @@ if ( is_readable( SPACERY_CORE_SOURCE ) ) {
 	require_once SPACERY_CORE_SOURCE;
 }
 
+if ( ! function_exists( '__' ) ) {
+	/**
+	 * Stub of __(), for the Spacery side of the comparison.
+	 *
+	 * @param string $text   Source string.
+	 * @param string $domain Text domain.
+	 */
+	function __( string $text, string $domain = 'default' ): string {
+		return $text;
+	}
+}
+
 require_once __DIR__ . '/../../includes/Autoloader.php';
 
 Spacery\Autoloader::register();
