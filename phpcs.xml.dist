@@ -4,7 +4,7 @@
 
 	<file>spacery.php</file>
 	<file>includes</file>
-	<file>tests/php</file>
+	<file>tests</file>
 
 	<arg name="extensions" value="php"/>
 	<arg name="basepath" value="."/>
@@ -37,11 +37,13 @@
 			</property>
 		</properties>
 		<!--
-			The test bootstrap deliberately defines WordPress's own functions
-			(get_option, wp_get_global_settings, apply_filters) so the suite runs
-			with no WordPress install. Prefixing them would defeat the purpose.
+			Tests stand in for WordPress: the bootstrap defines core's own
+			functions (get_option, wp_get_global_settings, apply_filters) so the
+			suite runs with no WordPress install, and the tests fire core's own
+			hooks (update_option_*, switch_theme) to simulate a real request.
+			Prefixing either would defeat the purpose. Nothing under tests/ ships.
 		-->
-		<exclude-pattern>tests/php/bootstrap\.php$</exclude-pattern>
+		<exclude-pattern>tests/</exclude-pattern>
 	</rule>
 
 	<!--
@@ -50,7 +52,7 @@
 		the function it stands in for.
 	-->
 	<rule ref="Generic.CodeAnalysis.UnusedFunctionParameter">
-		<exclude-pattern>tests/php/bootstrap\.php$</exclude-pattern>
+		<exclude-pattern>tests/</exclude-pattern>
 	</rule>
 
 	<!-- Match the minimum supported environment declared in the plugin header. -->
@@ -61,4 +63,6 @@
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>*/build/*</exclude-pattern>
+	<!-- Core source fetched for contract tests; not ours to lint. -->
+	<exclude-pattern>tests/contract/core/*</exclude-pattern>
 </ruleset>

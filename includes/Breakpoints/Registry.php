@@ -62,10 +62,41 @@ final class Registry {
 	private ?array $settings = null;
 
 	/**
+	 * Registers the hooks that keep the memo honest.
+	 *
+	 * Resolution is memoized per request, which is safe only while nothing
+	 * changes underneath it. Saving the settings screen does exactly that, so
+	 * both options invalidate the memo on write. Without this, a request that
+	 * resolves, saves and then resolves again would serve the pre-save answer.
+	 */
+	public function register(): void {
+		foreach ( array( self::OPTION_SOURCE, self::OPTION_CUSTOM ) as $option ) {
+			add_action( "update_option_{$option}", array( $this, 'flush' ) );
+			add_action( "add_option_{$option}", array( $this, 'flush' ) );
+			add_action( "delete_option_{$option}", array( $this, 'flush' ) );
+		}
+
+		// A theme switch replaces theme.json, and with it the theme source.
+		add_action( 'switch_theme', array( $this, 'flush' ) );
+	}
+
+	/**
+	 * Discards the memoized set and settings.
+	 *
+	 * Cheap: the next resolve() rebuilds from options and theme.json, both of
+	 * which core caches itself.
+	 */
+	public function flush(): void {
+		$this->resolved = null;
+		$this->settings = null;
+	}
+
+	/**
 	 * The active set.
 	 *
-	 * Memoized per request. Every path is total: an invalid theme or option
-	 * falls back to the preset rather than failing.
+	 * Memoized per request, invalidated by {@see Registry::flush()}. Every path
+	 * is total: an invalid theme or option falls back to the preset rather than
+	 * failing.
 	 */
 	public function resolve(): BreakpointSet {
 		if ( $this->resolved instanceof BreakpointSet ) {

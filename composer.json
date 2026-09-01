@@ -37,6 +37,8 @@
 		"lint": "phpcs",
 		"lint:fix": "phpcbf",
 		"analyse": "phpstan analyse --memory-limit=1G",
-		"test": "phpunit"
+		"fetch-core": "bin/fetch-core.sh",
+		"test": "phpunit",
+		"test:contract": "phpunit -c phpunit-contract.xml.dist"
 	}
 }

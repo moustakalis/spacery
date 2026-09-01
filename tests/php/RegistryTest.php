@@ -267,6 +267,71 @@ final class RegistryTest extends TestCase {
 		$this->assertSame( $first, $registry->resolve() );
 	}
 
+	public function test_flush_discards_the_memo(): void {
+		$registry = new Registry();
+
+		$this->assertSame(
+			array( 'desktop', 'laptop', 'tablet', 'mobile' ),
+			$registry->resolve()->slugs()
+		);
+
+		$this->given_option( Registry::OPTION_SOURCE, Registry::SOURCE_CUSTOM );
+		$this->given_option( Registry::OPTION_CUSTOM, array( 'only' => '900px' ) );
+		$registry->flush();
+
+		$this->assertSame( array( 'only' ), $registry->resolve()->slugs() );
+	}
+
+	public function test_flush_discards_memoized_theme_settings(): void {
+		$registry = new Registry();
+		$registry->resolve();
+
+		$this->given_theme_settings(
+			array( 'viewport' => array( 'mobile' => '400px' ) )
+		);
+		$registry->flush();
+
+		$this->assertSame( array( 'mobile' ), $registry->resolve()->slugs() );
+	}
+
+	/**
+	 * Saving the settings screen must invalidate the memo.
+	 *
+	 * Without this a single request that resolves, saves and resolves again
+	 * would serve the pre-save answer -- which is exactly what the settings
+	 * screen does in M6.
+	 */
+	public function test_option_writes_invalidate_the_memo(): void {
+		$registry = new Registry();
+		$registry->register();
+
+		$this->assertSame(
+			array( 'desktop', 'laptop', 'tablet', 'mobile' ),
+			$registry->resolve()->slugs()
+		);
+
+		$this->given_option( Registry::OPTION_SOURCE, Registry::SOURCE_CUSTOM );
+		$this->given_option( Registry::OPTION_CUSTOM, array( 'only' => '900px' ) );
+
+		do_action( 'update_option_' . Registry::OPTION_SOURCE );
+
+		$this->assertSame( array( 'only' ), $registry->resolve()->slugs() );
+	}
+
+	public function test_switching_theme_invalidates_the_memo(): void {
+		$registry = new Registry();
+		$registry->register();
+		$registry->resolve();
+
+		$this->given_theme_settings(
+			array( 'viewport' => array( 'tablet' => '700px' ) )
+		);
+
+		do_action( 'switch_theme' );
+
+		$this->assertSame( array( 'tablet' ), $registry->resolve()->slugs() );
+	}
+
 	// -- Preset ------------------------------------------------------------
 
 	public function test_preset_is_valid_and_anchored_on_core(): void {

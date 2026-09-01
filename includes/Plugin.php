@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace Spacery;
 
+use Spacery\Breakpoints\Registry;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -30,6 +32,11 @@ final class Plugin {
 	 * Whether boot() has already run.
 	 */
 	private bool $booted = false;
+
+	/**
+	 * The breakpoint registry.
+	 */
+	private ?Registry $breakpoints = null;
 
 	/**
 	 * Private constructor. Use instance().
@@ -58,6 +65,8 @@ final class Plugin {
 
 		$this->booted = true;
 
+		$this->breakpoints()->register();
+
 		/**
 		 * Fires once Spacery has finished booting.
 		 *
@@ -73,5 +82,19 @@ final class Plugin {
 	 */
 	public function has_booted(): bool {
 		return $this->booted;
+	}
+
+	/**
+	 * The breakpoint registry.
+	 *
+	 * One instance per request, so its memo is shared and its invalidation
+	 * hooks apply to whatever anything else is holding.
+	 */
+	public function breakpoints(): Registry {
+		if ( ! $this->breakpoints instanceof Registry ) {
+			$this->breakpoints = new Registry();
+		}
+
+		return $this->breakpoints;
 	}
 }

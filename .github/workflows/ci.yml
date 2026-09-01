@@ -42,6 +42,15 @@ jobs:
       - name: PHPUnit
         run: composer run test
 
+      # Compares Spacery's generated media queries and boundary validation
+      # against core's real WP_Theme_JSON, so a change in core fails here
+      # rather than as a subtly wrong layout on somebody's site.
+      - name: Fetch core source for contract tests
+        run: composer run fetch-core
+
+      - name: PHPUnit (core contract)
+        run: composer run test:contract
+
   js:
     name: "JS: lint, typecheck & build"
     runs-on: ubuntu-latest

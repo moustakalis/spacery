@@ -7,6 +7,9 @@ build/
 dist/
 *.zip
 
+# Fetched for contract tests; see bin/fetch-core.sh
+tests/contract/core/
+
 # Tooling caches
 .phpunit.result.cache
 .phpunit.cache/

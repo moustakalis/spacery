@@ -80,6 +80,28 @@ function add_filter( string $hook, callable $callback ): void {
 }
 
 /**
+ * Stub of add_action(). Actions and filters share one registry here.
+ *
+ * @param string   $hook     Hook name.
+ * @param callable $callback Callback.
+ */
+function add_action( string $hook, callable $callback ): void {
+	$GLOBALS['spacery_test_filters'][ $hook ][] = $callback;
+}
+
+/**
+ * Stub of do_action().
+ *
+ * @param string $hook Hook name.
+ * @param mixed  ...$args Arguments.
+ */
+function do_action( string $hook, ...$args ): void {
+	foreach ( $GLOBALS['spacery_test_filters'][ $hook ] ?? array() as $callback ) {
+		$callback( ...$args );
+	}
+}
+
+/**
  * Stub of apply_filters().
  *
  * @param string $hook  Hook name.
