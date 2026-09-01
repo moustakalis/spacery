@@ -318,12 +318,10 @@ follows that precedent: `!important` on media-query overrides only, never on the
 rule. Ugly, but it is what the platform does, and diverging would be worse.
 
 **Double declaration.** A block can still carry both a core `@tablet` value and a Spacery
-`tablet` value for the same property. This is no longer a cascade puzzle — later wins,
-and Spacery's stylesheet is enqueued after global styles — but emitting both is still
-confusing to anyone reading the CSS. The inspector should show a property already managed
-by core and offer to take it over, migrating core's `@mobile`/`@tablet` values into the
-matching Spacery tiers and clearing the core keys. With aligned directions that migration
-is now a straight key rename rather than a range conversion.
+`tablet` value for the same property. This is no longer a cascade puzzle — later wins, and
+Spacery's stylesheet is enqueued after global styles — but emitting both is confusing to
+anyone reading the CSS. It is resolved in the inspector rather than the stylesheet: see the
+takeover flow in §3.5.
 
 *Spike for 1.1 (do not block 1.0):* rewrite the wrapper's inline `style` with
 `WP_HTML_Tag_Processor` to `padding-top: var(--spy-pt, 3rem)` and set `--spy-pt` per tier
@@ -382,25 +380,58 @@ specification in `docs/responsive-state-request.md`.
 
 ### 3.5 Editor UX
 
-The hard design problem for an N-breakpoint toolkit: how do you show six sets of spacing
-controls without drowning the inspector? v1's answer — six stacked `PanelBody`s — does not
-scale past its own six.
+**Spacery has no viewport switcher of its own.** An earlier draft proposed a segmented
+`Default · Desktop · Laptop · Tablet · Mobile` control inside a Spacery panel. Reading how
+core 7.1 actually works made that a mistake: responsive editing there is a *mode*, not a
+per-control toggle.
 
-**A breakpoint switcher, not N panels.**
+The user enables "Responsive styles" from the View menu, then picks Desktop/Tablet/Mobile
+**or drags the canvas edge**. From that point every inspector control edits the selected
+viewport's values, with a badge at the top of the Settings panel naming it. Under the hood
+([PR #75121](https://github.com/WordPress/gutenberg/pull/75121)) **canvas width in pixels
+is the single source of truth**; device type is derived from it, not the reverse.
 
-- One segmented control at the top of the Spacery panel: `Base · sm · md · lg · xl · 2xl`,
-  built from the registry so it reflects the theme's actual tiers.
-- Below it, a single set of spacing controls, visually identical to core's, editing the
-  **currently selected** breakpoint.
-- A dot on each tier that has a value. Inherited values shown greyed with their source
-  tier named ("inherited from `md`") — computed with `pick()`.
-- Per-tier reset and a clear-all action.
-- Selecting a tier drives the canvas preview, so you see what you are editing.
+A second switcher inside a Spacery panel would compete with that — the editor announcing
+"Tablet" while Spacery announced "Laptop". So Spacery follows core's editing viewport
+instead of declaring its own.
 
-This mirrors core's device switcher and every page builder on the market, so it needs no
-teaching.
+**This is a gift rather than a constraint.** Because canvas width drives everything and
+Spacery has more tiers than core has device presets, dragging the canvas to 900px selects
+Spacery's `laptop` tier with no new UI at all. Core's resizable canvas *is* the N-tier
+switcher, using a mechanism the user already knows.
 
----
+**Mechanism.** A `ResizeObserver` on the canvas iframe feeds a `responsive-state` store
+built from the registry's tiers; `useSyncExternalStore` subscribes React to it. Deliberately
+not `getCanvasWidth()` — that selector is private — and not `getDeviceType()`, which has
+only three values and cannot express five tiers.
+
+**The one piece of new UI is a label, not a control.** Core's badge and Spacery's tier will
+not always agree: at a 900px canvas core says "Desktop" (>782px) while Spacery says
+"Laptop" (≤1024px). Both are correct within their own set, and hiding the discrepancy would
+be worse than naming it. Spacery's panel header states the active Spacery tier and its
+boundary — "Laptop · ≤1024px" — so the user always knows which rule they are writing.
+
+**Spacery is absent at the default tier.** Core's ordinary spacing controls already *are*
+the default tier, so a Spacery panel there would duplicate them for no gain. At the default
+the panel collapses to a single hint — "Resize the canvas or switch device view to set
+responsive spacing" — and only becomes editable once a narrower tier is active. This keeps
+the inspector quiet for the majority of blocks that never need responsive spacing.
+
+**Inheritance runs downward** (D10). A value set at `tablet` applies at `mobile` until
+overridden, so when editing `mobile` the inherited value shows greyed with its source named
+("inherited from Tablet"). Per-tier reset and clear-all sit beside it.
+
+**Takeover (D11).** Where core already holds a responsive value for a property — a
+`style.@tablet.spacing.padding` — Spacery does not silently add a competing rule. The
+panel says WordPress is managing that property at this size and offers a one-click
+takeover: copy core's value into the matching Spacery tier, clear core's key, done. One
+system owns one property on one block, and the user chose which. Because D10 aligned the
+cascade directions, that migration is a key rename rather than a range conversion.
+
+**When responsive editing is disabled** (`responsiveEditingEnabled => false`), core shows no
+viewport UI at all. Spacery then owns responsive spacing outright and falls back to its own
+compact tier selector in the panel — the only case where the rejected switcher is the right
+answer, because there is nothing to compete with.
 
 ## 4. Tech stack
 
@@ -496,18 +527,23 @@ height and width.
 validation error. This is shippable as a standalone release if the toolkit slips.
 
 **M4 — Editor UX**
-`responsive-state` store wired to the canvas iframe via `useSyncExternalStore`, breakpoint
-switcher, inherited-value display, canvas preview sync.
-*Exit:* resizing the editor canvas updates the preview; the preview matches the frontend
-at every tier (verified by an E2E test that screenshots both).
+`responsive-state` store fed by a `ResizeObserver` on the canvas iframe and subscribed via
+`useSyncExternalStore`; active-tier label; inherited-value display; the fallback tier
+selector for when `responsiveEditingEnabled` is false.
+*Exit:* dragging the canvas to 900px puts Spacery on the `laptop` tier while core's badge
+still reads Desktop, and the panel says so unambiguously. The preview matches the frontend
+at every tier, verified by an E2E test that screenshots both.
 
 **M5 — Spacing extension**
 Attribute injection filter and inspector integration for **any block declaring
 `supports.spacing`** — core and third-party alike — gated by a `spacery_supported_blocks`
 deny-list filter. Panel collapsed by default so it never reads as clutter.
+Includes the D11 takeover flow: detect a core `@mobile`/`@tablet` value for a property,
+surface it, and migrate it into the matching Spacery tier on request.
 *Exit:* padding/margin per breakpoint working on Group, Columns and Cover, plus one
-third-party block that was never explicitly supported; deactivation leaves posts valid
-(E2E asserts this explicitly).
+third-party block that was never explicitly supported; a block carrying core responsive
+padding offers takeover and, once taken over, emits exactly one rule for that property;
+deactivation leaves posts valid (E2E asserts this explicitly).
 
 **M5a — `blockGap` spike (timeboxed, 2 days)**
 Investigate whether per-breakpoint `blockGap` is viable for 1.0. The hypothesis is that it
@@ -570,6 +606,8 @@ premise changes.
 | D8 | **Viewport breakpoints only for 1.0** | Container queries are technically superior and would dissolve the editor-preview problem by construction, but they need `container-type` on an ancestor you do not control in someone else's theme, and they double the UX surface. |
 | D9 | **First public release is `1.0.0`, not `2.0.0`** | v1 was never buildable and never reached WP.org, so there is no released 1.x to succeed. Numbering the first public release `2.0.0` would show users a version history that begins at 2.0 with nothing behind it, and spend a major version on a story only the author knows. The 2023 code is a reference, not a predecessor. GitHub carries `0.x` through M0–M4; `1.0.0` is the WP.org submission. |
 | D10 | **Desktop-first `max-width`, matching core** — not mobile-first `min-width` | Reverses v1's instinct and this plan's own earlier draft. The cascade-collision risk in §3.3a was self-inflicted: it existed only because the two systems ran opposite directions. Aligning also makes `settings.viewport` readable verbatim (no stepped conversion), keeps one mental model for users who will inevitably use both systems on one page, and makes migration cheap if core ever widens `settings.viewport` beyond two tiers. The cost is that "mobile-first" leaves the positioning — but breakpoint *values* are direction-agnostic, so that was a weaker differentiator than it read. The originating issue #67620 is itself desktop-first. |
+| D11 | **Spacery owns every tier in its own namespace; core's values are imported by explicit takeover** | Considered letting core keep tablet/mobile and adding only wider tiers, and considered writing into core's own `style.@tablet`. Both give a tidier steady state and both break under configurations Spacery must support — a custom breakpoint set that does not align with core's values, or `responsiveEditingEnabled => false`. Owning the data unconditionally is the only option stable across all of them. The duplication that creates is resolved in the inspector, not the stylesheet: see the takeover flow in §3.5. |
+| D12 | **No Spacery viewport switcher; follow core's editing viewport** | Core 7.1 makes responsive editing a mode driven by canvas width ([PR #75121](https://github.com/WordPress/gutenberg/pull/75121)), so a second switcher would compete with it. Following it means core's resizable canvas becomes Spacery's N-tier selector for free. The exception is `responsiveEditingEnabled => false`, where core shows no viewport UI and Spacery supplies its own. |
 
 ### Deferred to 1.1+
 
