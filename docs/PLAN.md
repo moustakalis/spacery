@@ -24,8 +24,8 @@ Three gaps remain open, and they define what Spacery is:
 **Gap 1 — Core gives you exactly two breakpoints, and they are not extensible.**
 `settings.viewport` accepts only `mobile` and `tablet`. It is top-level only (no
 per-block-type configuration), and the cascade is desktop-first: base styles are the
-desktop values and cascade down. A six-tier mobile-first design system — the thing every
-Tailwind/Bootstrap-adjacent theme actually uses — cannot be expressed.
+desktop values and cascade down. A design system with four or five tiers — laptop and
+wide-desktop as well as tablet and mobile — cannot be expressed at all.
 
 **Gap 2 — The core Spacer block's height is still not responsive.**
 `core/spacer` declares `height` and `width` as plain top-level string attributes, not
@@ -50,6 +50,9 @@ Two deliverables in one plugin:
 
 - **A. `spacery/spacer`** — a spacer block with per-breakpoint height and width. Narrow,
   obviously useful, and directly fills the gap core has left open for eight years.
+  Note that the originating complaint ([#67620](https://github.com/WordPress/gutenberg/issues/67620))
+  is itself desktop-first: *"when we set more than 100px height then that space is too
+  much for mobile devices."*
 - **B. Responsive spacing extension** — adds per-breakpoint padding, margin and block gap
   to any block declaring `supports.spacing`, via a namespaced attribute and server-side
   CSS. This is the part core cannot easily obsolete, because it is N-breakpoint by design.
@@ -114,10 +117,10 @@ design decision below.
 - Tailwind wired up but inert — `purge` pointed at a filename that does not exist, using
   v2 config keys under v3. The only real CSS in the project was three lines.
 
-**Worth keeping:**
-- The mobile-first `min-width` cascade instinct. Correct then, correct now, and the
-  opposite of core's desktop-first model — a genuine differentiator, not a quirk.
-- The Tailwind breakpoint values as *one preset among several*, not as a hard dependency.
+**Worth keeping:** honestly, very little. v1's one structural instinct — the mobile-first
+`min-width` cascade — has been **deliberately reversed** for v2; see D10. Its breakpoint
+values were Tailwind's, which is a coupling v2 does not want either. What survives is the
+problem statement, not the solution.
 
 ---
 
@@ -170,24 +173,70 @@ For `spacery/spacer`, the same structure is native to the block rather than inje
 A breakpoint is `{ slug, label, min }` where `min` is a CSS length. One PHP class owns
 resolution; JavaScript never computes its own.
 
-**Resolution order** (first source that yields a valid set wins):
+**One source at a time — the user chooses which.** An earlier draft of this plan had a
+priority cascade that could blend a theme's two breakpoints with Spacery's wider tiers.
+That was wrong: it produces a set nobody designed, mixing theme-chosen and plugin-chosen
+values in a way no one can reason about. Each source instead yields one internally
+coherent set, and a single stored option decides which is active.
 
-1. `theme.json` → `settings.custom.spacery.breakpoints` — a theme explicitly declaring an
-   N-tier set. Highest priority because it is the most specific intent.
-2. `theme.json` → `settings.viewport` (WP 7.1 core) — derive `base` / `tablet` / `mobile`
-   from the theme's own core breakpoints, so Spacery and core agree by default.
-3. Plugin settings screen — user-defined set, stored in one option.
-4. Built-in default preset — mobile-first, Tailwind-derived (`base 0, sm 640, md 768,
-   lg 1024, xl 1280, 2xl 1536`), matching `responsive-state`'s `tailwind` preset.
+| Source | Yields |
+|---|---|
+| `theme` | `settings.custom.spacery.breakpoints` if the theme declares it; otherwise core's own two boundaries from `settings.viewport`, used verbatim — `tablet` and `mobile`. Nothing added, nothing invented, nothing converted. |
+| `spacery` | The built-in preset (below). |
+| `custom` | A set the user defines on the settings screen. |
+
+**The built-in preset.** Desktop-first: the base styles are the default and each tier is a
+`max-width` override beneath it.
+
+| Tier | Boundary | |
+|---|---|---|
+| *(default)* | — | Applies at every width. Unnamed, exactly as in core. |
+| `desktop` | `≤ 1280px` | |
+| `laptop` | `≤ 1024px` | |
+| `tablet` | `≤ 782px` | **core's value and name** |
+| `mobile` | `≤ 480px` | **core's value and name** |
+
+Two properties make this the right default. It is **anchored on core** rather than on a
+CSS framework — the two tiers that overlap `settings.viewport` match it in both name and
+value, so switching a site from the `theme` source to `spacery` *adds* tiers without
+moving the boundaries it already had. And the names **say what they are**, so nothing has
+to be learned or translated.
+
+Explicitly rejected: Tailwind's `sm`/`md`/`lg`/`xl`/`2xl`. Those are ascending
+min-width names — `lg:` means *≥1024px* — so reusing them for descending max-width tiers
+would invert their meaning for every reader who knows them. v1 took both its values and
+its naming from Tailwind; v2 takes neither. Themes remain free to name their tiers
+anything they like through `settings.custom.spacery.breakpoints`.
+
+**Default when the option is unset:** `theme` if the theme declares either
+`settings.custom.spacery.breakpoints` or `settings.viewport`; `spacery` otherwise. Out of
+the box a site therefore agrees with core, which is the safe default given the cascade
+collision in §3.3a — and switching to Spacery's richer set becomes a deliberate act with a
+visible trade-off, rather than something that silently happens because a theme author set
+a core setting for core's benefit.
+
+**Reading the `theme` set from `settings.viewport`.** There is no derivation. Core's
+values are already `max-width` boundaries in Spacery's own model, so they are read
+verbatim: `mobile: 480px` is Spacery's `mobile` tier at `≤480px`. An earlier draft
+converted them into stepped `min-width` minimums (`480.02px`) to fit a mobile-first
+cascade; D10 removed that cascade and the whole conversion with it. Where the theme
+declares `settings.custom.spacery.breakpoints` instead, that set is used as-is — the theme
+has spoken to Spacery directly.
+
+For the generated media queries themselves, call
+`WP_Theme_JSON::get_viewport_media_queries()` where the tiers came from
+`settings.viewport`; it is `public static`, and reusing it means core's output and
+Spacery's cannot drift.
 
 Then, unconditionally: `apply_filters( 'spacery_breakpoints', $breakpoints )`. The filter
-runs **last** so developers always have the final word.
+runs **last** so developers always have the final word, whichever source was active.
 
-**Validation** (reject the set and fall through on failure): slugs unique and
-`[a-z0-9-]`, mins strictly ascending, first min is `0px`, units limited to
-`px`/`rem`/`em`. This mirrors core's own rule exactly — see Appendix A for the verified
-regex and conversion. Note that core requires a *unit* on every value, so the base tier is
-`0px`, not `0`.
+**Validation** (reject the set and fall back to the built-in preset on failure): slugs
+unique and `[a-z0-9-]`, boundaries strictly **descending**, every value a positive length
+with a unit of `px`/`rem`/`em`. This mirrors core's own rule exactly — see Appendix A for
+the verified regex and the ×16 conversion used for ordering comparisons. There is no
+`0px` base entry: the default tier is the absence of a media query, not a boundary, so it
+is never part of the set.
 
 **Exposure to JS:** the resolved set is passed into the editor through **our own
 namespaced editor setting**, never recomputed client-side. One source of truth means the
@@ -222,9 +271,12 @@ So: PHP reads `settings.viewport`, derives, and hands the finished set to the ed
    `wp_style_engine_get_stylesheet_from_css_rules()` + `wp_add_inline_style()` on a
    registered handle.
 
-**Ordering:** base rule first, then `min-width` media queries ascending. Because it is one
-generated stylesheet we control cascade order absolutely — no reliance on source order in
-post content.
+**Ordering:** base rule first (no media query — it is the default, exactly as in core),
+then `max-width` media queries in **descending** order so narrower tiers override wider
+ones. Because it is one generated stylesheet we control cascade order absolutely — no
+reliance on source order in post content. Queries use core's range syntax verbatim, e.g.
+`@media (width <= 782px)`, so a Spacery rule and a core `@tablet` rule are byte-identical
+in their conditions.
 
 **Specificity — the one genuinely awkward problem.** Core writes block support styles as
 *inline* `style=""` on the wrapper. An inline declaration beats any class selector, so a
@@ -248,41 +300,35 @@ only if profiling on a large post says it matters.
 
 ### 3.3a Coexisting with core's responsive styles
 
-This is the sharpest technical problem in the project, and it only became visible after
-reading core's source.
+This was the sharpest technical problem in the project. **D10 dissolved most of it.**
 
-**The two systems run opposite cascades.** Verified in
-`WP_Theme_JSON::get_viewport_media_queries()`:
+The original design ran a mobile-first `min-width` cascade against core's desktop-first
+`max-width` one. Two opposite cascades over the same properties meant overlapping rules
+whose winner depended on source order, plus a two-mental-models problem for anyone using
+both systems on one page. Aligning direction removes the conceptual clash entirely: a
+Spacery rule and a core `@tablet` rule are now ordinary rules in one cascade, with
+byte-identical media conditions.
 
-```
-@mobile   →  @media (width <= 480px)
-@tablet   →  @media (480px < width <= 782px)
-@desktop  →  @media (width > 782px)
-```
+What remains is the ordinary, well-understood part:
 
-Range syntax, `max-width` semantics, desktop-first: base styles are the desktop values and
-narrower viewports override them. Spacery is mobile-first `min-width`: base is the
-smallest and wider viewports override.
+**Specificity.** Core writes block support styles as *inline* `style=""` on the wrapper,
+and an inline declaration beats any class selector. Core solves this for its own
+responsive styles by marking non-layout per-instance declarations `!important`. Spacery
+follows that precedent: `!important` on media-query overrides only, never on the base
+rule. Ugly, but it is what the platform does, and diverging would be worse.
 
-Both are defensible. They are not composable. A Group block with core `@mobile` padding
-*and* a Spacery `sm` padding produces two rules targeting the same property at overlapping
-widths, and the winner is decided by source order — which is not a contract anyone should
-rely on.
+**Double declaration.** A block can still carry both a core `@tablet` value and a Spacery
+`tablet` value for the same property. This is no longer a cascade puzzle — later wins,
+and Spacery's stylesheet is enqueued after global styles — but emitting both is still
+confusing to anyone reading the CSS. The inspector should show a property already managed
+by core and offer to take it over, migrating core's `@mobile`/`@tablet` values into the
+matching Spacery tiers and clearing the core keys. With aligned directions that migration
+is now a straight key rename rather than a range conversion.
 
-**Resolution (to be validated in M2):**
-
-1. **Detect and defer.** When a block already carries core responsive styles for a given
-   property, Spacery's inspector shows that property as managed by core and offers to take
-   it over — an explicit migration, not a silent overlap. One system owns one property on
-   one block.
-2. **Order deterministically.** Spacery's stylesheet is enqueued after core's global
-   styles, so on genuine ties Spacery wins predictably rather than accidentally.
-3. **Never emit both.** Taking over a property migrates core's `@mobile`/`@tablet` values
-   into the equivalent Spacery tiers and clears the core keys, rather than layering on top.
-
-**Derivation must reuse core's own logic.** When breakpoints come from `settings.viewport`,
-call `WP_Theme_JSON::get_viewport_media_queries()` — it is `public static` — rather than
-re-deriving the strings. Core's exact output then cannot drift from ours.
+*Spike for 1.1 (do not block 1.0):* rewrite the wrapper's inline `style` with
+`WP_HTML_Tag_Processor` to `padding-top: var(--spy-pt, 3rem)` and set `--spy-pt` per tier
+from our class. That removes `!important` entirely — but it mutates core's output, so it
+needs its own risk assessment.
 
 ### 3.4 `responsive-state` integration
 
@@ -296,11 +342,20 @@ re-deriving the strings. Core's exact output then cannot drift from ours.
   `contentWindow` and the store reports the breakpoint of the *canvas*, not the browser
   window. v1 measured `window.innerWidth` with sidebars open and iframing — structurally
   incapable of being right.
-- `pick(values, fallback)` already implements mobile-first fallback resolution: exactly
-  the semantics we need to preview which value applies at a given tier.
+- `pick( values, fallback )` resolves a value by falling back to the nearest **smaller**
+  defined tier — mobile-first semantics. Under D10 Spacery needs the nearest **larger**
+  tier instead. This is the one place the package encodes a policy Spacery cannot reuse;
+  see the upstream note below. It is not a blocker — the fallback walk is a few lines
+  Spacery can do itself over `snapshot.current` and `store.breakpoints`.
 - `createResponsiveState()` takes an arbitrary `BreakpointMap`, so the registry's resolved
-  set feeds straight in. `presets.tailwind` becomes our default preset rather than a
-  hardcoded enum.
+  set feeds straight in. Spacery passes its own tiers and uses none of the bundled
+  presets — `tailwind`, `bootstrap`, `material` and `devices` are all ascending
+  min-width sets, and Spacery is deliberately not coupled to any framework's values.
+- **Direction.** The store builds `min-width` queries internally. Spacery's tiers are
+  `max-width` boundaries, but the two describe the same partition of the width axis, so
+  Spacery derives ascending minimums once when constructing the store and keeps its CSS
+  output on core's exact `max-width` values. The 0.02px step therefore survives in one
+  place only — editor-preview bookkeeping — and never reaches generated CSS.
 - Dependency-free, SSR-safe, 2 kB budget, typed. No footprint concerns in an editor bundle.
 
 ```ts
@@ -320,6 +375,10 @@ const snapshot = useSyncExternalStore(
 development so the two repos can evolve together. If the editor integration surfaces
 missing capability (e.g. a `container` mode driven by `ResizeObserver`), that belongs
 upstream in `responsive-state`, not vendored here.
+
+**Upstream request (optional, not blocking):** a `direction` option on `pick()` so it can
+fall back to the nearest larger tier instead of the nearest smaller one. Full
+specification in `docs/responsive-state-request.md`.
 
 ### 3.5 Editor UX
 
@@ -490,7 +549,7 @@ Assets, readme.txt, submission.
 | Editor performance with N tiers × many blocks | Medium | Only the selected block subscribes to the store; memoize generated rules by hash. |
 | WP.org review friction (trademark, slug, build sources) | Low | Plugin Check in CI from M0; ship unminified sources; confirm the slug early. |
 | `responsive-state` needs changes to fit | Medium | It is our package. Changes go upstream and ship as a version bump, not a fork. |
-| **Cascade collision with core's own responsive styles** | **High** | Core's `@mobile` / `@tablet` are *desktop-first max-width* queries; Spacery is *mobile-first min-width*. A block carrying both core `@mobile` padding and a Spacery `sm` padding emits two competing rules for one property, and which wins depends on source order. See §3.3a — this needs an explicit, documented resolution, not luck. |
+| Double-declared properties alongside core's responsive styles | Low | Was **High** while the two systems ran opposite cascades; D10 aligned them. What remains is inspector UX — showing that core already manages a property and offering to take it over. See §3.3a. |
 
 ---
 
@@ -502,7 +561,7 @@ premise changes.
 | # | Decision | Reasoning |
 |---|---|---|
 | D1 | **Scope: responsive spacing toolkit**, not a spacer block alone | Flexible Spacer Block already owns the spacer-only position with 4,000+ installs. N-breakpoint spacing on *any* block is a category nobody occupies, and it is not boltable onto an incumbent because it changes the data model. |
-| D2 | **Breakpoints: theme.json first, settings UI fallback, filter last word** | Respects the theme's design system, aligns with core's direction, still works on themes that declare nothing. |
+| D2 | **Breakpoints: one source at a time, chosen by the user** (`theme` / `spacery` / `custom`), filter last word | Blending a theme's two breakpoints with Spacery's wider tiers produces a set nobody designed. Two coherent sets the user picks between beats one mixed set. Defaults to `theme` when the theme declares breakpoints, so a site agrees with core until someone deliberately opts out. Revised from an earlier priority-cascade draft. |
 | D3 | **Publish to WP.org + GitHub** | Discovery matters for a free plugin, and Plugin Check in CI from M0 makes compliance a non-event rather than a submission scramble. |
 | D4 | **Minimum WordPress 7.1, PHP 8.2** | `settings.viewport`, the always-iframed editor and apiVersion 3 with zero compat shims. The excluded install base shrinks every week. |
 | D5 | **`blockGap`: timeboxed spike in M5a, ship if clean** | Plausibly easier than padding/margin (custom property, not inline declaration), but gated behind layout supports. Two days of evidence beats a guess in either direction. |
@@ -510,6 +569,7 @@ premise changes.
 | D7 | **Free-only; clean internal API, no pro scaffolding** | Registry / Generator / Collector are already separate classes, which is what a future pro add-on would hook into. A `pro/` split designed before the first user shapes the codebase around unforecastable revenue. |
 | D8 | **Viewport breakpoints only for 1.0** | Container queries are technically superior and would dissolve the editor-preview problem by construction, but they need `container-type` on an ancestor you do not control in someone else's theme, and they double the UX surface. |
 | D9 | **First public release is `1.0.0`, not `2.0.0`** | v1 was never buildable and never reached WP.org, so there is no released 1.x to succeed. Numbering the first public release `2.0.0` would show users a version history that begins at 2.0 with nothing behind it, and spend a major version on a story only the author knows. The 2023 code is a reference, not a predecessor. GitHub carries `0.x` through M0–M4; `1.0.0` is the WP.org submission. |
+| D10 | **Desktop-first `max-width`, matching core** — not mobile-first `min-width` | Reverses v1's instinct and this plan's own earlier draft. The cascade-collision risk in §3.3a was self-inflicted: it existed only because the two systems ran opposite directions. Aligning also makes `settings.viewport` readable verbatim (no stepped conversion), keeps one mental model for users who will inevitably use both systems on one page, and makes migration cheap if core ever widens `settings.viewport` beyond two tiers. The cost is that "mobile-first" leaves the positioning — but breakpoint *values* are direction-agnostic, so that was a weaker differentiator than it read. The originating issue #67620 is itself desktop-first. |
 
 ### Deferred to 1.1+
 

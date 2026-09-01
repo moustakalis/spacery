@@ -16,8 +16,11 @@ Spacery covers what it leaves open:
 
 - **N breakpoints, not two.** Core's `settings.viewport` accepts exactly `mobile` and
   `tablet`, global-only. A design system with five tiers cannot be expressed.
-- **Mobile-first.** Core cascades desktop-down with `max-width` queries. Spacery cascades
-  mobile-up with `min-width`, matching how most design systems are written.
+- **Breakpoints from your theme.** Spacery reads `settings.viewport` or a theme's own
+  `settings.custom.spacery.breakpoints`, so the editor offers the breakpoints your CSS
+  already uses.
+- **Same direction as core.** Desktop-first `max-width` tiers, matching WordPress exactly,
+  so the two systems never disagree about what a breakpoint means.
 - **A responsive spacer.** `core/spacer` stores `height` as a plain attribute rather than
   `style.dimensions.height`, so responsive styles do not reach it. It has been an open
   request since [2018](https://github.com/WordPress/gutenberg/issues/10081).

@@ -21,23 +21,27 @@ Spacery fills both gaps.
 * **Unlimited breakpoints.** Define as many tiers as your design system has. Spacery reads
   them from your theme where possible, so the editor offers the same breakpoints your CSS
   already uses.
-* **Mobile-first.** Values cascade upward from the smallest tier, the way most design
-  systems are written.
+* **Consistent with WordPress.** Spacery uses the same desktop-first model and the same
+  breakpoint values as core's own responsive styles, so the two never disagree.
 * **A responsive spacer block.** Height and width per breakpoint, which the core Spacer
   block still does not offer.
 * **Responsive spacing on any block.** Padding and margin per breakpoint on any block that
   supports spacing, including blocks from other plugins.
 
-= Breakpoints come from your theme =
+= You choose where breakpoints come from =
 
-Spacery looks for breakpoints in this order:
+Spacery uses one set of breakpoints at a time, and you pick which:
 
-1. `settings.custom.spacery.breakpoints` in your theme's `theme.json`
-2. `settings.viewport` in your theme's `theme.json` (the WordPress 7.1 setting)
-3. The breakpoints you set on Spacery's settings screen
-4. A sensible mobile-first default
+* **Your theme.** Its `settings.custom.spacery.breakpoints`, or the `settings.viewport`
+  values WordPress 7.1 already uses. This is the default whenever your theme defines
+  either, so Spacery and WordPress agree out of the box.
+* **Spacery's own.** Five tiers: Desktop, Laptop, Tablet, Mobile, plus the default that
+  applies everywhere. Tablet and Mobile use WordPress's own values, so choosing this adds
+  tiers without moving the ones you already had.
+* **Your own.** Define any set you like on the settings screen.
 
-Developers can override the result with the `spacery_breakpoints` filter.
+The sets are never blended. Developers can override the result entirely with the
+`spacery_breakpoints` filter.
 
 = Your content stays yours =
 
