@@ -1,0 +1,6 @@
+# pnpm 11 refuses packages published within its minimum release age as a
+# supply-chain guard. `responsive-state` is a first-party dependency published
+# from github.com/moustakalis/responsive-state, so it is excluded explicitly
+# rather than by weakening the guard globally.
+minimumReleaseAgeExclude:
+  - responsive-state@0.1.0

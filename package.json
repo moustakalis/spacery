@@ -1,0 +1,46 @@
+{
+	"name": "spacery",
+	"version": "0.1.0",
+	"description": "Responsive spacing for the block editor — unlimited, theme-defined breakpoints for any block.",
+	"author": "Nickos Moustakas (https://github.com/moustakalis)",
+	"license": "GPL-2.0-or-later",
+	"private": true,
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/moustakalis/spacery.git"
+	},
+	"engines": {
+		"node": ">=22"
+	},
+	"packageManager": "pnpm@11.25.0",
+	"scripts": {
+		"build": "wp-scripts build",
+		"start": "wp-scripts start",
+		"format": "wp-scripts format",
+		"lint:js": "wp-scripts lint-js",
+		"lint:css": "wp-scripts lint-style",
+		"lint:pkg-json": "wp-scripts lint-pkg-json",
+		"typecheck": "tsc --noEmit",
+		"test:unit": "vitest run",
+		"test:e2e": "wp-scripts test-playwright",
+		"env": "wp-env",
+		"env:start": "wp-env start",
+		"env:stop": "wp-env stop",
+		"plugin-zip": "wp-scripts plugin-zip"
+	},
+	"dependencies": {
+		"responsive-state": "^0.1.0"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.62.1",
+		"@types/react": "^19.2.18",
+		"@types/react-dom": "^19.2.5",
+		"@types/wordpress__block-editor": "^15.0.6",
+		"@wordpress/env": "^11.14.0",
+		"@wordpress/scripts": "^34.2.0",
+		"react": "^19.2.8",
+		"react-dom": "^19.2.8",
+		"typescript": "^6.0.3",
+		"vitest": "^4.1.11"
+	}
+}
