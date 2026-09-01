@@ -36,6 +36,21 @@
 				<element value="Spacery"/>
 			</property>
 		</properties>
+		<!--
+			The test bootstrap deliberately defines WordPress's own functions
+			(get_option, wp_get_global_settings, apply_filters) so the suite runs
+			with no WordPress install. Prefixing them would defeat the purpose.
+		-->
+		<exclude-pattern>tests/php/bootstrap\.php$</exclude-pattern>
+	</rule>
+
+	<!--
+		Those same stubs mirror core's signatures exactly, including parameters
+		Spacery never reads. Narrowing them would make the stub a worse model of
+		the function it stands in for.
+	-->
+	<rule ref="Generic.CodeAnalysis.UnusedFunctionParameter">
+		<exclude-pattern>tests/php/bootstrap\.php$</exclude-pattern>
 	</rule>
 
 	<!-- Match the minimum supported environment declared in the plugin header. -->

@@ -9,6 +9,7 @@ dist/
 
 # Tooling caches
 .phpunit.result.cache
+.phpunit.cache/
 .phpcs-cache
 .eslintcache
 

@@ -39,6 +39,9 @@ jobs:
       - name: PHPStan
         run: composer run analyse
 
+      - name: PHPUnit
+        run: composer run test
+
   js:
     name: "JS: lint, typecheck & build"
     runs-on: ubuntu-latest

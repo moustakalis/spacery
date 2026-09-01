@@ -419,9 +419,11 @@ the panel collapses to a single hint — "Resize the canvas or switch device vie
 responsive spacing" — and only becomes editable once a narrower tier is active. This keeps
 the inspector quiet for the majority of blocks that never need responsive spacing.
 
-**Inheritance runs downward** (D10). A value set at `tablet` applies at `mobile` until
-overridden, so when editing `mobile` the inherited value shows greyed with its source named
-("inherited from Tablet"). Per-tier reset and clear-all sit beside it.
+**Inheritance runs downward, in authoring only** (D10, D13). A value set at `tablet` reads
+as applying at `mobile` until overridden, and when editing `mobile` the inherited value
+shows greyed with its source named ("inherited from Tablet"). The emitted CSS is not a
+cascade — see D13 — but the author never has to think in bands. Per-tier reset and
+clear-all sit beside it.
 
 **Takeover (D11).** Where core already holds a responsive value for a property — a
 `style.@tablet.spacing.padding` — Spacery does not silently add a competing rule. The
@@ -610,6 +612,7 @@ premise changes.
 | D10 | **Desktop-first `max-width`, matching core** — not mobile-first `min-width` | Reverses v1's instinct and this plan's own earlier draft. The cascade-collision risk in §3.3a was self-inflicted: it existed only because the two systems ran opposite directions. Aligning also makes `settings.viewport` readable verbatim (no stepped conversion), keeps one mental model for users who will inevitably use both systems on one page, and makes migration cheap if core ever widens `settings.viewport` beyond two tiers. The cost is that "mobile-first" leaves the positioning — but breakpoint *values* are direction-agnostic, so that was a weaker differentiator than it read. The originating issue #67620 is itself desktop-first. |
 | D11 | **Spacery owns every tier in its own namespace; core's values are imported by explicit takeover** | Considered letting core keep tablet/mobile and adding only wider tiers, and considered writing into core's own `style.@tablet`. Both give a tidier steady state and both break under configurations Spacery must support — a custom breakpoint set that does not align with core's values, or `responsiveEditingEnabled => false`. Owning the data unconditionally is the only option stable across all of them. The duplication that creates is resolved in the inspector, not the stylesheet: see the takeover flow in §3.5. |
 | D12 | **No Spacery viewport switcher; follow core's editing viewport** | Core 7.1 makes responsive editing a mode driven by canvas width ([PR #75121](https://github.com/WordPress/gutenberg/pull/75121)), so a second switcher would compete with it. Following it means core's resizable canvas becomes Spacery's N-tier selector for free. The exception is `responsiveEditingEnabled => false`, where core shows no viewport UI and Spacery supplies its own. |
+| D13 | **Tiers are disjoint bands in CSS, a cascade in authoring** | Discovered while implementing: core's tiers are *not* a cascade. `WP_Theme_JSON::get_viewport_media_queries()` emits `@media (480px < width <= 782px)` for `@tablet`, so a core tablet value never applies at mobile widths. Plain descending `max-width` rules would have been pleasant to author but would partially overlap core's bands — a Spacery `tablet` value (≤782px) would silently override a core `@mobile` value at 400px, which is exactly the mess D10 removed. Spacery therefore emits bands identical in shape to core's, and materializes an authored value into every narrower band at generation time. `responsive-state`'s `pick( …, { fallbackDirection: 'down' } )` is that materialization function. Cost: one authored value can emit up to N declarations; content-addressed hashing limits the damage, and M2's 200-block fixture measures it. |
 
 ### Deferred to 1.1+
 
