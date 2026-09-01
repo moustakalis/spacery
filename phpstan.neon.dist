@@ -3,10 +3,4 @@ parameters:
 	paths:
 		- spacery.php
 		- includes
-	scanDirectories:
-		- includes
 	treatPhpDocTypesAsCertain: false
-	excludePaths:
-		- node_modules
-		- vendor
-		- build
