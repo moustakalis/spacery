@@ -23,7 +23,7 @@ allowBuilds:
   core-js-pure: false
 
 # Transient: pnpm 11 refuses to resolve packages published in the last 24h.
-# responsive-state@0.1.0 was published 2026-08-31T23:11Z, hours before this
-# lockfile was generated. Remove this key once the package is older than a day.
+# responsive-state@0.2.0 was published 2026-09-01T12:42Z, minutes before this
+# lockfile was generated. Remove this key after 2026-09-02T12:42Z.
 minimumReleaseAgeExclude:
-  - responsive-state@0.1.0
+  - responsive-state@0.2.0

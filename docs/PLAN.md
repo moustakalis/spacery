@@ -340,11 +340,10 @@ needs its own risk assessment.
   `contentWindow` and the store reports the breakpoint of the *canvas*, not the browser
   window. v1 measured `window.innerWidth` with sidebars open and iframing — structurally
   incapable of being right.
-- `pick( values, fallback )` resolves a value by falling back to the nearest **smaller**
-  defined tier — mobile-first semantics. Under D10 Spacery needs the nearest **larger**
-  tier instead. This is the one place the package encodes a policy Spacery cannot reuse;
-  see the upstream note below. It is not a blocker — the fallback walk is a few lines
-  Spacery can do itself over `snapshot.current` and `store.breakpoints`.
+- `pick( values, fallback, { fallbackDirection: 'down' } )` resolves a value by falling
+  back to the nearest **larger** defined tier — desktop-first, exactly what D10 needs.
+  Shipped upstream in **0.2.0**; `'up'` remains the default, so the change was additive.
+  Spacery pins `^0.2.0` and needs no local fallback logic.
 - `createResponsiveState()` takes an arbitrary `BreakpointMap`, so the registry's resolved
   set feeds straight in. Spacery passes its own tiers and uses none of the bundled
   presets — `tailwind`, `bootstrap`, `material` and `devices` are all ascending
@@ -374,9 +373,12 @@ development so the two repos can evolve together. If the editor integration surf
 missing capability (e.g. a `container` mode driven by `ResizeObserver`), that belongs
 upstream in `responsive-state`, not vendored here.
 
-**Upstream request (optional, not blocking):** a `direction` option on `pick()` so it can
-fall back to the nearest larger tier instead of the nearest smaller one. Full
-specification in `docs/responsive-state-request.md`.
+**Upstream request: delivered.** `pick()` gained a `fallbackDirection` option in
+`responsive-state@0.2.0`. The original specification is kept at
+`docs/responsive-state-request.md` for the record. Verified against the published tarball
+with Spacery's real tier values before pinning: tier selection is correct at every
+boundary, desktop-first inheritance flows to narrower tiers, exact matches beat inherited
+values, and mobile-first behaviour is unchanged when the option is omitted.
 
 ### 3.5 Editor UX
 

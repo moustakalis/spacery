@@ -36,7 +36,7 @@
 		"plugin-zip": "wp-scripts plugin-zip"
 	},
 	"dependencies": {
-		"responsive-state": "^0.1.0"
+		"responsive-state": "^0.2.0"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.62.1",

@@ -2,7 +2,9 @@
 
 **For:** `github.com/moustakalis/responsive-state`
 **From:** Spacery (`docs/PLAN.md` §3.4, D10)
-**Priority:** nice-to-have. Spacery is not blocked without it.
+**Status: DELIVERED in `responsive-state@0.2.0`**, published 2026-09-01. Kept for the
+record. The shipped option is named `fallbackDirection` rather than `direction`; values
+`'up'` (default, unchanged) and `'down'` are as specified below.
 
 ---
 

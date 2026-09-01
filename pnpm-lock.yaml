@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       responsive-state:
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.2.0
+        version: 0.2.0
     devDependencies:
       '@playwright/test':
         specifier: ^1.62.1
@@ -6853,8 +6853,8 @@ packages:
   responselike@2.0.1:
     resolution: {integrity: sha512-4gl03wn3hj1HP3yzgdI7d3lCkF95F21Pz4BPGvKHinyQzALR5CapwC8yIi0Rh58DEMQ/SguC03wFj2k0M/mHhw==}
 
-  responsive-state@0.1.0:
-    resolution: {integrity: sha512-PVZcALP6+5wLyuKBBYng1RLFLkn9oqv6Krtps8RJ1GyEygTCjCobdYPWl0R7TsFS3Y/TEIVvHd/S2nvqKpdhlQ==}
+  responsive-state@0.2.0:
+    resolution: {integrity: sha512-4YLRdIXUjXsDNFDQEMVTlYGofEClLUtJ1SlM/NgJSR9rHwsAIzSZ37uPqWq/O9a1wRTUITjOLrhNDZ8wKwOdyg==}
     engines: {node: '>=18'}
 
   restore-cursor@3.1.0:
@@ -16283,7 +16283,7 @@ snapshots:
     dependencies:
       lowercase-keys: 2.0.0
 
-  responsive-state@0.1.0: {}
+  responsive-state@0.2.0: {}
 
   restore-cursor@3.1.0:
     dependencies:
