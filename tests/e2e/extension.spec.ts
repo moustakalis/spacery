@@ -260,7 +260,9 @@ function styleSheets(html: string): Array<{ id: string; css: string }> {
 
 		sheets.push({
 			id: match[1]!,
-			css: match[2]!.replace(/\/\*#\s*sourceURL=[\s\S]*?\*\//g, '').trim(),
+			css: match[2]!
+				.replace(/\/\*#\s*sourceURL=[\s\S]*?\*\//g, '')
+				.trim(),
 		});
 	}
 }
