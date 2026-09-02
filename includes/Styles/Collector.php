@@ -21,8 +21,37 @@ defined( 'ABSPATH' ) || exit;
  * once is both smaller and easier to read in devtools.
  *
  * Contrast v1, which wrote a `<style>` element into every block's saved markup.
+ *
+ * Collected rules are also pushed into a named Style Engine store. Core's
+ * `wp_enqueue_stored_styles()` iterates every store — "any other stores
+ * registered by themes or otherwise" — and registers, inlines and enqueues each
+ * one. Spacery therefore never decides *where* its CSS goes; core does, and gets
+ * it right for both theme types. See the note on {@see Collector::CONTEXT}.
  */
 final class Collector {
+
+	/**
+	 * Style Engine store name. Core prints this as `wp-style-engine-spacery`.
+	 *
+	 * Using the store rather than printing directly is what buys correct
+	 * placement:
+	 *
+	 * - **Block themes** render the whole template into a variable *before*
+	 *   `wp_head()` (see `template-canvas.php`: "This needs to run before <head>
+	 *   so that blocks can add scripts and styles in wp_head()"). By the time
+	 *   `wp_enqueue_stored_styles()` runs on `wp_enqueue_scripts`, every block
+	 *   has rendered, so the CSS lands in the head.
+	 * - **Classic themes** render during `the_content`, after the head is gone,
+	 *   so core reads the store on `wp_footer`. Since WordPress 6.9,
+	 *   `wp_hoist_late_printed_styles()` then output-buffers the template and
+	 *   moves footer-printed styles into the head anyway.
+	 *
+	 * The second half only works for styles left in the footer *queue*: the
+	 * hoist captures `wp_styles()->do_footer_items()`. Printing directly with
+	 * `wp_print_styles()` marks the handle done before the capture runs, which
+	 * strands the CSS in the footer — precisely the mistake this replaced.
+	 */
+	private const CONTEXT = 'spacery';
 
 	/**
 	 * Rules by class name.
@@ -42,6 +71,18 @@ final class Collector {
 		}
 
 		$this->rules[ $styles->class_name ] = $styles->rules;
+
+		/*
+		 * Pushing to the store as each block renders, rather than flushing on a
+		 * hook, means the rules are already there whenever core reads them --
+		 * `wp_enqueue_scripts` for block themes, `wp_footer` for classic. The
+		 * return value is the compiled CSS, which is discarded: core compiles
+		 * from the store itself.
+		 */
+		wp_style_engine_get_stylesheet_from_css_rules(
+			$styles->rules,
+			array( 'context' => self::CONTEXT )
+		);
 	}
 
 	/**
@@ -61,10 +102,12 @@ final class Collector {
 	/**
 	 * Compiles everything collected into one stylesheet.
 	 *
+	 * Not used to print anything — core does that from the store. This exists so
+	 * tests can assert on the exact CSS, and so the shape is inspectable without
+	 * a full WordPress request.
+	 *
 	 * Rules are emitted in insertion order, and within a block widest band
-	 * first, so narrower bands win on equal specificity. Because this is a
-	 * single generated stylesheet, that ordering is guaranteed rather than
-	 * dependent on where blocks happen to sit in the content.
+	 * first, so narrower bands win on equal specificity.
 	 */
 	public function to_css(): string {
 		if ( $this->is_empty() ) {

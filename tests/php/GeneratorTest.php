@@ -276,4 +276,58 @@ final class GeneratorTest extends TestCase {
 			$css
 		);
 	}
+
+	// -- Placement ---------------------------------------------------------
+
+	/**
+	 * Rules must reach the Style Engine store, because that is what decides
+	 * where the CSS ends up.
+	 *
+	 * Core's wp_enqueue_stored_styles() iterates every store and enqueues each
+	 * one, at wp_enqueue_scripts for block themes and wp_footer for classic.
+	 * Spacery therefore never chooses placement itself. An earlier version
+	 * called wp_print_styles() directly on wp_footer, which printed immediately
+	 * and marked the handle done -- so WordPress 6.9's
+	 * wp_hoist_late_printed_styles() could not capture it, and the CSS was
+	 * stranded in the footer on classic themes.
+	 */
+	public function test_rules_land_in_the_style_engine_store(): void {
+		\WP_Style_Engine_CSS_Rules_Store::remove_all_stores();
+
+		$collector = new Collector();
+		$collector->add(
+			$this->generator->generate(
+				array( 'mobile' => array( 'spacing' => array( 'padding' => array( 'top' => '1rem' ) ) ) )
+			)
+		);
+
+		$this->assertArrayHasKey(
+			'spacery',
+			\WP_Style_Engine_CSS_Rules_Store::get_stores(),
+			'core discovers third-party stores by name'
+		);
+
+		$css = wp_style_engine_get_stylesheet_from_context( 'spacery' );
+
+		$this->assertStringContainsString( '@media (width <= 480px)', $css );
+		$this->assertStringContainsString( 'padding-top:1rem !important', $css );
+	}
+
+	/**
+	 * The store merges identical rules, so repeats cost nothing.
+	 */
+	public function test_repeated_recipes_do_not_duplicate_stored_rules(): void {
+		\WP_Style_Engine_CSS_Rules_Store::remove_all_stores();
+
+		$recipe    = array( 'mobile' => array( 'spacing' => array( 'padding' => array( 'top' => '1rem' ) ) ) );
+		$collector = new Collector();
+
+		for ( $i = 0; $i < 50; $i++ ) {
+			$collector->add( $this->generator->generate( $recipe ) );
+		}
+
+		$css = wp_style_engine_get_stylesheet_from_context( 'spacery' );
+
+		$this->assertSame( 1, substr_count( $css, 'padding-top' ), '50 blocks, one declaration' );
+	}
 }

@@ -267,9 +267,8 @@ So: PHP reads `settings.viewport`, derives, and hands the finished set to the ed
 3. For each breakpoint, `wp_style_engine_get_styles()` → declarations.
 4. Add the class to the block's wrapper via `WP_HTML_Tag_Processor` (append to `class`,
    never rebuild the tag).
-5. Accumulate rules in a collector; flush once via
-   `wp_style_engine_get_stylesheet_from_css_rules()` + `wp_add_inline_style()` on a
-   registered handle.
+5. Push the rules into a **named Style Engine store** (`context => 'spacery'`).
+   Spacery does not decide where the CSS goes; core does. See D14.
 
 **Ordering:** base rule first (no media query — it is the default, exactly as in core),
 then `max-width` media queries in **descending** order so narrower tiers override wider
@@ -289,6 +288,22 @@ it is what core does, and the alternative is worse.
 `WP_HTML_Tag_Processor` to `padding-top: var(--spy-pt, 3rem)` and set `--spy-pt` per
 breakpoint from our class. That removes `!important` entirely and is a strictly better
 cascade story — but it means mutating core's output, which needs its own risk assessment.
+
+**Placement is core's job (D14).** `wp_enqueue_stored_styles()` ends by iterating every
+Style Engine store — "any other stores registered by themes or otherwise" — registering,
+inlining and enqueuing each one. Filling a store instead of printing means core places
+Spacery's CSS correctly for both theme types, without Spacery re-deriving the rules:
+
+| Theme | Why the CSS ends up in the head |
+|---|---|
+| Block | `template-canvas.php` renders the whole template into a variable *before* `wp_head()` — its own comment reads "This needs to run before `<head>` so that blocks can add scripts and styles in `wp_head()`." Every block has rendered by the time core reads the store on `wp_enqueue_scripts`. |
+| Classic | Content renders during `the_content`, after the head is gone, so core reads the store on `wp_footer`. Since WordPress 6.9, `wp_hoist_late_printed_styles()` output-buffers the template and lifts footer-printed styles into the head. |
+
+The classic half works only for styles left in the footer **queue**, because the hoist
+captures `wp_styles()->do_footer_items()`. Printing directly with `wp_print_styles()`
+marks the handle done before the capture runs and strands the CSS in the footer. M2's
+first implementation did exactly that, and the investigation into "should this be in the
+head?" is what found it.
 
 **Editor — same rules, injected into the iframe.**
 Since 7.1 the post editor is *always* iframed regardless of block API version, so styles
@@ -613,6 +628,7 @@ premise changes.
 | D11 | **Spacery owns every tier in its own namespace; core's values are imported by explicit takeover** | Considered letting core keep tablet/mobile and adding only wider tiers, and considered writing into core's own `style.@tablet`. Both give a tidier steady state and both break under configurations Spacery must support — a custom breakpoint set that does not align with core's values, or `responsiveEditingEnabled => false`. Owning the data unconditionally is the only option stable across all of them. The duplication that creates is resolved in the inspector, not the stylesheet: see the takeover flow in §3.5. |
 | D12 | **No Spacery viewport switcher; follow core's editing viewport** | Core 7.1 makes responsive editing a mode driven by canvas width ([PR #75121](https://github.com/WordPress/gutenberg/pull/75121)), so a second switcher would compete with it. Following it means core's resizable canvas becomes Spacery's N-tier selector for free. The exception is `responsiveEditingEnabled => false`, where core shows no viewport UI and Spacery supplies its own. |
 | D13 | **Tiers are disjoint bands in CSS, a cascade in authoring** | Discovered while implementing: core's tiers are *not* a cascade. `WP_Theme_JSON::get_viewport_media_queries()` emits `@media (480px < width <= 782px)` for `@tablet`, so a core tablet value never applies at mobile widths. Plain descending `max-width` rules would have been pleasant to author but would partially overlap core's bands — a Spacery `tablet` value (≤782px) would silently override a core `@mobile` value at 400px, which is exactly the mess D10 removed. Spacery therefore emits bands identical in shape to core's, and materializes an authored value into every narrower band at generation time. `responsive-state`'s `pick( …, { fallbackDirection: 'down' } )` is that materialization function. Cost: one authored value can emit up to N declarations; content-addressed hashing limits the damage, and M2's 200-block fixture measures it. |
+| D14 | **Spacery never places its own CSS; it fills a Style Engine store and core places it** | Investigating M2's open delivery question found the seam: `wp_enqueue_stored_styles()` explicitly iterates third-party stores, and core already solves both theme types — block themes render the entire template before `wp_head()`, and WordPress 6.9 added `wp_hoist_late_printed_styles()` to lift classic themes' footer styles into the head. Choosing placement inside the plugin would mean re-deriving that logic and drifting from it as core evolves. This deleted the placement code rather than fixing it. |
 
 ### Deferred to 1.1+
 

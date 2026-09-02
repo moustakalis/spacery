@@ -29,11 +29,6 @@ defined( 'ABSPATH' ) || exit;
 final class BlockFilter {
 
 	/**
-	 * Handle for the generated stylesheet.
-	 */
-	private const HANDLE = 'spacery';
-
-	/**
 	 * Constructor.
 	 *
 	 * @param Generator $generator Style generator.
@@ -49,7 +44,6 @@ final class BlockFilter {
 	 */
 	public function register(): void {
 		add_filter( 'render_block', array( $this, 'filter_block' ), 10, 2 );
-		add_action( 'wp_footer', array( $this, 'print_styles' ), 1 );
 	}
 
 	/**
@@ -88,32 +82,5 @@ final class BlockFilter {
 		$this->collector->add( $styles );
 
 		return $processor->get_updated_html();
-	}
-
-	/**
-	 * Prints the collected stylesheet.
-	 *
-	 * The footer, because blocks render during `the_content`, which is long
-	 * after `wp_head` has been sent. Core places late block-support styles the
-	 * same way. Emitting spacing this late is not ideal and is the one delivery
-	 * question M2 leaves open; resolving it means generating from parsed blocks
-	 * before the head is sent, which is a larger change than it looks because
-	 * blocks also arrive from templates and patterns.
-	 */
-	public function print_styles(): void {
-		if ( $this->collector->is_empty() ) {
-			return;
-		}
-
-		$css = $this->collector->to_css();
-
-		if ( '' === $css ) {
-			return;
-		}
-
-		wp_register_style( self::HANDLE, false, array(), \Spacery\VERSION );
-		wp_add_inline_style( self::HANDLE, $css );
-		wp_enqueue_style( self::HANDLE );
-		wp_print_styles( self::HANDLE );
 	}
 }
