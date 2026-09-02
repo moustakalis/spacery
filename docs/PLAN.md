@@ -627,15 +627,17 @@ Three things the plan did not anticipate, all of them silent failures:
   `_load_script_textdomain_from_src()` tries the handle form first and it does not depend
   on where the plugin is installed.
 
-**M7 — v1 migration**
-`deprecated` entry matching v1's exact save output so old posts validate rather than error;
-transform from `spacery/spacery-block` to `spacery/spacer`, mapping `height`→`base`,
-`heightSM`→`sm` and so on — **skipping `0px` values**, which were bogus defaults rather
-than user intent. WP-CLI `wp spacery migrate` for bulk conversion.
-*Exit:* a post saved with v1 opens in v2 without a validation error and converts on demand.
+**M7 — v1 migration — DROPPED (see D15)**
+There is nothing to migrate from. v1 had no webpack entry point, so its `build/` directory
+was never generated and the block could not register; it also never left Bitbucket. No post
+anywhere contains a `spacery/spacery-block` comment, so a `deprecated` entry would be a
+transform with no input, and `wp spacery migrate` a command with nothing to convert. The
+work this milestone described was real, but only against a version that shipped — and this
+one did not.
 
 **M8 — Publish**
-Assets, readme.txt, submission.
+Banner and icon assets, readme.txt final pass, a WordPress.org account and slug, and a
+release workflow deploying on tag.
 *Exit:* live on WP.org, release workflow deploying on tag.
 
 ---
@@ -675,6 +677,7 @@ premise changes.
 | D12 | **No Spacery viewport switcher; follow core's editing viewport** | Core 7.1 makes responsive editing a mode driven by canvas width ([PR #75121](https://github.com/WordPress/gutenberg/pull/75121)), so a second switcher would compete with it. Following it means core's resizable canvas becomes Spacery's N-tier selector for free. The exception is `responsiveEditingEnabled => false`, where core shows no viewport UI and Spacery supplies its own. |
 | D13 | **Tiers are disjoint bands in CSS, a cascade in authoring** | Discovered while implementing: core's tiers are *not* a cascade. `WP_Theme_JSON::get_viewport_media_queries()` emits `@media (480px < width <= 782px)` for `@tablet`, so a core tablet value never applies at mobile widths. Plain descending `max-width` rules would have been pleasant to author but would partially overlap core's bands — a Spacery `tablet` value (≤782px) would silently override a core `@mobile` value at 400px, which is exactly the mess D10 removed. Spacery therefore emits bands identical in shape to core's, and materializes an authored value into every narrower band at generation time. `responsive-state`'s `pick( …, { fallbackDirection: 'down' } )` is that materialization function. Cost: one authored value can emit up to N declarations; content-addressed hashing limits the damage, and M2's 200-block fixture measures it. |
 | D14 | **Spacery never places its own CSS; it fills a Style Engine store and core places it** | Investigating M2's open delivery question found the seam: `wp_enqueue_stored_styles()` explicitly iterates third-party stores, and core already solves both theme types — block themes render the entire template before `wp_head()`, and WordPress 6.9 added `wp_hoist_late_printed_styles()` to lift classic themes' footer styles into the head. Choosing placement inside the plugin would mean re-deriving that logic and drifting from it as core evolves. This deleted the placement code rather than fixing it. |
+| D15 | **No v1 migration path** | v1 never built and never shipped. Its `block.json` pointed at a `build/` directory nothing generated, so the block could not register even locally, and the code lived on Bitbucket rather than WP.org. A `deprecated` entry exists to keep *existing content* valid; there is no existing content. Writing one would mean maintaining a parser for a save format no post has ever contained, and testing it against fixtures invented for the purpose. D9 already reached the same conclusion from the other direction when it numbered the first public release `1.0.0`: the 2023 code is a reference, not a predecessor. |
 
 ### Deferred to 1.1+
 

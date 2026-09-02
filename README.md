@@ -5,8 +5,8 @@ for any block.
 
 > **Status: pre-release.** Breakpoint registry, CSS generation, the spacer block,
 > the editor, the spacing extension, the settings screen and translations are in
-> place (M0–M6). Remaining before 1.0: migration from the 2023 version, and
-> WordPress.org submission. See [`docs/PLAN.md`](docs/PLAN.md) for the
+> place (M0–M6). Remaining before 1.0: WordPress.org submission. See
+> [`docs/PLAN.md`](docs/PLAN.md) for the
 > architecture and roadmap, and [`docs/FILTERS.md`](docs/FILTERS.md) for the
 > developer API.
 
