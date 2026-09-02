@@ -79,6 +79,50 @@ jobs:
       - name: Build
         run: pnpm run build
 
+  i18n:
+    name: "i18n: POT is current"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install WP-CLI
+        run: |
+          curl -fsSL -o /tmp/wp-cli.phar \
+            https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+
+      # A string added without regenerating the POT is untranslatable and
+      # nothing else would notice: the plugin works, the string is just stuck in
+      # English forever. This is the only check that catches it.
+      - name: Regenerate the POT
+        run: WP_CLI=/tmp/wp-cli.phar pnpm run i18n:pot
+
+      - name: Fail if it differs from the committed one
+        run: |
+          # POT-Creation-Date changes on every run and carries no information.
+          undated='^"POT-Creation-Date:'
+          git show HEAD:languages/spacery.pot | grep -v "$undated" > /tmp/committed.pot
+          grep -v "$undated" languages/spacery.pot > /tmp/fresh.pot
+          if ! diff -u /tmp/committed.pot /tmp/fresh.pot; then
+            echo "::error::languages/spacery.pot is out of date. Run 'pnpm run i18n:pot'."
+            exit 1
+          fi
+
   plugin-check:
     name: Plugin Check
     runs-on: ubuntu-latest
@@ -145,6 +189,26 @@ jobs:
 
       - name: Run end-to-end tests
         run: pnpm run test:e2e
+
+      # M6's exit criterion. The site is switched to Greek and both halves of the
+      # translation pipeline are exercised: `wp eval` proves PHP loads the .mo
+      # through WordPress's own just-in-time mechanism, and the Playwright spec
+      # proves the browser loads the per-handle .json.
+      - name: Switch the test site to Greek
+        run: pnpm run env run tests-cli wp option update WPLANG el
+
+      - name: A second locale renders (PHP)
+        run: |
+          pnpm run env run tests-cli wp eval 'echo __( "Save changes", "spacery" );' \
+            | tee /tmp/translated.txt
+          grep -q 'Αποθήκευση αλλαγών' /tmp/translated.txt
+
+      - name: A second locale renders (editor and admin)
+        run: pnpm exec playwright test --config playwright-locale.config.ts
+
+      - name: Switch the test site back
+        if: always()
+        run: pnpm run env run tests-cli wp option update WPLANG '' || true
 
       - name: Upload traces on failure
         if: failure()

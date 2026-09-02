@@ -3,8 +3,12 @@
 Responsive spacing for the WordPress block editor — unlimited, theme-defined breakpoints
 for any block.
 
-> **Status: pre-release.** M0 (foundations) is in place. See
-> [`docs/PLAN.md`](docs/PLAN.md) for the architecture and roadmap.
+> **Status: pre-release.** Breakpoint registry, CSS generation, the spacer block,
+> the editor, the spacing extension, the settings screen and translations are in
+> place (M0–M6). Remaining before 1.0: migration from the 2023 version, and
+> WordPress.org submission. See [`docs/PLAN.md`](docs/PLAN.md) for the
+> architecture and roadmap, and [`docs/FILTERS.md`](docs/FILTERS.md) for the
+> developer API.
 
 ## Why
 
@@ -48,9 +52,23 @@ pnpm run start          # watch and rebuild
 ```bash
 pnpm run typecheck      # tsc --noEmit
 pnpm run lint:js
+pnpm run test:unit      # Vitest
 composer run lint       # PHPCS, WordPress-Extra
 composer run analyse    # PHPStan level 6
+composer run test       # PHPUnit
 ```
+
+### Translations
+
+```bash
+pnpm run i18n:pot       # languages/spacery.pot
+pnpm run i18n:build     # .mo and per-handle .json from every .po
+```
+
+Both need [WP-CLI](https://wp-cli.org/); set `WP_CLI` to a `wp-cli.phar` if it
+is not on your `PATH`. `i18n:pot` transpiles the TypeScript before extracting,
+because `wp i18n make-pot` cannot read it and skips every string in the editor
+and the settings screen without saying so.
 
 CI runs all of the above plus
 [Plugin Check](https://github.com/WordPress/plugin-check-action) on every push and pull
@@ -61,8 +79,11 @@ request.
 - **No bundled `vendor/`.** Spacery has no runtime PHP dependencies. Composer is a
   development tool here; classes load through a small PSR-4 autoloader in
   `includes/Autoloader.php`.
-- **No webpack config.** `wp-scripts build` scans `src/` for `block.json` files and uses
-  the scripts they declare as entry points.
+- **A minimal webpack config.** `wp-scripts build` scans `src/` for `block.json` files and
+  uses the scripts they declare as entry points — but that scan returns early once it
+  finds one, so the `src/index.*` fallback never runs here. `webpack.config.js` exists
+  only to name the two bundles that are not blocks: the editor extension and the settings
+  screen. Adding a block still needs no change to it.
 - **`node-linker=hoisted`** in `.npmrc`, because `@wordpress/scripts` assumes a hoisted
   `node_modules` when resolving its peer dependencies.
 - **PSR-4 over WordPress file naming.** `WordPress.Files.FileName` is the one
@@ -76,9 +97,13 @@ request.
 ```
 spacery.php              Plugin header and boot
 includes/                PHP, PSR-4 under the Spacery\ namespace
-src/                     TypeScript and blocks
-tests/{php,unit,e2e}     PHPUnit, Vitest, Playwright
+src/                     TypeScript: the block, the editor extension, the settings screen
+languages/               POT, and translations
+bin/                     Toolchain scripts (core fetch, POT, translation build)
+tests/{php,unit,e2e,contract}
 docs/PLAN.md             Architecture and roadmap
+docs/FILTERS.md          Developer API
+docs/blockgap-spike.md   Why responsive blockGap is core's job, not Spacery's
 ```
 
 ## License

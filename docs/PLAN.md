@@ -602,11 +602,30 @@ Full answer with source citations in [`blockgap-spike.md`](blockgap-spike.md). I
 *Outcome:* deferred. `spacingFeatures()` already declines gap; that now has a recorded
 reason. 1.0 documents core's own control as the answer for responsive gap.
 
-**M6 — Settings, i18n, docs**
-Settings screen, `load_plugin_textdomain()`, `wp_set_script_translations()` — both of which
-v1 omitted entirely, making every translatable string untranslatable. User docs, developer
-docs for the filter API.
-*Exit:* POT generated; a second locale renders.
+**M6 — Settings, i18n, docs — DONE**
+Settings screen under Settings → Spacery, a React app over `register_setting( show_in_rest )`
+so `/wp/v2/settings` owns the values and their validation and the screen is one client of
+the rules rather than a second authority. Sanitizers reuse `BreakpointSet::from_array()`,
+so a set the screen accepts is one the generator can use. A read-only
+`spacery/v1/breakpoints` serves what each source contains, because nobody can choose
+between sources they cannot see. Developer API in [`FILTERS.md`](FILTERS.md).
+*Exit met:* POT generated from source in CI with a drift guard, and Greek renders — proven
+in both halves, `wp eval` for PHP and a Playwright run against a Greek site for the editor.
+
+Three things the plan did not anticipate, all of them silent failures:
+
+- `load_plugin_textdomain()` on `plugins_loaded` is now how you *get* a
+  `_doing_it_wrong` notice, not how you avoid one. Since 6.7 it only registers a path, and
+  just-in-time loading objects to any domain first needed before `after_setup_theme`. It
+  runs on `init`.
+- **`wp i18n make-pot` cannot read TypeScript.** Pointed at this codebase it extracted 24
+  strings where there are 84, with no warning. `bin/make-pot.sh` transpiles first and
+  refuses to write a POT when that produced nothing.
+- **`wp i18n make-json` ignores `.jsx` references**, so preserving JSX through the
+  transpile yielded translations for one source file out of fourteen. The transpile emits
+  `.js`, and output is named per script handle rather than per path hash, because
+  `_load_script_textdomain_from_src()` tries the handle form first and it does not depend
+  on where the plugin is installed.
 
 **M7 — v1 migration**
 `deprecated` entry matching v1's exact save output so old posts validate rather than error;

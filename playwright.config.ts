@@ -23,6 +23,12 @@ const artifacts =
 
 export default defineConfig({
 	testDir: './tests/e2e',
+	/*
+	 * The locale check needs the site switched to Greek, which would change what
+	 * every other spec sees. It runs from playwright-locale.config.ts instead,
+	 * after CI has switched the language.
+	 */
+	testIgnore: '**/locale.spec.ts',
 	globalSetup: require.resolve('./tests/e2e/global-setup.ts'),
 	timeout: 60_000,
 	forbidOnly: !!process.env.CI,

@@ -27,5 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A takeover flow for values WordPress 7.1 already sets responsively: Spacery surfaces
   them and moves them into the matching tier on request, but only when the two agree on
   the boundary.
+- A settings screen under Settings → Spacery for choosing where breakpoints come from, and
+  for defining your own. Both options are registered with WordPress, so the REST API and
+  WP-CLI get the same validation.
+- Translations: a POT generated from source, a Greek translation, and script translations
+  for every bundle. `bin/make-pot.sh` and `bin/make-translations.sh` regenerate them.
+- Developer documentation for the filter API in `docs/FILTERS.md`.
 
 [Unreleased]: https://github.com/moustakalis/spacery/compare/main...HEAD
