@@ -127,6 +127,25 @@ function __( string $text, string $domain = 'default' ): string {
 	return $text;
 }
 
+/**
+ * Stub of wp_json_encode().
+ *
+ * @param mixed $data Data to encode.
+ * @return string|false
+ */
+function wp_json_encode( $data ) {
+	return json_encode( $data ); // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode
+}
+
+/*
+ * The Style Engine is real, not stubbed. It is what turns a style object into
+ * declarations and resolves preset variables, so faking it would leave the most
+ * consequential step of generation untested. The classes load standalone given
+ * a handful of core helpers; the same fetched source the contract suite uses
+ * provides them when present.
+ */
+require_once __DIR__ . '/style-engine.php';
+
 require_once __DIR__ . '/../../includes/Autoloader.php';
 
 Spacery\Autoloader::register();

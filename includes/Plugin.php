@@ -10,6 +10,9 @@ declare( strict_types=1 );
 namespace Spacery;
 
 use Spacery\Breakpoints\Registry;
+use Spacery\Render\BlockFilter;
+use Spacery\Styles\Collector;
+use Spacery\Styles\Generator;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -37,6 +40,11 @@ final class Plugin {
 	 * The breakpoint registry.
 	 */
 	private ?Registry $breakpoints = null;
+
+	/**
+	 * The per-request style collector.
+	 */
+	private ?Collector $collector = null;
 
 	/**
 	 * Private constructor. Use instance().
@@ -67,6 +75,11 @@ final class Plugin {
 
 		$this->breakpoints()->register();
 
+		( new BlockFilter(
+			new Generator( $this->breakpoints() ),
+			$this->collector()
+		) )->register();
+
 		/**
 		 * Fires once Spacery has finished booting.
 		 *
@@ -96,5 +109,19 @@ final class Plugin {
 		}
 
 		return $this->breakpoints;
+	}
+
+	/**
+	 * The style collector.
+	 *
+	 * One per request, so every block's rules land in the same stylesheet and
+	 * identical spacing is stored once.
+	 */
+	public function collector(): Collector {
+		if ( ! $this->collector instanceof Collector ) {
+			$this->collector = new Collector();
+		}
+
+		return $this->collector;
 	}
 }
