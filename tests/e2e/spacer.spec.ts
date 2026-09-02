@@ -75,24 +75,46 @@ test.describe('spacery/spacer', () => {
 		for (const width of [1600, 1100, 900, 700]) {
 			await page.setViewportSize({ width, height: 900 });
 
-			// The canvas is the editor iframe, whatever the chrome around it.
-			const canvasWidth = await page
-				.locator('iframe[name="editor-canvas"]')
-				.evaluate((frame) => frame.getBoundingClientRect().width);
+			/*
+			 * Measured INSIDE the canvas, because that is what the code
+			 * measures. An iframe element's bounding box includes the vertical
+			 * scrollbar; matchMedia inside it does not, and the two differ by
+			 * roughly 15px. Near a boundary that is a whole band: at a 1100px
+			 * browser the outer box reads ~1030 (Desktop) while the viewport
+			 * reads ~1015 (Laptop). Comparing the panel against the outer box
+			 * repeats, one level down, the browser-versus-canvas confusion this
+			 * very test exists to catch.
+			 *
+			 * Polled rather than measured once: the resize, the ResizeObserver
+			 * and the React update all settle asynchronously, and re-reading the
+			 * width each attempt keeps the expectation matched to reality
+			 * instead of to a stale measurement.
+			 */
+			await expect
+				.poll(
+					async () => {
+						const canvas =
+							page.frame({ name: 'editor-canvas' }) ??
+							page.mainFrame();
 
-			const expected = tierFor(canvasWidth);
+						const canvasWidth = await canvas.evaluate(
+							() => window.innerWidth
+						);
 
-			if (undefined === expected) {
-				await expect(
-					page.getByText('Resize the canvas', { exact: false })
-				).toBeVisible();
-			} else {
-				await expect(
-					page.getByRole('button', {
-						name: new RegExp(`${expected} · ≤`),
-					})
-				).toBeVisible();
-			}
+						const tier = tierFor(canvasWidth);
+
+						return page
+							.getByText(
+								tier ? `${tier} · ≤` : 'Resize the canvas',
+								{
+									exact: false,
+								}
+							)
+							.isVisible();
+					},
+					{ timeout: 10_000 }
+				)
+				.toBe(true);
 		}
 	});
 

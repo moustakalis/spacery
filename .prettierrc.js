@@ -8,4 +8,4 @@
  * already follows WordPress standards; this makes the JavaScript side agree.
  */
 
-module.exports = require( '@wordpress/prettier-config' );
+module.exports = require('@wordpress/prettier-config');
