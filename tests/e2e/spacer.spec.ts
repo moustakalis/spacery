@@ -81,30 +81,22 @@ test.describe('spacery/spacer', () => {
 			await page.setViewportSize({ width: browserWidth, height: 900 });
 
 			/*
-			 * Reports what it saw rather than a bare boolean. Two earlier
-			 * versions of this test failed with no way to tell whether the
-			 * measurement, the expectation or the panel was wrong, which cost
-			 * two CI round trips to guess at. On failure Playwright prints this
-			 * whole object.
+			 * Asserted as a STRING, not an object.
+			 *
+			 * A previous version returned an object and asserted
+			 * toMatchObject({ matches: true }). That prints only the keys being
+			 * matched, so every diagnostic field was discarded and the failure
+			 * read "matches: false" -- an instrument that threw away its own
+			 * reading. Playwright prints a received string in full, so the
+			 * failure message now carries everything needed to tell apart:
+			 * settings never arriving (tiers=0), the canvas ref never firing
+			 * (shown=none while tiers>0), and a genuine tier disagreement.
 			 */
 			await expect
-				.poll(
-					async () => {
-						const canvasWidth = await measureCanvas(page);
-						const expected = tierFor(canvasWidth) ?? 'none';
-						const shown = await shownTier(page);
-
-						return {
-							browserWidth,
-							canvasWidth: Math.round(canvasWidth),
-							expected,
-							shown,
-							matches: expected === shown,
-						};
-					},
-					{ timeout: 10_000 }
-				)
-				.toMatchObject({ matches: true });
+				.poll(async () => await describeState(page, browserWidth), {
+					timeout: 10_000,
+				})
+				.toMatch(/ verdict=match$/);
 		}
 	});
 
@@ -203,4 +195,38 @@ async function shownTier(page: Page): Promise<string> {
 	const label = (await panel.first().textContent()) ?? '';
 
 	return label.split('·')[0]?.trim() ?? 'unreadable';
+}
+
+/**
+ * A one-line report of everything that decides this assertion.
+ *
+ * @param page         The Playwright page.
+ * @param browserWidth The viewport width just set.
+ * @return A description ending in `verdict=match` when the panel agrees.
+ */
+async function describeState(
+	page: Page,
+	browserWidth: number
+): Promise<string> {
+	const tiers = await page.evaluate(
+		() =>
+			(
+				window as unknown as {
+					spacerySettings?: { breakpoints?: unknown[] };
+				}
+			).spacerySettings?.breakpoints?.length ?? -1
+	);
+
+	const canvasWidth = Math.round(await measureCanvas(page));
+	const expected = tierFor(canvasWidth) ?? 'none';
+	const shown = await shownTier(page);
+
+	return [
+		`browser=${browserWidth}`,
+		`canvas=${canvasWidth}`,
+		`tiers=${tiers}`,
+		`expected=${expected}`,
+		`shown=${shown}`,
+		`verdict=${expected === shown ? 'match' : 'differ'}`,
+	].join(' ');
 }
