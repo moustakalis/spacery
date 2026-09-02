@@ -6,6 +6,7 @@
  * only be made about a running WordPress.
  */
 
+import type { Page } from '@playwright/test';
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 const BLOCK = 'spacery/spacer';
@@ -72,49 +73,38 @@ test.describe('spacery/spacer', () => {
 			attributes: { height: '120px' },
 		});
 
-		for (const width of [1600, 1100, 900, 700]) {
-			await page.setViewportSize({ width, height: 900 });
+		// The panel only exists inside InspectorControls, so an assertion about
+		// it says nothing unless the sidebar is definitely open.
+		await editor.openDocumentSettingsSidebar();
+
+		for (const browserWidth of [1600, 1100, 900, 700]) {
+			await page.setViewportSize({ width: browserWidth, height: 900 });
 
 			/*
-			 * Measured INSIDE the canvas, because that is what the code
-			 * measures. An iframe element's bounding box includes the vertical
-			 * scrollbar; matchMedia inside it does not, and the two differ by
-			 * roughly 15px. Near a boundary that is a whole band: at a 1100px
-			 * browser the outer box reads ~1030 (Desktop) while the viewport
-			 * reads ~1015 (Laptop). Comparing the panel against the outer box
-			 * repeats, one level down, the browser-versus-canvas confusion this
-			 * very test exists to catch.
-			 *
-			 * Polled rather than measured once: the resize, the ResizeObserver
-			 * and the React update all settle asynchronously, and re-reading the
-			 * width each attempt keeps the expectation matched to reality
-			 * instead of to a stale measurement.
+			 * Reports what it saw rather than a bare boolean. Two earlier
+			 * versions of this test failed with no way to tell whether the
+			 * measurement, the expectation or the panel was wrong, which cost
+			 * two CI round trips to guess at. On failure Playwright prints this
+			 * whole object.
 			 */
 			await expect
 				.poll(
 					async () => {
-						const canvas =
-							page.frame({ name: 'editor-canvas' }) ??
-							page.mainFrame();
+						const canvasWidth = await measureCanvas(page);
+						const expected = tierFor(canvasWidth) ?? 'none';
+						const shown = await shownTier(page);
 
-						const canvasWidth = await canvas.evaluate(
-							() => window.innerWidth
-						);
-
-						const tier = tierFor(canvasWidth);
-
-						return page
-							.getByText(
-								tier ? `${tier} · ≤` : 'Resize the canvas',
-								{
-									exact: false,
-								}
-							)
-							.isVisible();
+						return {
+							browserWidth,
+							canvasWidth: Math.round(canvasWidth),
+							expected,
+							shown,
+							matches: expected === shown,
+						};
 					},
 					{ timeout: 10_000 }
 				)
-				.toBe(true);
+				.toMatchObject({ matches: true });
 		}
 	});
 
@@ -167,4 +157,50 @@ function tierFor(width: number): string | undefined {
 	}
 
 	return undefined;
+}
+
+/**
+ * The canvas viewport width, measured the way the code measures it.
+ *
+ * Uses the same selector that is known to resolve, then evaluates inside the
+ * frame. `page.frame({ name })` was tried first and is not used: if it fails to
+ * match it returns null, and falling back to the main frame silently measures
+ * the BROWSER width -- reintroducing the exact bug this test exists to catch,
+ * with no visible error.
+ *
+ * @param page The Playwright page.
+ * @return The canvas viewport width in pixels.
+ */
+async function measureCanvas(page: Page): Promise<number> {
+	const canvas = page.frameLocator('iframe[name="editor-canvas"]');
+
+	return canvas.locator('body').evaluate(() => window.innerWidth);
+}
+
+/**
+ * The tier the inspector is currently showing.
+ *
+ * Returns 'none' for the default range, and 'missing' when neither the hint nor
+ * a tier panel is present -- which distinguishes "Spacery picked the wrong
+ * tier" from "the panel is not rendered at all".
+ *
+ * @param page The Playwright page.
+ * @return The tier label, 'none', or 'missing'.
+ */
+async function shownTier(page: Page): Promise<string> {
+	const hint = page.getByText('Resize the canvas', { exact: false });
+
+	if (await hint.isVisible().catch(() => false)) {
+		return 'none';
+	}
+
+	const panel = page.getByRole('button', { name: /· ≤/ });
+
+	if (0 === (await panel.count())) {
+		return 'missing';
+	}
+
+	const label = (await panel.first().textContent()) ?? '';
+
+	return label.split('·')[0]?.trim() ?? 'unreadable';
 }

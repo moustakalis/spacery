@@ -10,13 +10,3 @@ export interface Breakpoint {
 	/** Upper bound as a CSS length, e.g. `782px`. */
 	max: string;
 }
-
-/**
- * The editor settings Spacery adds.
- *
- * Breakpoints are resolved in PHP and handed over finished. JavaScript never
- * recomputes them, so the editor preview and the generated CSS cannot disagree.
- */
-export interface SpacerySettings {
-	breakpoints: Breakpoint[];
-}

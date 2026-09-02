@@ -13,6 +13,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
 	test: {
 		include: ['tests/unit/**/*.test.ts'],
-		environment: 'node',
+		// jsdom, because the settings global lives on `window`.
+		environment: 'jsdom',
 	},
 });

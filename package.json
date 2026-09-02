@@ -48,6 +48,7 @@
 		"@wordpress/eslint-plugin": "^25.10.0",
 		"@wordpress/prettier-config": "^4.51.0",
 		"@wordpress/scripts": "^34.2.0",
+		"jsdom": "^25.0.0",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8",
 		"typescript": "^6.0.3",
