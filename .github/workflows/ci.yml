@@ -153,3 +153,7 @@ jobs:
           name: playwright-traces
           path: artifacts/
           retention-days: 7
+
+      - name: WordPress logs on failure
+        if: failure()
+        run: pnpm run env logs tests --no-watch || true

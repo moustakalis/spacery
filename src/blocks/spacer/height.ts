@@ -11,8 +11,10 @@ import type { SpacerAttributes } from './types';
 
 /**
  * The height authored at a breakpoint, if any.
- * @param attributes
- * @param slug
+ *
+ * @param attributes The block's attributes.
+ * @param slug       Breakpoint slug to read.
+ * @return The authored height, or undefined when this tier sets none.
  */
 export function authoredHeight(
 	attributes: SpacerAttributes,
@@ -27,9 +29,11 @@ export function authoredHeight(
  *
  * Desktop-first: a tier inherits from the nearest *wider* tier that sets a
  * value, because narrower viewports override wider ones.
- * @param attributes
- * @param breakpoints
- * @param slug
+ *
+ * @param attributes  The block's attributes.
+ * @param breakpoints The active set, widest first.
+ * @param slug        Breakpoint slug to resolve.
+ * @return The label of the tier inherited from, or undefined for the base height.
  */
 export function inheritedFrom(
 	attributes: SpacerAttributes,
@@ -56,9 +60,11 @@ export function inheritedFrom(
 
 /**
  * The height that actually applies at a breakpoint.
- * @param attributes
- * @param breakpoints
- * @param slug
+ *
+ * @param attributes  The block's attributes.
+ * @param breakpoints The active set, widest first.
+ * @param slug        Breakpoint slug to resolve.
+ * @return The effective height, falling back to the base height.
  */
 export function heightAt(
 	attributes: SpacerAttributes,
@@ -88,9 +94,11 @@ export function heightAt(
  * Clearing prunes the tier, and prunes the whole `spacery` attribute when it
  * empties, so a block the author has reset back to nothing serializes exactly
  * as it did before they touched it.
- * @param attributes
- * @param slug
- * @param height
+ *
+ * @param attributes The block's attributes.
+ * @param slug       Breakpoint slug to set or clear.
+ * @param height     New height, or undefined to clear the tier.
+ * @return An attribute patch for setAttributes().
  */
 export function withHeight(
 	attributes: SpacerAttributes,

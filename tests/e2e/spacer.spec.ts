@@ -55,12 +55,15 @@ test.describe('spacery/spacer', () => {
 	/**
 	 * M4's exit criterion.
 	 *
-	 * At a 900px canvas, core's own device label reads Desktop because 900 is
-	 * wider than its 782px tablet bound, while Spacery is on Laptop because 900
-	 * is within its 1024px bound. Both are right inside their own set, so the
-	 * panel has to say which one it means.
+	 * The claim is that the inspector always names the tier matching the
+	 * CANVAS width, not the browser width. An earlier version of this test set
+	 * the browser viewport to 900px and expected "Laptop" -- which was wrong,
+	 * because the open inspector sidebar takes roughly 280px, so the canvas
+	 * would actually have been around 620px and sat in the Tablet band. That
+	 * bug is exactly the class of mistake the feature exists to prevent, so the
+	 * test measures the canvas rather than assuming it.
 	 */
-	test('follows the canvas onto a tier core has no device for', async ({
+	test('names the tier matching the canvas, not the browser', async ({
 		editor,
 		page,
 	}) => {
@@ -69,17 +72,28 @@ test.describe('spacery/spacer', () => {
 			attributes: { height: '120px' },
 		});
 
-		await page.setViewportSize({ width: 1400, height: 900 });
-		await expect(
-			page.getByText('Resize the canvas', { exact: false })
-		).toBeVisible();
+		for (const width of [1600, 1100, 900, 700]) {
+			await page.setViewportSize({ width, height: 900 });
 
-		// Narrow enough that the canvas itself lands inside the laptop band.
-		await page.setViewportSize({ width: 900, height: 900 });
+			// The canvas is the editor iframe, whatever the chrome around it.
+			const canvasWidth = await page
+				.locator('iframe[name="editor-canvas"]')
+				.evaluate((frame) => frame.getBoundingClientRect().width);
 
-		await expect(
-			page.getByRole('button', { name: /Laptop · ≤1024px/ })
-		).toBeVisible();
+			const expected = tierFor(canvasWidth);
+
+			if (undefined === expected) {
+				await expect(
+					page.getByText('Resize the canvas', { exact: false })
+				).toBeVisible();
+			} else {
+				await expect(
+					page.getByRole('button', {
+						name: new RegExp(`${expected} · ≤`),
+					})
+				).toBeVisible();
+			}
+		}
 	});
 
 	/**
@@ -97,6 +111,8 @@ test.describe('spacery/spacer', () => {
 
 		const postId = await editor.publishPost();
 
+		expect(postId).not.toBeNull();
+
 		await page.goto(`/?p=${postId}`);
 
 		const html = await page.content();
@@ -106,3 +122,27 @@ test.describe('spacery/spacer', () => {
 		expect(html).toMatch(/class="[^"]*spy-[0-9a-f]+/);
 	});
 });
+
+/**
+ * Spacery's built-in preset, as the server resolves it. Upper bounds, so the
+ * first tier a width fits inside is the one that applies.
+ *
+ * @param width The measured canvas width in pixels.
+ * @return The tier label that should be showing, or undefined above every tier.
+ */
+function tierFor(width: number): string | undefined {
+	if (width <= 480) {
+		return 'Mobile';
+	}
+	if (width <= 782) {
+		return 'Tablet';
+	}
+	if (width <= 1024) {
+		return 'Laptop';
+	}
+	if (width <= 1280) {
+		return 'Desktop';
+	}
+
+	return undefined;
+}

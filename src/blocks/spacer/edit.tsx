@@ -282,8 +282,10 @@ function Summary({ breakpoints, attributes, activeSlug }: SummaryProps) {
  * Authors need to distinguish a value they set from one that merely reaches
  * this tier — which is the reason the attribute stores only authored values and
  * lets the server expand them.
- * @param authored
- * @param source
+ *
+ * @param authored The height set at this tier, if any.
+ * @param source   The label of the tier inherited from, if any.
+ * @return A short phrase naming where the value comes from.
  */
 function describeProvenance(
 	authored: string | undefined,

@@ -34,7 +34,9 @@ const PIXELS_PER_EM = 16;
 
 /**
  * Converts a CSS length to pixels, the same way the server does for ordering.
- * @param length
+ *
+ * @param length A validated CSS length.
+ * @return The length in pixels.
  */
 export function toPixels(length: string): number {
 	const value = length.trim();
