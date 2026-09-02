@@ -13,8 +13,15 @@ import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 /** Panel title, and the accessible name of the button that expands it. */
 const PANEL = 'Responsive spacing';
 
-/** How the REST plugins controller names Spacery. */
-const PLUGIN = 'spacery/spacery';
+/**
+ * How `RequestUtils` names Spacery.
+ *
+ * Not the plugin file path. `activatePlugin`/`deactivatePlugin` build their map
+ * from `GET /wp/v2/plugins` keyed by the kebab-cased **Plugin Name header**, so
+ * "Spacery" is `spacery`. A path like `spacery/spacery` fails with "isn't
+ * installed", which reads like a broken environment rather than a wrong key.
+ */
+const PLUGIN = 'spacery';
 
 /**
  * Blocks that declare `supports.spacing` and are always registered.
@@ -23,6 +30,16 @@ const PLUGIN = 'spacery/spacery';
  * core declares spacing support on them, which is the whole claim.
  */
 const SUPPORTED = ['core/group', 'core/columns', 'core/cover'];
+
+/**
+ * The block's own padding, and the value WordPress sets for tablets.
+ *
+ * Odd on purpose: the front-end assertion counts how many rules in the whole
+ * document set this exact declaration, so a value a theme might plausibly use
+ * would make a second hit ambiguous.
+ */
+const BASE = '61px';
+const TAKEN = '37px';
 
 test.describe('spacing extension', () => {
 	test.beforeEach(async ({ admin, page }) => {
@@ -93,10 +110,6 @@ test.describe('spacing extension', () => {
 		expect(saved).not.toContain('spy-');
 		expect(saved).not.toContain('<style');
 
-		/*
-		 * The REST plugins controller identifies a plugin by its file path
-		 * without the extension, so `spacery/spacery` and not `spacery`.
-		 */
 		await requestUtils.deactivatePlugin(PLUGIN);
 
 		try {
@@ -130,8 +143,8 @@ test.describe('spacing extension', () => {
 			name: 'core/group',
 			attributes: {
 				style: {
-					spacing: { padding: { top: '4rem' } },
-					'@tablet': { spacing: { padding: { top: '2rem' } } },
+					spacing: { padding: { top: BASE } },
+					'@tablet': { spacing: { padding: { top: TAKEN } } },
 				},
 			},
 		});
@@ -169,10 +182,10 @@ test.describe('spacing extension', () => {
 			.toBe(
 				JSON.stringify({
 					spacery: {
-						tablet: { spacing: { padding: { top: '2rem' } } },
+						tablet: { spacing: { padding: { top: TAKEN } } },
 					},
 					viewport: null,
-					base: '4rem',
+					base: BASE,
 				})
 			);
 
@@ -186,18 +199,43 @@ test.describe('spacing extension', () => {
 
 		// One rule for the property at that width, and it is Spacery's.
 		expect(html).toContain('@media (480px < width <= 782px)');
-		expect(html).toMatch(/\.spy-[0-9a-f]+\{padding-top:2rem !important;\}/);
-		expect(occurrences(html, 'padding-top:2rem')).toBe(1);
+		expect(html).toMatch(
+			new RegExp(`\\.spy-[0-9a-f]+\\{padding-top:${TAKEN} !important;\\}`)
+		);
+
+		/*
+		 * Asserted as the surrounding CSS, not as a count.
+		 *
+		 * A count that comes back as 2 says only that something else on the page
+		 * also sets this value, which is the least useful thing it could say --
+		 * whether that is core still emitting its own rule, or Spacery emitting
+		 * twice, is the entire question. Showing each site answers it from the
+		 * CI log alone. `TAKEN` is deliberately an odd value no theme or core
+		 * stylesheet would produce, so a second hit means a real second rule.
+		 */
+		expect(rulesSetting(html, `padding-top:${TAKEN}`)).toHaveLength(1);
 	});
 });
 
 /**
- * How many times a literal string appears.
+ * Every rule in the document containing a declaration, with its selector.
  *
- * @param haystack The text to search.
- * @param needle   The literal to count.
- * @return The number of non-overlapping occurrences.
+ * @param html        The page HTML.
+ * @param declaration The declaration to look for, e.g. `padding-top:37px`.
+ * @return One entry per rule, each showing the text around the declaration.
  */
-function occurrences(haystack: string, needle: string): number {
-	return haystack.split(needle).length - 1;
+function rulesSetting(html: string, declaration: string): string[] {
+	const found: string[] = [];
+	let from = 0;
+
+	for (;;) {
+		const at = html.indexOf(declaration, from);
+
+		if (at < 0) {
+			return found;
+		}
+
+		found.push(html.slice(Math.max(0, at - 120), at + declaration.length));
+		from = at + declaration.length;
+	}
 }

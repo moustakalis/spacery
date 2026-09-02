@@ -24,15 +24,22 @@ export interface SpacerySettings {
 	 * tell a tier that merely shares a name from one that shares a boundary.
 	 */
 	coreViewports: Breakpoint[];
-	/** Blocks the site has excluded from the extension. */
-	deniedBlocks: string[];
+	/**
+	 * Blocks the extension must not attach to.
+	 *
+	 * The site's deny-list plus Spacery's own blocks, which own the `spacery`
+	 * attribute already. Deliberately not the same list the render filter
+	 * consults: excluding the spacer from the *panel* must not stop it being
+	 * *styled*.
+	 */
+	excludedBlocks: string[];
 }
 
 const FALLBACK: SpacerySettings = {
 	breakpoints: [],
 	responsiveEditingEnabled: true,
 	coreViewports: [],
-	deniedBlocks: [],
+	excludedBlocks: [],
 };
 
 /**
@@ -60,8 +67,8 @@ export function getSpacerySettings(): SpacerySettings {
 		coreViewports: Array.isArray(published.coreViewports)
 			? published.coreViewports
 			: [],
-		deniedBlocks: Array.isArray(published.deniedBlocks)
-			? published.deniedBlocks
+		excludedBlocks: Array.isArray(published.excludedBlocks)
+			? published.excludedBlocks
 			: [],
 	};
 }

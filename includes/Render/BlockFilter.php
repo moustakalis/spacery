@@ -71,7 +71,7 @@ final class BlockFilter {
 		 */
 		$name = $block['blockName'] ?? '';
 
-		if ( ! is_string( $name ) || ! $this->supported->allows( $name ) ) {
+		if ( ! is_string( $name ) || ! $this->supported->renders( $name ) ) {
 			return $content;
 		}
 

@@ -12,10 +12,11 @@ import { spacingFeatures } from './supports';
  *
  * Two gates, in this order:
  *
- * 1. The site's deny-list, filtered in PHP through `spacery_denied_blocks` and
- *    published to the editor. A site that excludes a block excludes it from the
- *    attribute as well as from the panel, so "denied" means Spacery does not
- *    touch it rather than "the controls are hidden but the CSS still ships".
+ * 1. The exclusion list PHP publishes: the site's `spacery_denied_blocks`
+ *    filter plus Spacery's own blocks, which declare and edit the `spacery`
+ *    attribute themselves and would otherwise get a second panel writing the
+ *    same attribute. A block denied by the site loses the CSS as well, but that
+ *    happens on the server; here the list only decides what the editor shows.
  * 2. The block's own `supports.spacing`. Blocks that only declare `blockGap`
  *    fall out here, because Spacery does not edit gap yet.
  *
@@ -24,7 +25,7 @@ import { spacingFeatures } from './supports';
  * @return Whether to extend it.
  */
 export function isExtendable(name: string, support: unknown): boolean {
-	if (getSpacerySettings().deniedBlocks.includes(name)) {
+	if (getSpacerySettings().excludedBlocks.includes(name)) {
 		return false;
 	}
 
@@ -36,9 +37,9 @@ export function isExtendable(name: string, support: unknown): boolean {
  *
  * Two conditions, and both are load-bearing.
  *
- * The block must still qualify — `spacery/spacer` declares the `spacery`
- * attribute itself and has its own Height panel, so eligibility rather than the
- * mere presence of the attribute is what decides.
+ * The block must still qualify. `spacery/spacer` declares `supports.spacing.margin`
+ * *and* the `spacery` attribute, so testing only for the attribute would put a
+ * second panel on the one block that certainly must not have one.
  *
  * And the block's registered type must actually carry the attribute.
  * `blocks.registerBlockType` only reaches blocks registered after Spacery's

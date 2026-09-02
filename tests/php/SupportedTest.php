@@ -25,38 +25,52 @@ final class SupportedTest extends TestCase {
 		spacery_test_reset();
 	}
 
-	public function test_allows_an_ordinary_block_by_default(): void {
-		$this->assertTrue( ( new Supported() )->allows( 'core/group' ) );
+	public function test_extends_an_ordinary_block_by_default(): void {
+		$this->assertNotContains( 'core/group', ( new Supported() )->excluded() );
 	}
 
 	/**
-	 * Spacery's own spacer declares and edits the attribute itself, so a second
-	 * panel writing the same attribute would be a conflict rather than a feature.
+	 * Spacery's own spacer declares `supports.spacing.margin`, so it qualifies
+	 * for the extension on the platform's terms -- and must not get it, because
+	 * it already owns the `spacery` attribute and has its own controls.
 	 */
-	public function test_always_denies_spacerys_own_spacer(): void {
-		$this->assertFalse( ( new Supported() )->allows( 'spacery/spacer' ) );
+	public function test_never_extends_spacerys_own_spacer(): void {
+		$this->assertContains( 'spacery/spacer', ( new Supported() )->excluded() );
+	}
+
+	/**
+	 * The regression guard for the bug this class shipped once.
+	 *
+	 * "Not extended" and "not rendered" were one list, so putting the spacer on
+	 * it to keep a second panel off the block also switched off the block's own
+	 * CSS. Nothing failed loudly: the editor looked right and the front end
+	 * silently lost every responsive height.
+	 */
+	public function test_still_renders_spacerys_own_spacer(): void {
+		$this->assertTrue( ( new Supported() )->renders( 'spacery/spacer' ) );
 	}
 
 	public function test_a_site_can_deny_a_block(): void {
 		add_filter(
 			'spacery_denied_blocks',
-			static fn( array $denied ): array => array( ...$denied, 'core/cover' )
+			static fn(): array => array( 'core/cover' )
 		);
 
 		$supported = new Supported();
 
-		$this->assertFalse( $supported->allows( 'core/cover' ) );
-		$this->assertTrue( $supported->allows( 'core/group' ) );
+		$this->assertContains( 'core/cover', $supported->excluded() );
+		$this->assertFalse( $supported->renders( 'core/cover' ) );
+		$this->assertTrue( $supported->renders( 'core/group' ) );
 	}
 
 	/**
-	 * A filter that forgets to return must not silently re-enable Spacery on
-	 * its own spacer, which is the one block that genuinely cannot take it.
+	 * Denying is the site's decision, so a filter that forgets to return must
+	 * deny nothing rather than have Spacery guess at what it meant.
 	 */
-	public function test_a_filter_returning_nothing_leaves_the_built_in_list(): void {
+	public function test_a_filter_returning_nothing_denies_nothing(): void {
 		add_filter( 'spacery_denied_blocks', static fn(): ?array => null );
 
-		$this->assertFalse( ( new Supported() )->allows( 'spacery/spacer' ) );
+		$this->assertSame( array(), ( new Supported() )->denied() );
 	}
 
 	public function test_drops_non_strings_and_duplicates(): void {
@@ -86,8 +100,8 @@ final class SupportedTest extends TestCase {
 		);
 
 		$supported = new Supported();
-		$supported->allows( 'core/group' );
-		$supported->allows( 'core/cover' );
+		$supported->renders( 'core/group' );
+		$supported->renders( 'core/cover' );
 
 		$this->assertSame( 1, $calls );
 	}
@@ -105,7 +119,7 @@ final class SupportedTest extends TestCase {
 
 		add_filter(
 			'spacery_denied_blocks',
-			static fn( array $denied ): array => array( ...$denied, 'core/cover' )
+			static fn(): array => array( 'core/cover' )
 		);
 
 		$collector = new Collector();

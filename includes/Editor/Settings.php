@@ -149,7 +149,7 @@ final class Settings {
 	 *     breakpoints: array<int, array{slug: string, label: string, max: string}>,
 	 *     responsiveEditingEnabled: bool,
 	 *     coreViewports: array<int, array{slug: string, label: string, max: string}>,
-	 *     deniedBlocks: array<int, string>
+	 *     excludedBlocks: array<int, string>
 	 * }
 	 */
 	private function data(): array {
@@ -157,7 +157,7 @@ final class Settings {
 			'breakpoints'              => $this->registry->resolve()->to_array(),
 			'responsiveEditingEnabled' => $this->responsive_editing,
 			'coreViewports'            => $this->registry->core_viewports()?->to_array() ?? array(),
-			'deniedBlocks'             => $this->supported->denied(),
+			'excludedBlocks'           => $this->supported->excluded(),
 		);
 	}
 }
