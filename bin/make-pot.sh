@@ -22,6 +22,12 @@
 # to check types; `pnpm run typecheck` does that, against the real config, with
 # the ambient declarations this pass deliberately does without.
 #
+# `--ignoreConfig` is required, not cosmetic. TypeScript 6 made it error TS5112
+# to name files on the command line while a tsconfig.json exists, where 5.x
+# merely proceeded. Without the flag nothing is emitted at all -- which is how
+# this script first failed in CI, silently, because it was discarding tsc's
+# output at the time. It no longer does.
+#
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -56,14 +62,18 @@ cp "$ROOT/src/blocks/spacer/block.json" "$SCAN/src/blocks/spacer/block.json"
 cd "$ROOT"
 mapfile -t sources < <(find src -name '*.ts' -o -name '*.tsx' | grep -v '\.d\.ts$')
 
-"$TSC" \
+"$TSC" --ignoreConfig \
   --outDir "$SCAN/src" --rootDir src \
   --module esnext --target es2022 --jsx react-jsx --moduleResolution bundler \
   --declaration false --sourceMap false --skipLibCheck \
-  "${sources[@]}" >/dev/null 2>&1 || true
+  "${sources[@]}" > "$SCAN/tsc.log" 2>&1 || true
 
-if [ ! -f "$SCAN/src/settings/App.js" ]; then
-  echo "Transpilation produced nothing. Refusing to write a POT that would silently be missing every JavaScript string." >&2
+emitted="$(find "$SCAN/src" -name '*.js' | wc -l)"
+
+if [ "$emitted" -lt 20 ]; then
+  echo "Transpilation emitted $emitted files. Refusing to write a POT that would silently be missing JavaScript strings." >&2
+  echo "--- tsc output ---" >&2
+  cat "$SCAN/tsc.log" >&2
   exit 1
 fi
 

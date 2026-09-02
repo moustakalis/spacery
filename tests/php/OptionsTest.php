@@ -55,15 +55,30 @@ final class OptionsTest extends TestCase {
 	public function test_stores_a_valid_set_in_canonical_form(): void {
 		$stored = $this->options->sanitize_breakpoints(
 			array(
-				array( 'slug' => 'mobile', 'max' => '480px' ),
-				array( 'slug' => 'laptop', 'label' => 'Laptop', 'max' => '1024px' ),
+				array(
+					'slug' => 'mobile',
+					'max'  => '480px',
+				),
+				array(
+					'slug'  => 'laptop',
+					'label' => 'Laptop',
+					'max'   => '1024px',
+				),
 			)
 		);
 
 		$this->assertSame(
 			array(
-				array( 'slug' => 'laptop', 'label' => 'Laptop', 'max' => '1024px' ),
-				array( 'slug' => 'mobile', 'label' => 'Mobile', 'max' => '480px' ),
+				array(
+					'slug'  => 'laptop',
+					'label' => 'Laptop',
+					'max'   => '1024px',
+				),
+				array(
+					'slug'  => 'mobile',
+					'label' => 'Mobile',
+					'max'   => '480px',
+				),
 			),
 			$stored
 		);
@@ -79,18 +94,36 @@ final class OptionsTest extends TestCase {
 	 */
 	public function test_refuses_an_invalid_set_and_keeps_what_was_there(): void {
 		$GLOBALS['spacery_test_options'][ Registry::OPTION_CUSTOM ] = array(
-			array( 'slug' => 'tablet', 'label' => 'Tablet', 'max' => '782px' ),
+			array(
+				'slug'  => 'tablet',
+				'label' => 'Tablet',
+				'max'   => '782px',
+			),
 		);
 
 		$stored = $this->options->sanitize_breakpoints(
 			array(
-				array( 'slug' => 'laptop', 'label' => 'Laptop', 'max' => '1024px' ),
-				array( 'slug' => 'broken', 'label' => 'Broken', 'max' => '80%' ),
+				array(
+					'slug'  => 'laptop',
+					'label' => 'Laptop',
+					'max'   => '1024px',
+				),
+				array(
+					'slug'  => 'broken',
+					'label' => 'Broken',
+					'max'   => '80%',
+				),
 			)
 		);
 
 		$this->assertSame(
-			array( array( 'slug' => 'tablet', 'label' => 'Tablet', 'max' => '782px' ) ),
+			array(
+				array(
+					'slug'  => 'tablet',
+					'label' => 'Tablet',
+					'max'   => '782px',
+				),
+			),
 			$stored
 		);
 	}
@@ -100,7 +133,13 @@ final class OptionsTest extends TestCase {
 	 */
 	public function test_a_refusal_registers_an_error(): void {
 		$this->options->sanitize_breakpoints(
-			array( array( 'slug' => 'x', 'label' => 'X', 'max' => 'wide' ) )
+			array(
+				array(
+					'slug'  => 'x',
+					'label' => 'X',
+					'max'   => 'wide',
+				),
+			)
 		);
 
 		$this->assertCount( 1, $GLOBALS['spacery_test_settings_errors'] );
@@ -113,8 +152,16 @@ final class OptionsTest extends TestCase {
 	public function test_two_breakpoints_may_not_share_a_width(): void {
 		$stored = $this->options->sanitize_breakpoints(
 			array(
-				array( 'slug' => 'a', 'label' => 'A', 'max' => '48rem' ),
-				array( 'slug' => 'b', 'label' => 'B', 'max' => '768px' ),
+				array(
+					'slug'  => 'a',
+					'label' => 'A',
+					'max'   => '48rem',
+				),
+				array(
+					'slug'  => 'b',
+					'label' => 'B',
+					'max'   => '768px',
+				),
 			)
 		);
 
