@@ -19,8 +19,9 @@ import type { SpacerAttributes } from './types';
  * `useBlockProps.save()` is used rather than a hand-built element so that
  * `supports.anchor` and the margin controls actually reach the front end. v1
  * omitted it and silently dropped both.
- * @param root0
- * @param root0.attributes
+ * @param root0            Component props.
+ * @param root0.attributes The block's attributes.
+ * @return The saved markup.
  */
 export default function save({
 	attributes,

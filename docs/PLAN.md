@@ -526,6 +526,10 @@ from day one — retrofitting compliance is what makes WP.org submission painful
 *Note:* the v1 build blocker is already resolved — `wp-scripts build` scans `src/` for
 `block.json` files and uses their listed scripts as entry points, so no webpack config is
 required as long as each block lives at `src/blocks/<name>/block.json`.
+*Amended in M5:* that scan **returns early** once it finds a `block.json`, so the
+`src/index.*` fallback never runs on a project that has a block. The spacing extension is
+not a block, so it needed a `webpack.config.js` naming one extra entry point. Block
+entries still come from the default config; adding a block still needs no change.
 
 **M1 — Breakpoint registry**
 PHP registry with the full resolution chain, value object, validation, `spacery_breakpoints`
@@ -555,10 +559,20 @@ at every tier, verified by an E2E test that screenshots both.
 
 **M5 — Spacing extension**
 Attribute injection filter and inspector integration for **any block declaring
-`supports.spacing`** — core and third-party alike — gated by a `spacery_supported_blocks`
+`supports.spacing`** — core and third-party alike — gated by a `spacery_denied_blocks`
 deny-list filter. Panel collapsed by default so it never reads as clutter.
 Includes the D11 takeover flow: detect a core `@mobile`/`@tablet` value for a property,
 surface it, and migrate it into the matching Spacery tier on request.
+*Filter named `spacery_denied_blocks`, not `spacery_supported_blocks` as first written:
+the value passed is a list of blocks to leave alone, and a filter whose name says
+"supported" while its argument means the opposite is a trap.*
+*Takeover is offered only when the boundaries agree.* A Spacery tier sharing core's slug
+but not its bound would apply the value over a different range of widths, which is a
+change of meaning dressed up as a move; where they differ Spacery says so and leaves the
+value where it is. Both features are gated twice — by block supports and by
+`settings.spacing.padding` / `.margin` — because core hides its own controls when either
+says no, and a panel offering padding a theme disabled would generate CSS the site asked
+not to have.
 *Exit:* padding/margin per breakpoint working on Group, Columns and Cover, plus one
 third-party block that was never explicitly supported; a block carrying core responsive
 padding offers takeover and, once taken over, emits exactly one rule for that property;

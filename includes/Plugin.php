@@ -10,7 +10,9 @@ declare( strict_types=1 );
 namespace Spacery;
 
 use Spacery\Blocks\Spacer;
+use Spacery\Blocks\Supported;
 use Spacery\Breakpoints\Registry;
+use Spacery\Editor\Extension;
 use Spacery\Editor\Settings;
 use Spacery\Render\BlockFilter;
 use Spacery\Styles\Collector;
@@ -49,6 +51,11 @@ final class Plugin {
 	private ?Collector $collector = null;
 
 	/**
+	 * The block deny-list.
+	 */
+	private ?Supported $supported = null;
+
+	/**
 	 * Private constructor. Use instance().
 	 */
 	private function __construct() {
@@ -79,10 +86,12 @@ final class Plugin {
 
 		( new BlockFilter(
 			new Generator( $this->breakpoints() ),
-			$this->collector()
+			$this->collector(),
+			$this->supported()
 		) )->register();
 
-		( new Settings( $this->breakpoints() ) )->register();
+		( new Extension() )->register();
+		( new Settings( $this->breakpoints(), $this->supported() ) )->register();
 		( new Spacer() )->register();
 
 		/**
@@ -128,5 +137,21 @@ final class Plugin {
 		}
 
 		return $this->collector;
+	}
+
+	/**
+	 * The block deny-list.
+	 *
+	 * One per request, so the render filter and the editor settings answer the
+	 * same question the same way. Two instances would each run
+	 * `spacery_denied_blocks` separately, and a filter with any state at all
+	 * could then hide a block from the inspector while still styling it.
+	 */
+	public function supported(): Supported {
+		if ( ! $this->supported instanceof Supported ) {
+			$this->supported = new Supported();
+		}
+
+		return $this->supported;
 	}
 }

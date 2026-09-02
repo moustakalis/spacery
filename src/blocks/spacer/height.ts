@@ -1,13 +1,25 @@
 /**
  * Desktop-first height resolution for the spacer.
  *
- * These helpers must agree exactly with `BreakpointSet::materialize()` on the
- * server. If they drift, the editor shows one thing and the front end renders
- * another — the class of bug that made v1's preview useless.
+ * Thin wrappers over the shared per-property resolution in `src/attribute`.
+ * The spacer stores its height at `dimensions.height` inside each tier, exactly
+ * where the Style Engine expects it, so "the spacer's height" is just one
+ * property path among the many the extension edits — and resolving it with the
+ * same code is what keeps the two from ever disagreeing.
  */
 
+import {
+	authoredAt,
+	effectiveAt,
+	inheritedFrom as tierInheritedFrom,
+	withValue,
+} from '../../attribute/tiers';
+import type { StylePath } from '../../attribute/types';
 import type { Breakpoint } from '../../breakpoints/types';
 import type { SpacerAttributes } from './types';
+
+/** Where a tier stores the spacer's height. */
+export const HEIGHT_PATH: StylePath = ['dimensions', 'height'];
 
 /**
  * The height authored at a breakpoint, if any.
@@ -20,15 +32,12 @@ export function authoredHeight(
 	attributes: SpacerAttributes,
 	slug: string
 ): string | undefined {
-	return attributes.spacery?.[slug]?.dimensions?.height;
+	return authoredAt(attributes.spacery, slug, HEIGHT_PATH);
 }
 
 /**
  * The breakpoint a tier inherits its height from, or undefined when the value
  * comes from the base height.
- *
- * Desktop-first: a tier inherits from the nearest *wider* tier that sets a
- * value, because narrower viewports override wider ones.
  *
  * @param attributes  The block's attributes.
  * @param breakpoints The active set, widest first.
@@ -40,22 +49,8 @@ export function inheritedFrom(
 	breakpoints: Breakpoint[],
 	slug: string
 ): string | undefined {
-	const index = breakpoints.findIndex((b) => b.slug === slug);
-
-	if (index < 0) {
-		return undefined;
-	}
-
-	// Walk toward wider tiers, which sit earlier in the widest-first list.
-	for (let i = index - 1; i >= 0; i--) {
-		const candidate = breakpoints[i]!;
-
-		if (undefined !== authoredHeight(attributes, candidate.slug)) {
-			return candidate.label;
-		}
-	}
-
-	return undefined;
+	return tierInheritedFrom(attributes.spacery, breakpoints, slug, HEIGHT_PATH)
+		?.label;
 }
 
 /**
@@ -71,29 +66,14 @@ export function heightAt(
 	breakpoints: Breakpoint[],
 	slug: string
 ): string {
-	const index = breakpoints.findIndex((b) => b.slug === slug);
-
-	if (index < 0) {
-		return attributes.height;
-	}
-
-	for (let i = index; i >= 0; i--) {
-		const authored = authoredHeight(attributes, breakpoints[i]!.slug);
-
-		if (undefined !== authored) {
-			return authored;
-		}
-	}
-
-	return attributes.height;
+	return (
+		effectiveAt(attributes.spacery, breakpoints, slug, HEIGHT_PATH) ??
+		attributes.height
+	);
 }
 
 /**
  * Returns the attribute patch that sets or clears a breakpoint's height.
- *
- * Clearing prunes the tier, and prunes the whole `spacery` attribute when it
- * empties, so a block the author has reset back to nothing serializes exactly
- * as it did before they touched it.
  *
  * @param attributes The block's attributes.
  * @param slug       Breakpoint slug to set or clear.
@@ -105,25 +85,7 @@ export function withHeight(
 	slug: string,
 	height: string | undefined
 ): Partial<SpacerAttributes> {
-	const next = { ...(attributes.spacery ?? {}) };
-
-	if (undefined === height || '' === height) {
-		const tier = { ...(next[slug] ?? {}) };
-		delete tier.dimensions;
-
-		if (0 === Object.keys(tier).length) {
-			delete next[slug];
-		} else {
-			next[slug] = tier;
-		}
-	} else {
-		next[slug] = {
-			...(next[slug] ?? {}),
-			dimensions: { ...(next[slug]?.dimensions ?? {}), height },
-		};
-	}
-
 	return {
-		spacery: 0 === Object.keys(next).length ? undefined : next,
+		spacery: withValue(attributes.spacery, slug, HEIGHT_PATH, height),
 	};
 }

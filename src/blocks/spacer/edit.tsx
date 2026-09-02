@@ -27,7 +27,7 @@ import type { Breakpoint } from '../../breakpoints/types';
 import { useBreakpoints } from '../../breakpoints/useBreakpoints';
 import { useCanvasBreakpoint } from '../../breakpoints/useCanvasBreakpoint';
 import { useResponsiveEditing } from '../../breakpoints/useResponsiveEditing';
-import { heightAt, inheritedFrom, withHeight } from './height';
+import { authoredHeight, heightAt, inheritedFrom, withHeight } from './height';
 import type { SpacerAttributes } from './types';
 
 const UNITS = [
@@ -157,11 +157,12 @@ interface ActiveTierProps extends EditProps {
  * tier legitimately disagree: at a 900px canvas core reads "Desktop" (>782px)
  * while Spacery is on "Laptop" (≤1024px). Both are right within their own set,
  * and hiding the difference would be worse than naming it.
- * @param root0
- * @param root0.breakpoint
- * @param root0.breakpoints
- * @param root0.attributes
- * @param root0.setAttributes
+ * @param root0               Component props.
+ * @param root0.breakpoint    The tier being edited.
+ * @param root0.breakpoints   The active set, widest first.
+ * @param root0.attributes    The block's attributes.
+ * @param root0.setAttributes Attribute setter.
+ * @return The control for the active tier.
  */
 function ActiveTier({
 	breakpoint,
@@ -169,7 +170,7 @@ function ActiveTier({
 	attributes,
 	setAttributes,
 }: ActiveTierProps) {
-	const authored = attributes.spacery?.[breakpoint.slug]?.dimensions?.height;
+	const authored = authoredHeight(attributes, breakpoint.slug);
 	const source = inheritedFrom(attributes, breakpoints, breakpoint.slug);
 	const effective = heightAt(attributes, breakpoints, breakpoint.slug);
 
@@ -234,17 +235,17 @@ interface SummaryProps {
  * Read-only on purpose. Making these clickable would rebuild the viewport
  * switcher this design deliberately does not have, but the author still needs
  * to see what they have set without dragging the canvas to every width.
- * @param root0
- * @param root0.breakpoints
- * @param root0.attributes
- * @param root0.activeSlug
+ * @param root0             Component props.
+ * @param root0.breakpoints The active set, widest first.
+ * @param root0.attributes  The block's attributes.
+ * @param root0.activeSlug  The tier currently being edited, if any.
+ * @return A read-only list of which tiers carry a height.
  */
 function Summary({ breakpoints, attributes, activeSlug }: SummaryProps) {
 	return (
 		<Flex direction="column" gap={1}>
 			{breakpoints.map((breakpoint) => {
-				const authored =
-					attributes.spacery?.[breakpoint.slug]?.dimensions?.height;
+				const authored = authoredHeight(attributes, breakpoint.slug);
 
 				return (
 					<Flex key={breakpoint.slug} justify="space-between">

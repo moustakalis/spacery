@@ -12,13 +12,27 @@
 import type { Breakpoint } from './types';
 
 export interface SpacerySettings {
+	/** The active set, widest first. */
 	breakpoints: Breakpoint[];
+	/** Whether core's responsive editing mode is available. */
 	responsiveEditingEnabled: boolean;
+	/**
+	 * Core's own `settings.viewport` tiers, widest first.
+	 *
+	 * Carried separately from `breakpoints` because they are not Spacery's:
+	 * they are what the takeover flow reads a core `@tablet` value against, to
+	 * tell a tier that merely shares a name from one that shares a boundary.
+	 */
+	coreViewports: Breakpoint[];
+	/** Blocks the site has excluded from the extension. */
+	deniedBlocks: string[];
 }
 
 const FALLBACK: SpacerySettings = {
 	breakpoints: [],
 	responsiveEditingEnabled: true,
+	coreViewports: [],
+	deniedBlocks: [],
 };
 
 /**
@@ -43,5 +57,11 @@ export function getSpacerySettings(): SpacerySettings {
 			? published.breakpoints
 			: [],
 		responsiveEditingEnabled: false !== published.responsiveEditingEnabled,
+		coreViewports: Array.isArray(published.coreViewports)
+			? published.coreViewports
+			: [],
+		deniedBlocks: Array.isArray(published.deniedBlocks)
+			? published.deniedBlocks
+			: [],
 	};
 }

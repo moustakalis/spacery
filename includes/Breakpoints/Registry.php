@@ -50,6 +50,21 @@ final class Registry {
 	);
 
 	/**
+	 * Core's own `settings.viewport` defaults, for when theme.json yields none.
+	 *
+	 * WordPress 7.1 ships these in its own theme.json, so `theme_viewport()`
+	 * normally finds them and this is never reached. It exists because the
+	 * takeover flow needs to say "core's tablet is 782px" with certainty, and
+	 * an absent answer there would silently turn every takeover offer off.
+	 *
+	 * @var array<string, string>
+	 */
+	private const CORE_DEFAULT_VIEWPORT = array(
+		'tablet' => '782px',
+		'mobile' => '480px',
+	);
+
+	/**
 	 * Translated labels for tiers Spacery names itself.
 	 *
 	 * These are Spacery's own strings, so they belong in the POT file. Labels
@@ -242,6 +257,30 @@ final class Registry {
 		}
 
 		return $set;
+	}
+
+	/**
+	 * Core's own viewport tiers, whatever source Spacery is using.
+	 *
+	 * Not the same question as `resolve()`. When the site follows the theme
+	 * these two agree, but under Spacery's preset or a custom set they need not,
+	 * and the takeover flow has to be able to tell a Spacery tier that merely
+	 * shares core's name from one that shares core's boundary. Moving a value
+	 * between tiers with different bounds changes which widths it applies to,
+	 * which is a change of meaning dressed up as a move.
+	 *
+	 * @return BreakpointSet|null Core's tiers, or null if even the fallback is
+	 *                            unusable — which would mean this class is
+	 *                            broken, not the site.
+	 */
+	public function core_viewports(): ?BreakpointSet {
+		$viewport = $this->theme_viewport();
+
+		if ( array() === $viewport ) {
+			$viewport = self::CORE_DEFAULT_VIEWPORT;
+		}
+
+		return BreakpointSet::from_array( $this->with_labels( $viewport ) );
 	}
 
 	/**

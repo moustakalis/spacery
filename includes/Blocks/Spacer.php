@@ -16,8 +16,10 @@ defined( 'ABSPATH' ) || exit;
  *
  * Registered from build metadata, which is what `wp-scripts build` produces by
  * scanning `src/` for `block.json` files. v1 pointed at a build directory that
- * nothing generated, because it had no webpack entry point; there is no custom
- * webpack config here precisely because that scanning removes the need for one.
+ * nothing generated, because it had no webpack entry point; blocks here need no
+ * entry point of their own, because that scanning finds them. The project's
+ * `webpack.config.js` exists only for the spacing extension, which is not a
+ * block and so is invisible to that scan.
  */
 final class Spacer {
 

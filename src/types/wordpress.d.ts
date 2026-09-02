@@ -21,6 +21,36 @@ declare module '@wordpress/blocks' {
 		name: string,
 		settings: Record<string, unknown>
 	): unknown;
+
+	interface BlockType {
+		name: string;
+		attributes?: Record<string, unknown> | undefined;
+		supports?: Record<string, unknown> | undefined;
+	}
+
+	export function getBlockType(name: string): BlockType | undefined;
+
+	export function getBlockSupport(
+		nameOrType: string,
+		feature: string,
+		defaultSupports?: unknown
+	): unknown;
+}
+
+declare module '@wordpress/hooks' {
+	export function addFilter(
+		hookName: string,
+		namespace: string,
+		callback: (...args: never[]) => unknown,
+		priority?: number
+	): void;
+}
+
+declare module '@wordpress/compose' {
+	export function createHigherOrderComponent<Inner, Outer>(
+		mapper: (inner: Inner) => Outer,
+		name: string
+	): (inner: Inner) => Outer;
 }
 
 declare module '@wordpress/element' {
@@ -56,6 +86,18 @@ declare module '@wordpress/block-editor' {
 	}
 
 	export const useBlockProps: UseBlockProps;
+
+	/**
+	 * Reads theme.json settings for the current block context.
+	 *
+	 * Public since WordPress 6.5, and the only supported way to know whether a
+	 * site has switched a spacing feature off. Values are deliberately
+	 * `unknown`: each path has its own shape, and callers narrow.
+	 *
+	 * @param paths Settings paths, e.g. `spacing.padding`.
+	 * @return One value per requested path, in order.
+	 */
+	export function useSettings(...paths: string[]): unknown[];
 	export const InspectorControls: React.ComponentType<{
 		children?: React.ReactNode;
 	}>;
@@ -114,6 +156,7 @@ declare module '@wordpress/components' {
 	export const __experimentalText: React.ComponentType<{
 		variant?: string | undefined;
 		size?: number | string;
+		weight?: number | string;
 		children?: React.ReactNode;
 	}>;
 }

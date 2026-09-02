@@ -14,5 +14,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - JS toolchain: `@wordpress/scripts`, TypeScript in strict mode.
 - `wp-env` configuration targeting WordPress 7.1 on PHP 8.2.
 - CI running lint, typecheck, build and Plugin Check.
+- Breakpoint registry resolving theme.json, Spacery's preset or a custom set, with a
+  `spacery_breakpoints` filter and a contract suite that checks the generated media
+  queries against core's own `WP_Theme_JSON`.
+- Style generation through the Style Engine: content-addressed class names, per-request
+  dedupe, and a `render_block` filter that adds a class without touching saved markup.
+- The `spacery/spacer` block, with a height per breakpoint.
+- An editor that follows the canvas rather than the browser window, so the preview and the
+  rendered page agree at every tier.
+- Responsive padding and margin on **any** block declaring `supports.spacing`, core or
+  third-party, with a `spacery_denied_blocks` filter for blocks a site wants left alone.
+- A takeover flow for values WordPress 7.1 already sets responsively: Spacery surfaces
+  them and moves them into the matching tier on request, but only when the two agree on
+  the boundary.
 
 [Unreleased]: https://github.com/moustakalis/spacery/compare/main...HEAD

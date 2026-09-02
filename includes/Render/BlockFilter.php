@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Spacery\Render;
 
+use Spacery\Blocks\Supported;
 use Spacery\Styles\Collector;
 use Spacery\Styles\GeneratedStyles;
 use Spacery\Styles\Generator;
@@ -33,10 +34,12 @@ final class BlockFilter {
 	 *
 	 * @param Generator $generator Style generator.
 	 * @param Collector $collector Style collector.
+	 * @param Supported $supported Block deny-list.
 	 */
 	public function __construct(
 		private readonly Generator $generator,
-		private readonly Collector $collector
+		private readonly Collector $collector,
+		private readonly Supported $supported
 	) {}
 
 	/**
@@ -57,6 +60,18 @@ final class BlockFilter {
 		$attribute = $block['attrs']['spacery'] ?? null;
 
 		if ( null === $attribute || '' === trim( $content ) ) {
+			return $content;
+		}
+
+		/*
+		 * A denied block keeps whatever attribute it was saved with -- removing
+		 * it would edit the author's content -- but stops being styled. That
+		 * makes denying a block reversible: re-allow it and the spacing comes
+		 * back exactly as it was.
+		 */
+		$name = $block['blockName'] ?? '';
+
+		if ( ! is_string( $name ) || ! $this->supported->allows( $name ) ) {
 			return $content;
 		}
 

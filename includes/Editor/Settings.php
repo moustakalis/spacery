@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Spacery\Editor;
 
+use Spacery\Blocks\Supported;
 use Spacery\Breakpoints\Registry;
 use WP_Block_Type_Registry;
 
@@ -52,9 +53,13 @@ final class Settings {
 	/**
 	 * Constructor.
 	 *
-	 * @param Registry $registry Breakpoint registry.
+	 * @param Registry  $registry  Breakpoint registry.
+	 * @param Supported $supported Block deny-list.
 	 */
-	public function __construct( private readonly Registry $registry ) {}
+	public function __construct(
+		private readonly Registry $registry,
+		private readonly Supported $supported
+	) {}
 
 	/**
 	 * Attaches hooks.
@@ -62,7 +67,12 @@ final class Settings {
 	public function register(): void {
 		// Late, so anything else that filters the value has already run.
 		add_filter( 'block_editor_settings_all', array( $this, 'capture_settings' ), 999 );
-		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_settings' ) );
+
+		/*
+		 * Priority 20: `wp_add_inline_script()` needs its handle registered
+		 * already, and the extension registers its own at the default priority.
+		 */
+		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_settings' ), 20 );
 	}
 
 	/**
@@ -110,6 +120,15 @@ final class Settings {
 	private function editor_script_handles(): array {
 		$handles = array();
 
+		/*
+		 * The extension bundle runs on every editor screen and needs the same
+		 * settings, so it is included whenever it actually made it into the
+		 * queue -- a source install with no build has no such handle.
+		 */
+		if ( wp_script_is( Extension::HANDLE, 'registered' ) ) {
+			$handles[] = Extension::HANDLE;
+		}
+
 		foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $block_type ) {
 			if ( ! str_starts_with( $block_type->name, 'spacery/' ) ) {
 				continue;
@@ -126,12 +145,19 @@ final class Settings {
 	/**
 	 * The payload handed to the editor.
 	 *
-	 * @return array{breakpoints: array<int, array{slug: string, label: string, max: string}>, responsiveEditingEnabled: bool}
+	 * @return array{
+	 *     breakpoints: array<int, array{slug: string, label: string, max: string}>,
+	 *     responsiveEditingEnabled: bool,
+	 *     coreViewports: array<int, array{slug: string, label: string, max: string}>,
+	 *     deniedBlocks: array<int, string>
+	 * }
 	 */
 	private function data(): array {
 		return array(
 			'breakpoints'              => $this->registry->resolve()->to_array(),
 			'responsiveEditingEnabled' => $this->responsive_editing,
+			'coreViewports'            => $this->registry->core_viewports()?->to_array() ?? array(),
+			'deniedBlocks'             => $this->supported->denied(),
 		);
 	}
 }

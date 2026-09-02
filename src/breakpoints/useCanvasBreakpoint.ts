@@ -28,16 +28,25 @@ interface CanvasBreakpoint {
  * Deliberately not `getCanvasWidth()`, a private store selector, nor
  * `getDeviceType()`, which has three values and cannot express five tiers.
  *
+ * Callers with no node in the canvas — the spacing extension, whose only output
+ * is an inspector panel — pass a window found by `useCanvasWindow()` instead and
+ * ignore the returned ref.
+ *
  * @param breakpoints Tiers, widest first.
+ * @param given       A canvas window to measure, when the caller already has one.
  */
 export function useCanvasBreakpoint(
-	breakpoints: Breakpoint[]
+	breakpoints: Breakpoint[],
+	given?: Window | null
 ): CanvasBreakpoint {
-	const [canvas, setCanvas] = useState<Window | null>(null);
+	const [attached, setAttached] = useState<Window | null>(null);
 
 	const ref = useCallback((node: HTMLElement | null) => {
-		setCanvas(node?.ownerDocument?.defaultView ?? null);
+		setAttached(node?.ownerDocument?.defaultView ?? null);
 	}, []);
+
+	// An explicitly supplied window wins: the caller looked it up on purpose.
+	const canvas = undefined === given ? attached : given;
 
 	const store = useMemo(() => {
 		if (!canvas || 0 === breakpoints.length) {
