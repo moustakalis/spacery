@@ -584,16 +584,23 @@ third-party block that was never explicitly supported; a block carrying core res
 padding offers takeover and, once taken over, emits exactly one rule for that property;
 deactivation leaves posts valid (E2E asserts this explicitly).
 
-**M5a — `blockGap` spike (timeboxed, 2 days)**
-Investigate whether per-breakpoint `blockGap` is viable for 1.0. The hypothesis is that it
-is *easier* than padding/margin, not harder: core applies gap through the
-`--wp--style--block-gap` custom property rather than an inline declaration, so overriding
-it per breakpoint means setting a variable inside a media query — no `!important`, no
-specificity fight. The risk is that gap flows through layout supports, and the generated
-layout CSS differs per layout type (flow, constrained, flex, grid).
-*Exit:* a written answer with a working proof on flow, constrained and flex layouts —
-**ship in 1.0 if clean, defer to 1.1 if it fights the layout stylesheet.** Do not let this
-spike expand; the timebox is the point.
+**M5a — `blockGap` spike (timeboxed, 2 days) — DONE, deferred to 1.1**
+Full answer with source citations in [`blockgap-spike.md`](blockgap-spike.md). In short:
+
+- The hypothesis above was **wrong**. `layout.php` never emits
+  `var(--wp--style--block-gap)` — the property was removed from `WP_Theme_JSON` — so
+  there is no variable to set inside a media query. Per-block gap is baked as literal
+  values into rules whose shape differs per layout type, and on `grid` the gap value
+  feeds the `grid-template-columns` calculation.
+- Core 7.1 **already emits responsive `blockGap`** at its own two viewports, for every
+  layout type. Responsive gap is no longer a gap in core; only N tiers is.
+- Matching it would mean reimplementing `wp_get_layout_style()`, and Spacery's class
+  lands on the outer wrapper while core's layout rules target the inner one.
+- The escape hatch of giving core more viewports is closed:
+  `get_viewport_media_queries()` reads two fixed keys rather than iterating.
+
+*Outcome:* deferred. `spacingFeatures()` already declines gap; that now has a recorded
+reason. 1.0 documents core's own control as the answer for responsive gap.
 
 **M6 — Settings, i18n, docs**
 Settings screen, `load_plugin_textdomain()`, `wp_set_script_translations()` — both of which
@@ -639,7 +646,7 @@ premise changes.
 | D2 | **Breakpoints: one source at a time, chosen by the user** (`theme` / `spacery` / `custom`), filter last word | Blending a theme's two breakpoints with Spacery's wider tiers produces a set nobody designed. Two coherent sets the user picks between beats one mixed set. Defaults to `theme` when the theme declares breakpoints, so a site agrees with core until someone deliberately opts out. Revised from an earlier priority-cascade draft. |
 | D3 | **Publish to WP.org + GitHub** | Discovery matters for a free plugin, and Plugin Check in CI from M0 makes compliance a non-event rather than a submission scramble. |
 | D4 | **Minimum WordPress 7.1, PHP 8.2** | `settings.viewport`, the always-iframed editor and apiVersion 3 with zero compat shims. The excluded install base shrinks every week. |
-| D5 | **`blockGap`: timeboxed spike in M5a, ship if clean** | Plausibly easier than padding/margin (custom property, not inline declaration), but gated behind layout supports. Two days of evidence beats a guess in either direction. |
+| D5 | **`blockGap`: deferred to 1.1** (spike done, [`blockgap-spike.md`](blockgap-spike.md)) | The spike was framed as "plausibly easier than padding/margin, because custom property rather than inline declaration". That premise was false: `layout.php` emits no `var(--wp--style--block-gap)` and the property was removed from `WP_Theme_JSON`. Gap is baked into per-layout-type rules, and on `grid` it feeds the column-track calculation, so matching core means duplicating `wp_get_layout_style()`. Core 7.1 also already does responsive gap at its own two viewports, so the remaining gap is N tiers alone. The two days bought a firm no instead of a guessed yes, which is what the timebox was for. |
 | D6 | **Targeting: any block with `supports.spacing`, deny-list filter** | An allow-list is a maintenance treadmill that silently misses blocks users care about. Third-party blocks get support for free. |
 | D7 | **Free-only; clean internal API, no pro scaffolding** | Registry / Generator / Collector are already separate classes, which is what a future pro add-on would hook into. A `pro/` split designed before the first user shapes the codebase around unforecastable revenue. |
 | D8 | **Viewport breakpoints only for 1.0** | Container queries are technically superior and would dissolve the editor-preview problem by construction, but they need `container-type` on an ancestor you do not control in someone else's theme, and they double the UX surface. |
@@ -657,7 +664,9 @@ premise changes.
 - **Custom-property cascade rewrite** (§3.3). Replaces `!important` by rewriting core's
   inline `style` with `WP_HTML_Tag_Processor`. Strictly better cascade story; needs its own
   risk assessment because it mutates core output.
-- **`blockGap`**, if M5a says it fights the layout stylesheet.
+- **`blockGap`** — confirmed deferred by the M5a spike. Preferred route is upstream: make
+  `get_viewport_media_queries()` iterate its settings rather than read two fixed keys, which
+  would give N tiers to gap, layout and everything else core routes through it.
 
 ### Resolved by source review
 

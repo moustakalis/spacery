@@ -67,9 +67,10 @@ describe('spacingFeatures', () => {
 	});
 
 	/**
-	 * Gap flows through layout supports and a custom property rather than a
-	 * declaration on the wrapper, so it is a different problem with a different
-	 * failure mode. A block declaring only `blockGap` is not extendable yet.
+	 * Gap is not a declaration on the wrapper: core bakes it into layout
+	 * container rules whose shape differs per layout type, and WordPress 7.1
+	 * already emits it responsively at its own two viewports. Deferred to 1.1
+	 * by the M5a spike, so a block declaring only `blockGap` is not extendable.
 	 */
 	it('ignores blockGap entirely', () => {
 		expect(spacingFeatures({ blockGap: true })).toEqual([]);

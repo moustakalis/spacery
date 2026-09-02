@@ -8,9 +8,13 @@
  * own statement of what a block is willing to have spacing applied to, and
  * honouring them is both smaller and more accurate.
  *
- * `blockGap` is read but never offered. Gap flows through layout supports and
- * a custom property rather than a declaration on the wrapper, so it is a
- * different problem with a different failure mode — see M5a in docs/PLAN.md.
+ * `blockGap` is deliberately not offered, and the M5a spike settled why. Gap is
+ * not a declaration on the wrapper: core bakes it into rules on the inner
+ * block's layout container, in a shape that differs per layout type, and on a
+ * grid the gap value feeds the column-track calculation. Matching that means
+ * duplicating `wp_get_layout_style()`. WordPress 7.1 also already emits
+ * responsive gap at its own two viewports, so the only thing missing is N
+ * tiers. Full reasoning in docs/blockgap-spike.md.
  */
 
 import { __ } from '@wordpress/i18n';
