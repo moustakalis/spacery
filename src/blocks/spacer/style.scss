@@ -1,0 +1,12 @@
+/**
+ * Front-end and editor styles for the spacer.
+ *
+ * The base height is written as an inline style by save(); per-breakpoint
+ * heights arrive as a generated class from the server. Nothing here needs to
+ * know about either.
+ */
+.wp-block-spacery-spacer {
+	// A spacer is space. Anything it contains would be a bug.
+	clear: both;
+	pointer-events: none;
+}

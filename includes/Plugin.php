@@ -9,7 +9,9 @@ declare( strict_types=1 );
 
 namespace Spacery;
 
+use Spacery\Blocks\Spacer;
 use Spacery\Breakpoints\Registry;
+use Spacery\Editor\Settings;
 use Spacery\Render\BlockFilter;
 use Spacery\Styles\Collector;
 use Spacery\Styles\Generator;
@@ -79,6 +81,9 @@ final class Plugin {
 			new Generator( $this->breakpoints() ),
 			$this->collector()
 		) )->register();
+
+		( new Settings( $this->breakpoints() ) )->register();
+		( new Spacer() )->register();
 
 		/**
 		 * Fires once Spacery has finished booting.

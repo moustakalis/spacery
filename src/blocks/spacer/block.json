@@ -1,0 +1,39 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "spacery/spacer",
+	"title": "Spacery",
+	"category": "design",
+	"icon": "image-flip-vertical",
+	"description": "Vertical space whose height can change at every breakpoint.",
+	"keywords": [
+		"spacer",
+		"space",
+		"responsive",
+		"gap",
+		"breakpoint"
+	],
+	"textdomain": "spacery",
+	"attributes": {
+		"height": {
+			"type": "string",
+			"default": "100px"
+		},
+		"spacery": {
+			"type": "object"
+		}
+	},
+	"supports": {
+		"anchor": true,
+		"html": false,
+		"reusable": false,
+		"spacing": {
+			"margin": [
+				"top",
+				"bottom"
+			]
+		}
+	},
+	"editorScript": "file:./index.ts",
+	"style": "file:./style-index.css"
+}
