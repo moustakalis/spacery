@@ -47,6 +47,7 @@ declare module '@wordpress/block-editor' {
 	interface BlockProps extends Record<string, unknown> {
 		className?: string | undefined;
 		style?: Record<string, string | undefined> | undefined;
+		ref?: ((node: HTMLElement | null) => void) | undefined;
 	}
 
 	interface UseBlockProps {
@@ -80,7 +81,17 @@ declare module '@wordpress/components' {
 	export const Flex: React.ComponentType<{
 		justify?: string;
 		align?: string;
+		direction?: string;
+		gap?: number;
 		children?: React.ReactNode;
+	}>;
+
+	export const SelectControl: React.ComponentType<{
+		label?: string;
+		help?: string;
+		value?: string;
+		options?: Array<{ value: string; label: string }>;
+		onChange?: (value: string) => void;
 	}>;
 
 	export const FlexItem: React.ComponentType<{
@@ -101,7 +112,7 @@ declare module '@wordpress/components' {
 	}>;
 
 	export const __experimentalText: React.ComponentType<{
-		variant?: string;
+		variant?: string | undefined;
 		size?: number | string;
 		children?: React.ReactNode;
 	}>;

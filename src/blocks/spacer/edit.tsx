@@ -1,26 +1,32 @@
 /**
  * Editor UI for the spacer block.
  *
- * M3 gives the block a working, honest editor: a base height plus one height
- * control per breakpoint, each showing whether its value is set here or
- * inherited from a wider tier. It deliberately does NOT yet follow the editor's
- * viewport (D12) or preview the active tier on the canvas — that is M4, and it
- * needs the ResizeObserver wiring to the canvas iframe.
+ * Spacery has no viewport switcher of its own. Core 7.1 makes responsive
+ * editing a mode: the author turns on "Responsive styles", picks a device or
+ * drags the canvas edge, and every inspector control then edits that viewport.
+ * A second switcher here would compete with it — the editor announcing "Tablet"
+ * while Spacery announced "Laptop". Following the canvas instead means core's
+ * own resize handle becomes Spacery's tier selector, including for the tiers
+ * core has no device preset for.
  */
 
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
-	__experimentalUnitControl as UnitControl,
 	Button,
 	Flex,
 	FlexItem,
 	PanelBody,
+	SelectControl,
 	__experimentalText as Text,
+	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { useState } from 'react';
 
 import type { Breakpoint } from '../../breakpoints/types';
 import { useBreakpoints } from '../../breakpoints/useBreakpoints';
+import { useCanvasBreakpoint } from '../../breakpoints/useCanvasBreakpoint';
+import { useResponsiveEditing } from '../../breakpoints/useResponsiveEditing';
 import { heightAt, inheritedFrom, withHeight } from './height';
 import type { SpacerAttributes } from './types';
 
@@ -38,10 +44,26 @@ interface EditProps {
 
 export default function Edit({ attributes, setAttributes }: EditProps) {
 	const breakpoints = useBreakpoints();
-	const { height } = attributes;
+	const responsiveEditing = useResponsiveEditing();
+	const canvas = useCanvasBreakpoint(breakpoints);
+
+	/*
+	 * With core's responsive editing switched off there is no canvas to follow,
+	 * so the author picks a tier here instead.
+	 */
+	const [picked, setPicked] = useState<string>('');
+	const activeSlug = responsiveEditing ? canvas.slug : picked || undefined;
+
+	const active = breakpoints.find((b) => b.slug === activeSlug);
+
+	// The canvas shows the height that would actually apply at its width.
+	const previewHeight = active
+		? heightAt(attributes, breakpoints, active.slug)
+		: attributes.height;
 
 	const blockProps = useBlockProps({
-		style: { height },
+		ref: canvas.ref,
+		style: { height: previewHeight },
 	});
 
 	return (
@@ -51,26 +73,71 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 					<UnitControl
 						label={__('Default', 'spacery')}
 						help={__(
-							'Applies at every width unless a breakpoint below overrides it.',
+							'Applies at every width unless a narrower breakpoint overrides it.',
 							'spacery'
 						)}
-						value={height}
+						value={attributes.height}
 						units={UNITS}
 						onChange={(next?: string) =>
 							setAttributes({ height: next ?? '' })
 						}
 					/>
+
+					{!responsiveEditing && breakpoints.length > 0 && (
+						<SelectControl
+							label={__('Breakpoint', 'spacery')}
+							help={__(
+								'Responsive editing is switched off for this site, so choose a breakpoint here.',
+								'spacery'
+							)}
+							value={picked}
+							options={[
+								{ value: '', label: __('Default', 'spacery') },
+								...breakpoints.map((b) => ({
+									value: b.slug,
+									label: b.label,
+								})),
+							]}
+							onChange={setPicked}
+						/>
+					)}
 				</PanelBody>
 
-				{breakpoints.map((breakpoint: Breakpoint) => (
-					<TierControl
-						key={breakpoint.slug}
-						breakpoint={breakpoint}
+				{active ? (
+					<ActiveTier
+						breakpoint={active}
 						breakpoints={breakpoints}
 						attributes={attributes}
 						setAttributes={setAttributes}
 					/>
-				))}
+				) : (
+					<PanelBody title={__('Breakpoints', 'spacery')}>
+						<Text variant="muted">
+							{responsiveEditing
+								? __(
+										'Resize the canvas or switch device view to set a height for narrower screens.',
+										'spacery'
+									)
+								: __(
+										'Choose a breakpoint above to set a height for narrower screens.',
+										'spacery'
+									)}
+						</Text>
+					</PanelBody>
+				)}
+
+				{breakpoints.length > 0 && (
+					<PanelBody
+						title={__('Set at', 'spacery')}
+						initialOpen={false}
+					>
+						<Summary
+							breakpoints={breakpoints}
+							attributes={attributes}
+							activeSlug={activeSlug}
+						/>
+					</PanelBody>
+				)}
 			</InspectorControls>
 
 			<div {...blockProps} aria-hidden="true" />
@@ -78,44 +145,42 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 	);
 }
 
-interface TierControlProps extends EditProps {
+interface ActiveTierProps extends EditProps {
 	breakpoint: Breakpoint;
 	breakpoints: Breakpoint[];
 }
 
 /**
- * One breakpoint's height control.
+ * The control for whichever tier the canvas is showing.
  *
- * Shows an inherited value as the placeholder rather than as the value, so the
- * author can tell at a glance which tiers they have actually set. That
- * distinction is the whole reason the attribute stores only authored values and
- * lets the server expand them.
+ * The header names the tier and its boundary because core's badge and Spacery's
+ * tier legitimately disagree: at a 900px canvas core reads "Desktop" (>782px)
+ * while Spacery is on "Laptop" (≤1024px). Both are right within their own set,
+ * and hiding the difference would be worse than naming it.
  * @param root0
  * @param root0.breakpoint
  * @param root0.breakpoints
  * @param root0.attributes
  * @param root0.setAttributes
  */
-function TierControl({
+function ActiveTier({
 	breakpoint,
 	breakpoints,
 	attributes,
 	setAttributes,
-}: TierControlProps) {
+}: ActiveTierProps) {
 	const authored = attributes.spacery?.[breakpoint.slug]?.dimensions?.height;
 	const source = inheritedFrom(attributes, breakpoints, breakpoint.slug);
 	const effective = heightAt(attributes, breakpoints, breakpoint.slug);
-	const provenance = describeProvenance(authored, source);
 
 	return (
 		<PanelBody
 			title={sprintf(
-				/* translators: 1: breakpoint name, 2: its upper bound, e.g. "Tablet · ≤782px". */
+				/* translators: 1: breakpoint name, 2: its upper bound, e.g. "Laptop · ≤1024px". */
 				__('%1$s · ≤%2$s', 'spacery'),
 				breakpoint.label,
 				breakpoint.max
 			)}
-			initialOpen={undefined !== authored}
 		>
 			<UnitControl
 				value={authored ?? ''}
@@ -129,7 +194,7 @@ function TierControl({
 			<Flex justify="space-between" align="center">
 				<FlexItem>
 					<Text variant="muted" size={12}>
-						{provenance}
+						{describeProvenance(authored, source)}
 					</Text>
 				</FlexItem>
 
@@ -157,12 +222,66 @@ function TierControl({
 	);
 }
 
+interface SummaryProps {
+	breakpoints: Breakpoint[];
+	attributes: SpacerAttributes;
+	activeSlug: string | undefined;
+}
+
+/**
+ * Which tiers carry a value.
+ *
+ * Read-only on purpose. Making these clickable would rebuild the viewport
+ * switcher this design deliberately does not have, but the author still needs
+ * to see what they have set without dragging the canvas to every width.
+ * @param root0
+ * @param root0.breakpoints
+ * @param root0.attributes
+ * @param root0.activeSlug
+ */
+function Summary({ breakpoints, attributes, activeSlug }: SummaryProps) {
+	return (
+		<Flex direction="column" gap={1}>
+			{breakpoints.map((breakpoint) => {
+				const authored =
+					attributes.spacery?.[breakpoint.slug]?.dimensions?.height;
+
+				return (
+					<Flex key={breakpoint.slug} justify="space-between">
+						<FlexItem>
+							<Text
+								variant={
+									undefined === authored ? 'muted' : undefined
+								}
+								size={12}
+							>
+								{breakpoint.slug === activeSlug
+									? sprintf(
+											/* translators: %s: breakpoint name. */
+											__('%s (editing)', 'spacery'),
+											breakpoint.label
+										)
+									: breakpoint.label}
+							</Text>
+						</FlexItem>
+						<FlexItem>
+							<Text variant="muted" size={12}>
+								{authored ?? '—'}
+							</Text>
+						</FlexItem>
+					</Flex>
+				);
+			})}
+		</Flex>
+	);
+}
+
 /**
  * Says where a tier's height actually comes from.
  *
- * Kept separate so the control can show provenance plainly: authors need to
- * distinguish a value they set from one that merely reaches this tier, which is
- * the reason the attribute stores only authored values.
+ * Authors need to distinguish a value they set from one that merely reaches
+ * this tier — which is the reason the attribute stores only authored values and
+ * lets the server expand them.
  * @param authored
  * @param source
  */

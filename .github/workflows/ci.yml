@@ -116,3 +116,40 @@ jobs:
           slug: spacery
           build-dir: ./dist/spacery
           wp-version: '7.1'
+
+  e2e:
+    name: "E2E: editor"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      # wp-env needs Docker, which is why these cannot run outside CI.
+      - name: Start WordPress
+        run: pnpm run env:start
+
+      - name: Run end-to-end tests
+        run: pnpm run test:e2e
+
+      - name: Upload traces on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: artifacts/
+          retention-days: 7

@@ -3,17 +3,19 @@
 		"target": "ES2022",
 		"module": "ESNext",
 		"moduleResolution": "bundler",
-		"lib": ["ES2022", "DOM", "DOM.Iterable"],
+		"lib": [
+			"ES2022",
+			"DOM",
+			"DOM.Iterable"
+		],
 		"jsx": "react-jsx",
 		"jsxImportSource": "react",
-
 		"strict": true,
 		"noUncheckedIndexedAccess": true,
 		"noImplicitOverride": true,
 		"noFallthroughCasesInSwitch": true,
 		"exactOptionalPropertyTypes": true,
 		"verbatimModuleSyntax": true,
-
 		"allowJs": false,
 		"noEmit": true,
 		"skipLibCheck": true,
@@ -21,9 +23,20 @@
 		"forceConsistentCasingInFileNames": true,
 		"resolveJsonModule": true,
 		"isolatedModules": true,
-
-		"types": ["vitest/globals"]
+		"types": [
+			"vitest/globals",
+			"node"
+		]
 	},
-	"include": ["src/**/*", "tests/unit/**/*"],
-	"exclude": ["node_modules", "build", "vendor"]
+	"include": [
+		"src/**/*",
+		"tests/unit/**/*",
+		"tests/e2e/**/*",
+		"playwright.config.ts"
+	],
+	"exclude": [
+		"node_modules",
+		"build",
+		"vendor"
+	]
 }
