@@ -45,6 +45,7 @@ module.exports = [
 					'@wordpress/components': [
 						'__experimentalUnitControl',
 						'__experimentalText',
+						'__experimentalHeading',
 					],
 				},
 			],

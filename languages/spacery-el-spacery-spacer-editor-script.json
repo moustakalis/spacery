@@ -1,0 +1,199 @@
+{
+	"translation-revision-date": "",
+	"generator": "bin/make-translations.sh",
+	"domain": "messages",
+	"locale_data": {
+		"messages": {
+			"": {
+				"domain": "messages",
+				"lang": "el",
+				"plural-forms": "nplurals=2; plural=(n != 1);"
+			},
+			"Padding": [
+				"Εσωτερικό περιθώριο"
+			],
+			"Margin": [
+				"Εξωτερικό περιθώριο"
+			],
+			"Top": [
+				"Πάνω"
+			],
+			"Right": [
+				"Δεξιά"
+			],
+			"Bottom": [
+				"Κάτω"
+			],
+			"Left": [
+				"Αριστερά"
+			],
+			"Name": [
+				"Όνομα"
+			],
+			"Shown in the editor, e.g. Laptop.": [
+				"Εμφανίζεται στον επεξεργαστή, π.χ. Φορητός."
+			],
+			"Slug": [
+				"Σύντομο όνομα"
+			],
+			"Stored in block attributes. Lowercase letters, numbers and dashes.": [
+				"Αποθηκεύεται στις ιδιότητες του μπλοκ. Πεζά λατινικά γράμματα, αριθμοί και παύλες."
+			],
+			"Up to": [
+				"Έως"
+			],
+			"The widest screen this breakpoint covers.": [
+				"Η ευρύτερη οθόνη που καλύπτει αυτό το σημείο διακοπής."
+			],
+			"Remove %s": [
+				"Αφαίρεση %s"
+			],
+			"Remove": [
+				"Αφαίρεση"
+			],
+			"Add breakpoint": [
+				"Προσθήκη σημείου διακοπής"
+			],
+			"%d breakpoints is the maximum. Beyond that the editor asks more of an author than it gives back.": [
+				"Τα %d σημεία διακοπής είναι το ανώτατο όριο. Πέρα από αυτό, ο επεξεργαστής ζητά από τον συντάκτη περισσότερα απ' όσα του δίνει."
+			],
+			"Spacery": [
+				""
+			],
+			"Breakpoint source": [
+				"Πηγή σημείων διακοπής"
+			],
+			"Spacery adds responsive padding and margin to any block that supports spacing. These are the breakpoints it offers.": [
+				"Το Spacery προσθέτει αποκρίσιμο εσωτερικό και εξωτερικό περιθώριο σε κάθε μπλοκ που υποστηρίζει κενά. Αυτά είναι τα σημεία διακοπής που προσφέρει."
+			],
+			"One source is used at a time. Spacery never mixes two sets: values from different intentions sitting side by side produce a set nobody designed.": [
+				"Χρησιμοποιείται μία πηγή κάθε φορά. Το Spacery δεν αναμειγνύει ποτέ δύο σύνολα: τιμές από διαφορετικές προθέσεις, η μία δίπλα στην άλλη, παράγουν ένα σύνολο που δεν σχεδίασε κανείς."
+			],
+			"Your breakpoints": [
+				"Τα σημεία διακοπής σας"
+			],
+			"In use now": [
+				"Σε χρήση τώρα"
+			],
+			"Save changes": [
+				"Αποθήκευση αλλαγών"
+			],
+			"This theme — %s": [
+				"Αυτό το θέμα — %s"
+			],
+			"This theme — it declares no breakpoints": [
+				"Αυτό το θέμα — δεν δηλώνει σημεία διακοπής"
+			],
+			"Decide for me (currently %s)": [
+				"Ας αποφασίσει το Spacery (τώρα: %s)"
+			],
+			"Spacery's own — %s": [
+				"Του ίδιου του Spacery — %s"
+			],
+			"Breakpoints I define below": [
+				"Σημεία διακοπής που ορίζω παρακάτω"
+			],
+			"No breakpoints are active.": [
+				"Δεν υπάρχουν ενεργά σημεία διακοπής."
+			],
+			"Source: %s": [
+				"Πηγή: %s"
+			],
+			"up to %s": [
+				"έως %s"
+			],
+			"over %1$s, up to %2$s": [
+				"πάνω από %1$s, έως %2$s"
+			],
+			"Settings saved.": [
+				"Οι ρυθμίσεις αποθηκεύτηκαν."
+			],
+			"Those breakpoints were not saved, and nothing changed. Every breakpoint needs a name and a width in px, em or rem, and no two may share a width.": [
+				"Αυτά τα σημεία διακοπής δεν αποθηκεύτηκαν και δεν άλλαξε τίποτα. Κάθε σημείο διακοπής χρειάζεται όνομα και πλάτος σε px, em ή rem, και δύο σημεία δεν μπορούν να έχουν το ίδιο πλάτος."
+			],
+			"Something went wrong talking to the site.": [
+				"Κάτι πήγε στραβά στην επικοινωνία με τον ιστότοπο."
+			],
+			"WordPress already sets %d value here for narrower screens.": [
+				"Το WordPress ορίζει ήδη %d τιμή εδώ για στενότερες οθόνες.",
+				"Το WordPress ορίζει ήδη %d τιμές εδώ για στενότερες οθόνες."
+			],
+			"Moved into Spacery they follow its breakpoints, so narrower screens inherit them too unless a narrower breakpoint sets its own value.": [
+				"Μεταφερόμενες στο Spacery ακολουθούν τα δικά του σημεία διακοπής, οπότε τις κληρονομούν και οι στενότερες οθόνες, εκτός αν κάποιο στενότερο σημείο διακοπής ορίσει δική του τιμή."
+			],
+			"Manage these in Spacery": [
+				"Διαχείριση από το Spacery"
+			],
+			"Leaving %s to WordPress: no Spacery breakpoint covers the same widths.": [
+				"Το %s παραμένει στο WordPress: κανένα σημείο διακοπής του Spacery δεν καλύπτει τα ίδια πλάτη."
+			],
+			"Responsive spacing": [
+				"Αποκρίσιμα κενά"
+			],
+			"Breakpoint": [
+				"Σημείο διακοπής"
+			],
+			"Responsive editing is switched off for this site, so choose a breakpoint here.": [
+				"Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε επιλέξτε σημείο διακοπής εδώ."
+			],
+			"%1$s · ≤%2$s": [
+				"%1$s · ≤%2$s"
+			],
+			"Reset": [
+				"Επαναφορά"
+			],
+			"This site has no breakpoints, so there is nothing to set here yet.": [
+				"Αυτός ο ιστότοπος δεν έχει σημεία διακοπής, οπότε δεν υπάρχει ακόμη κάτι να οριστεί εδώ."
+			],
+			"This theme has spacing controls switched off for this block.": [
+				"Αυτό το θέμα έχει απενεργοποιημένα τα χειριστήρια κενών για αυτό το μπλοκ."
+			],
+			"None": [
+				"Κανένα"
+			],
+			"Resize the canvas or switch device view to set spacing for narrower screens.": [
+				"Αλλάξτε το μέγεθος του καμβά ή την προβολή συσκευής για να ορίσετε κενά για στενότερες οθόνες."
+			],
+			"Choose a breakpoint above to set spacing for narrower screens.": [
+				"Επιλέξτε σημείο διακοπής παραπάνω για να ορίσετε κενά για στενότερες οθόνες."
+			],
+			"Empty fields inherit from the nearest wider breakpoint.": [
+				"Τα κενά πεδία κληρονομούν από το πλησιέστερο ευρύτερο σημείο διακοπής."
+			],
+			"Height": [
+				"Ύψος"
+			],
+			"Default": [
+				"Προεπιλογή"
+			],
+			"Applies at every width unless a narrower breakpoint overrides it.": [
+				"Ισχύει σε κάθε πλάτος, εκτός αν το αντικαταστήσει ένα στενότερο σημείο διακοπής."
+			],
+			"Breakpoints": [
+				"Σημεία διακοπής"
+			],
+			"Resize the canvas or switch device view to set a height for narrower screens.": [
+				"Αλλάξτε το μέγεθος του καμβά ή την προβολή συσκευής για να ορίσετε ύψος για στενότερες οθόνες."
+			],
+			"Choose a breakpoint above to set a height for narrower screens.": [
+				"Επιλέξτε σημείο διακοπής παραπάνω για να ορίσετε ύψος για στενότερες οθόνες."
+			],
+			"Set at": [
+				"Ορισμένα σε"
+			],
+			"%s (editing)": [
+				"%s (σε επεξεργασία)"
+			],
+			"Set here": [
+				"Ορίστηκε εδώ"
+			],
+			"Inherited from %s": [
+				"Κληρονομείται από %s"
+			],
+			"Inherited from Default": [
+				"Κληρονομείται από την Προεπιλογή"
+			]
+		}
+	},
+	"source": "spacery-spacer-editor-script"
+}

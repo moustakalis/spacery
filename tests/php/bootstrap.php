@@ -22,6 +22,8 @@ function spacery_test_reset(): void {
 	$GLOBALS['spacery_test_options']  = array();
 	$GLOBALS['spacery_test_settings'] = array();
 	$GLOBALS['spacery_test_filters']  = array();
+
+	$GLOBALS['spacery_test_settings_errors'] = array();
 }
 
 spacery_test_reset();
@@ -125,6 +127,21 @@ function apply_filters( string $hook, $value, ...$args ) {
  */
 function __( string $text, string $domain = 'default' ): string {
 	return $text;
+}
+
+/**
+ * Stub of add_settings_error().
+ *
+ * Recorded rather than discarded: "the save was refused" is a claim worth
+ * asserting, and a silent refusal would look identical to a successful one.
+ *
+ * @param string $setting Option name.
+ * @param string $code    Error code.
+ * @param string $message Message shown to the user.
+ * @param string $type    Severity.
+ */
+function add_settings_error( string $setting, string $code, string $message, string $type = 'error' ): void {
+	$GLOBALS['spacery_test_settings_errors'][] = compact( 'setting', 'code', 'message', 'type' );
 }
 
 /**

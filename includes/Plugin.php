@@ -14,6 +14,9 @@ use Spacery\Blocks\Supported;
 use Spacery\Breakpoints\Registry;
 use Spacery\Editor\Extension;
 use Spacery\Editor\Settings;
+use Spacery\Settings\Options;
+use Spacery\Settings\RestController;
+use Spacery\Settings\Screen;
 use Spacery\Render\BlockFilter;
 use Spacery\Styles\Collector;
 use Spacery\Styles\Generator;
@@ -82,6 +85,8 @@ final class Plugin {
 
 		$this->booted = true;
 
+		( new I18n() )->register();
+
 		$this->breakpoints()->register();
 
 		( new BlockFilter(
@@ -93,6 +98,10 @@ final class Plugin {
 		( new Extension() )->register();
 		( new Settings( $this->breakpoints(), $this->supported() ) )->register();
 		( new Spacer() )->register();
+
+		( new Options() )->register();
+		( new RestController( $this->breakpoints() ) )->register();
+		( new Screen() )->register();
 
 		/**
 		 * Fires once Spacery has finished booting.

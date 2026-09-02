@@ -286,6 +286,16 @@ final class Registry {
 	/**
 	 * The theme's set, or null when it declares nothing usable.
 	 *
+	 * Public because the settings screen has to show what choosing "Theme"
+	 * would actually get you. Reading it does not make it active.
+	 */
+	public function theme(): ?BreakpointSet {
+		return $this->from_theme();
+	}
+
+	/**
+	 * The theme's set, or null when it declares nothing usable.
+	 *
 	 * A theme speaking to Spacery directly wins over core's two viewport
 	 * values, because it is the more specific statement of intent.
 	 */

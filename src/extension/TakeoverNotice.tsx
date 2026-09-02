@@ -12,7 +12,7 @@
  */
 
 import { Button, __experimentalText as Text } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 import type { SpaceryAttribute, StyleNode } from '../attribute/types';
 import { canTakeOver, type CoreOverride, takeOver } from './takeover';
@@ -56,8 +56,10 @@ export function TakeoverNotice({
 			<Text variant="muted" size={12}>
 				{sprintf(
 					/* translators: %d: number of values WordPress sets for narrower screens. */
-					__(
-						'WordPress already sets %d value(s) here for narrower screens.',
+					_n(
+						'WordPress already sets %d value here for narrower screens.',
+						'WordPress already sets %d values here for narrower screens.',
+						overrides.length,
 						'spacery'
 					),
 					overrides.length

@@ -59,10 +59,58 @@ declare module '@wordpress/element' {
 		props?: Record<string, unknown> | null,
 		...children: unknown[]
 	): React.ReactElement;
+
+	interface Root {
+		render: (children: React.ReactNode) => void;
+		unmount: () => void;
+	}
+
+	/**
+	 * WordPress's re-export of React 18's client root.
+	 *
+	 * Imported from here rather than `react-dom/client` because this is the
+	 * path `wp-scripts` maps to an external; the React one would be bundled.
+	 * @param container
+	 */
+	export function createRoot(container: Element): Root;
+}
+
+declare module '@wordpress/api-fetch' {
+	interface FetchOptions {
+		path: string;
+		method?: string;
+		data?: unknown;
+		parse?: boolean;
+	}
+
+	/**
+	 * Typed by the caller, because a REST response's shape is a property of the
+	 * route rather than of this function.
+	 * @param options
+	 */
+	export default function apiFetch<T>(options: FetchOptions): Promise<T>;
 }
 
 declare module '@wordpress/i18n' {
 	export function __(text: string, domain?: string): string;
+
+	/**
+	 * Plural form. Greek, like English, has two; other locales have more, which
+	 * is the reason a count belongs in `_n()` rather than in a "value(s)" fudge.
+	 *
+	 * @param single The singular source string.
+	 * @param plural The plural source string.
+	 * @param number The count deciding which form applies.
+	 * @param domain Text domain.
+	 * @return The translated string, still holding its placeholders.
+	 */
+	export function _n(
+		single: string,
+		plural: string,
+		number: number,
+		domain?: string
+	): string;
+
 	export function sprintf(format: string, ...args: unknown[]): string;
 }
 
@@ -117,6 +165,11 @@ declare module '@wordpress/components' {
 		size?: 'small' | 'compact' | 'default';
 		variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 		onClick?: () => void;
+		disabled?: boolean;
+		isBusy?: boolean;
+		isDestructive?: boolean;
+		/** Accessible name, when the visible text is not enough on its own. */
+		label?: string;
 		children?: React.ReactNode;
 	}>;
 
@@ -125,6 +178,50 @@ declare module '@wordpress/components' {
 		align?: string;
 		direction?: string;
 		gap?: number;
+		children?: React.ReactNode;
+	}>;
+
+	export const FlexBlock: React.ComponentType<{
+		children?: React.ReactNode;
+	}>;
+
+	export const Card: React.ComponentType<{ children?: React.ReactNode }>;
+	export const CardBody: React.ComponentType<{ children?: React.ReactNode }>;
+	export const CardHeader: React.ComponentType<{
+		children?: React.ReactNode;
+	}>;
+
+	export const Spinner: React.ComponentType<Record<string, never>>;
+
+	export const Notice: React.ComponentType<{
+		status?: 'success' | 'error' | 'warning' | 'info';
+		isDismissible?: boolean;
+		onRemove?: () => void;
+		children?: React.ReactNode;
+	}>;
+
+	export const RadioControl: React.ComponentType<{
+		label?: string;
+		help?: string;
+		selected?: string;
+		options?: Array<{ label: string; value: string }>;
+		onChange?: (value: string) => void;
+	}>;
+
+	export const TextControl: React.ComponentType<{
+		label?: string;
+		help?: string;
+		value?: string;
+		onChange?: (value: string) => void;
+	}>;
+
+	/**
+	 * Still underscore-prefixed in WordPress 7.1, like the other two Spacery
+	 * uses. `Heading` gives the settings screen headings that match the admin's
+	 * own typography scale rather than raw `<h2>` elements.
+	 */
+	export const __experimentalHeading: React.ComponentType<{
+		level?: number;
 		children?: React.ReactNode;
 	}>;
 

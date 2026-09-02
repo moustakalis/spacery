@@ -68,5 +68,7 @@ final class Extension {
 			is_string( $version ) ? $version : \Spacery\VERSION,
 			array( 'in_footer' => true )
 		);
+
+		\Spacery\I18n::set_script_translations( self::HANDLE );
 	}
 }

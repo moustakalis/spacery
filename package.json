@@ -1,7 +1,7 @@
 {
 	"name": "spacery",
 	"version": "0.1.0",
-	"description": "Responsive spacing for the block editor — unlimited, theme-defined breakpoints for any block.",
+	"description": "Responsive spacing for the block editor \u2014 unlimited, theme-defined breakpoints for any block.",
 	"author": "Nickos Moustakas (https://github.com/moustakalis)",
 	"license": "GPL-2.0-or-later",
 	"private": true,
@@ -9,6 +9,7 @@
 		"spacery.php",
 		"includes",
 		"build",
+		"languages",
 		"readme.txt",
 		"LICENSE"
 	],
@@ -22,6 +23,8 @@
 	"packageManager": "pnpm@11.25.0",
 	"scripts": {
 		"build": "wp-scripts build",
+		"i18n:pot": "bash bin/make-pot.sh",
+		"i18n:build": "bash bin/make-translations.sh",
 		"start": "wp-scripts start",
 		"format": "wp-scripts format",
 		"lint:js": "wp-scripts lint-js",
