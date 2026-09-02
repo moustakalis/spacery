@@ -77,7 +77,21 @@ test.describe('spacery/spacer', () => {
 		// it says nothing unless the sidebar is definitely open.
 		await editor.openDocumentSettingsSidebar();
 
-		for (const browserWidth of [1600, 1100, 900, 700]) {
+		/*
+		 * Kept at or above 900px on purpose.
+		 *
+		 * Below Gutenberg's `medium` breakpoint (782px) WordPress dismisses the
+		 * settings sidebar automatically, so there is no inspector to assert
+		 * against -- a 700px run reports `shown=missing` with the canvas filling
+		 * the whole width, because the sidebar that normally takes ~280px is
+		 * gone. That is the editor's own responsive behaviour, not Spacery's.
+		 *
+		 * These three widths still land the canvas in three different tiers
+		 * (none, Laptop, Tablet), which is what this test is about. Resolution
+		 * at every tier, including Mobile, is covered exhaustively by the unit
+		 * tests, which need no editor chrome to be honest.
+		 */
+		for (const browserWidth of [1600, 1100, 900]) {
 			await page.setViewportSize({ width: browserWidth, height: 900 });
 
 			/*
@@ -174,7 +188,9 @@ async function measureCanvas(page: Page): Promise<number> {
  *
  * Returns 'none' for the default range, and 'missing' when neither the hint nor
  * a tier panel is present -- which distinguishes "Spacery picked the wrong
- * tier" from "the panel is not rendered at all".
+ * tier" from "the panel is not rendered at all". That distinction is what
+ * identified the sidebar being auto-dismissed at narrow widths, after four
+ * rounds of guessing at measurement instead.
  *
  * @param page The Playwright page.
  * @return The tier label, 'none', or 'missing'.
