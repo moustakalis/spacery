@@ -569,7 +569,13 @@ the value passed is a list of blocks to leave alone, and a filter whose name say
 *Takeover is offered only when the boundaries agree.* A Spacery tier sharing core's slug
 but not its bound would apply the value over a different range of widths, which is a
 change of meaning dressed up as a move; where they differ Spacery says so and leaves the
-value where it is. Both features are gated twice — by block supports and by
+value where it is.
+*Adoption still widens where a value applies, and the panel says so.* Core's viewports are
+disjoint with no inheritance — a `@tablet` padding applies between 480px and 782px and
+nowhere else — while Spacery's tiers are the desktop-first cascade of D13, so the same
+value at `tablet` also reaches Mobile. That is the model the author gets for every other
+value they set in this panel, so the answer is to state it above the button, not to
+special-case adopted values into behaving unlike everything around them. Both features are gated twice — by block supports and by
 `settings.spacing.padding` / `.margin` — because core hides its own controls when either
 says no, and a panel offering padding a theme disabled would generate CSS the site asked
 not to have.

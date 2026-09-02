@@ -1,5 +1,14 @@
 /**
  * Surfaces values core already sets responsively, and offers to adopt them.
+ *
+ * Adoption is not a no-op, and the notice says so. Core's viewports are
+ * disjoint bands with no inheritance between them: a `@tablet` padding applies
+ * between 480px and 782px and nowhere else. Spacery's tiers are a desktop-first
+ * cascade, so the same value in its `tablet` tier also reaches everything
+ * narrower. That is the model the author gets for every other value they set
+ * here — but a takeover changes the widths a value already applies at, which is
+ * exactly the kind of silent change D11's boundary rule exists to prevent. So
+ * it is stated before the button rather than discovered afterwards.
  */
 
 import { Button, __experimentalText as Text } from '@wordpress/components';
@@ -54,6 +63,15 @@ export function TakeoverNotice({
 					overrides.length
 				)}
 			</Text>
+
+			{movable.length > 0 && (
+				<Text variant="muted" size={12}>
+					{__(
+						'Moved into Spacery they follow its breakpoints, so narrower screens inherit them too unless a narrower breakpoint sets its own value.',
+						'spacery'
+					)}
+				</Text>
+			)}
 
 			{movable.length > 0 && (
 				<Button

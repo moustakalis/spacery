@@ -5,7 +5,7 @@
  * made against a real editor with core's own blocks registered: that the panel
  * reaches them, that Spacery's attribute never touches their saved markup, and
  * that a value WordPress already sets responsively can be moved across without
- * leaving two rules behind.
+ * leaving a competing rule behind.
  */
 
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
@@ -34,12 +34,21 @@ const SUPPORTED = ['core/group', 'core/columns', 'core/cover'];
 /**
  * The block's own padding, and the value WordPress sets for tablets.
  *
- * Odd on purpose: the front-end assertion counts how many rules in the whole
- * document set this exact declaration, so a value a theme might plausibly use
- * would make a second hit ambiguous.
+ * Odd on purpose: the front-end assertion looks for every style block in the
+ * document setting this exact declaration, and a value a theme might plausibly
+ * use would make a stray match ambiguous.
  */
 const BASE = '61px';
 const TAKEN = '37px';
+
+/**
+ * The `id` of the stylesheet core prints for Spacery's Style Engine store.
+ *
+ * Core builds it as `wp-style-engine-{store}` and WordPress appends
+ * `-inline-css`, so this follows from `Collector::CONTEXT` being `spacery`.
+ * Spacery never prints this tag itself — that is decision D14.
+ */
+const SPACERY_STYLESHEET = 'wp-style-engine-spacery-inline-css';
 
 test.describe('spacing extension', () => {
 	test.beforeEach(async ({ admin, page }) => {
@@ -196,46 +205,62 @@ test.describe('spacing extension', () => {
 		await page.goto(`/?p=${postId}`);
 
 		const html = await page.content();
-
-		// One rule for the property at that width, and it is Spacery's.
-		expect(html).toContain('@media (480px < width <= 782px)');
-		expect(html).toMatch(
-			new RegExp(`\\.spy-[0-9a-f]+\\{padding-top:${TAKEN} !important;\\}`)
+		const setting = styleSheets(html).filter((sheet) =>
+			sheet.css.includes(`padding-top:${TAKEN}`)
 		);
 
 		/*
-		 * Asserted as the surrounding CSS, not as a count.
-		 *
-		 * A count that comes back as 2 says only that something else on the page
-		 * also sets this value, which is the least useful thing it could say --
-		 * whether that is core still emitting its own rule, or Spacery emitting
-		 * twice, is the entire question. Showing each site answers it from the
-		 * CI log alone. `TAKEN` is deliberately an odd value no theme or core
-		 * stylesheet would produce, so a second hit means a real second rule.
+		 * Nothing but Spacery sets it. This is the takeover claim: core's own
+		 * `@tablet` rule is gone from the page, not merely overridden.
 		 */
-		expect(rulesSetting(html, `padding-top:${TAKEN}`)).toHaveLength(1);
+		expect(setting.map((sheet) => sheet.id)).toEqual([SPACERY_STYLESHEET]);
+
+		/*
+		 * Two bands, not one, and that is the point rather than a leak.
+		 *
+		 * An earlier version of this test asserted a single rule and failed,
+		 * which was the test being wrong about the feature. Core's viewports are
+		 * disjoint: `@tablet` applies between 480px and 782px and nowhere else.
+		 * Spacery's tiers are a desktop-first cascade, so a value at `tablet`
+		 * reaches Mobile too -- the server materializes the cascade into bands
+		 * rather than relying on one media query overriding another. Adopting a
+		 * core value therefore widens where it applies, which is why the panel
+		 * says so before the author clicks.
+		 *
+		 * Asserted with the hash normalized, exactly as SpacerTest does on the
+		 * server, so both suites make the same claim in the same shape.
+		 */
+		expect(setting[0]!.css.replace(/spy-[0-9a-f]+/g, 'spy-HASH')).toBe(
+			`@media (480px < width <= 782px){.spy-HASH{padding-top:${TAKEN} !important;}}` +
+				`@media (width <= 480px){.spy-HASH{padding-top:${TAKEN} !important;}}`
+		);
 	});
 });
 
 /**
- * Every rule in the document containing a declaration, with its selector.
+ * Every `<style id="...">` block on the page, with its CSS.
  *
- * @param html        The page HTML.
- * @param declaration The declaration to look for, e.g. `padding-top:37px`.
- * @return One entry per rule, each showing the text around the declaration.
+ * `sourceURL` comments are stripped: `wp-env` runs with `SCRIPT_DEBUG` on, so
+ * core appends one to every inline stylesheet, and a test that compared them
+ * would be asserting on a debug setting.
+ *
+ * @param html The page HTML.
+ * @return One entry per identified stylesheet.
  */
-function rulesSetting(html: string, declaration: string): string[] {
-	const found: string[] = [];
-	let from = 0;
+function styleSheets(html: string): Array<{ id: string; css: string }> {
+	const sheets: Array<{ id: string; css: string }> = [];
+	const pattern = /<style[^>]*\bid="([^"]+)"[^>]*>([\s\S]*?)<\/style>/g;
 
 	for (;;) {
-		const at = html.indexOf(declaration, from);
+		const match = pattern.exec(html);
 
-		if (at < 0) {
-			return found;
+		if (null === match) {
+			return sheets;
 		}
 
-		found.push(html.slice(Math.max(0, at - 120), at + declaration.length));
-		from = at + declaration.length;
+		sheets.push({
+			id: match[1]!,
+			css: match[2]!.replace(/\/\*#\s*sourceURL=[\s\S]*?\*\//g, '').trim(),
+		});
 	}
 }
