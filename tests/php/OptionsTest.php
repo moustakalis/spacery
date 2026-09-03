@@ -130,6 +130,11 @@ final class OptionsTest extends TestCase {
 
 	/**
 	 * A refusal the user is never told about is indistinguishable from a save.
+	 *
+	 * Only where `add_settings_error()` exists, which is not a REST request —
+	 * the settings screen learns of a refusal by comparing what came back with
+	 * what it sent instead. The bootstrap defines the stub, so this exercises
+	 * the branch that is taken in an admin-side save.
 	 */
 	public function test_a_refusal_registers_an_error(): void {
 		$this->options->sanitize_breakpoints(

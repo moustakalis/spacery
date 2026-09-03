@@ -153,12 +153,26 @@ final class Options {
 		$set = BreakpointSet::from_array( $value );
 
 		if ( ! $set instanceof BreakpointSet ) {
-			add_settings_error(
-				Registry::OPTION_CUSTOM,
-				'spacery_invalid_breakpoints',
-				__( 'Those breakpoints were not saved. Every breakpoint needs a name and a width in px, em or rem, widths must all differ, and there is a maximum of 12.', 'spacery' ),
-				'error'
-			);
+			/*
+			 * Guarded, because `add_settings_error()` lives in wp-admin and a
+			 * REST request never loads it. Calling it unguarded made every
+			 * refused save a 500 instead of a refusal -- and since the screen
+			 * saves through `/wp/v2/settings`, that was the *only* path a person
+			 * could reach it by. Core guards its own call in `sanitize_option()`
+			 * for the same reason; see wp-includes/formatting.php.
+			 *
+			 * The screen does not depend on this. It compares what came back
+			 * with what it sent, which works in any context. The notice is for
+			 * anything still using the Settings API's own form rendering.
+			 */
+			if ( function_exists( 'add_settings_error' ) ) {
+				add_settings_error(
+					Registry::OPTION_CUSTOM,
+					'spacery_invalid_breakpoints',
+					__( 'Those breakpoints were not saved. Every breakpoint needs a name and a width in px, em or rem, widths must all differ, and there is a maximum of 12.', 'spacery' ),
+					'error'
+				);
+			}
 
 			return $this->stored_breakpoints();
 		}

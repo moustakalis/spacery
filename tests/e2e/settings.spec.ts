@@ -27,14 +27,39 @@ const OPTIONS = {
 const appRoot = '#spacery-settings';
 
 test.describe('settings screen', () => {
+	/**
+	 * Server errors, surfaced as failures rather than as console noise.
+	 *
+	 * A refused save used to fatal — the sanitizer called `add_settings_error()`,
+	 * which lives in wp-admin and is absent from a REST request. The suite
+	 * reported "element not found" for the notice, and the 500 that caused it
+	 * appeared only as a stray browser console line above the results. Watching
+	 * responses turns that into the first thing the failure says.
+	 */
+	let serverErrors: string[] = [];
+
+	test.beforeEach(async ({ page }) => {
+		serverErrors = [];
+
+		page.on('response', (response) => {
+			if (response.status() >= 500) {
+				serverErrors.push(
+					`${response.status()} ${response.request().method()} ${response.url()}`
+				);
+			}
+		});
+	});
+
 	test.afterEach(async ({ requestUtils }) => {
-		// Later specs read the resolved set; leaving a source chosen would make
-		// their expectations depend on the order tests happened to run in.
+		// Reset first. Asserting before this would let a failing check skip the
+		// cleanup and leave the next spec reading options this one chose.
 		await requestUtils.rest({
 			path: '/wp/v2/settings',
 			method: 'POST',
 			data: OPTIONS,
 		});
+
+		expect(serverErrors).toEqual([]);
 	});
 
 	test('saves a source and still shows it after a reload', async ({
