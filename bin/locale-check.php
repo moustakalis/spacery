@@ -23,10 +23,14 @@
  * was called; the option keeps its old value. See the CI workflow, which now
  * installs the language pack rather than assuming the option took.
  *
+ * No `declare( strict_types=1 )` here, deliberately. `wp eval-file` does not
+ * include the file -- it reads it, strips the opening tag and hands the rest to
+ * `eval()`, and a `declare()` is only legal as the first statement of a real
+ * script. Adding one turns this diagnostic into the fatal error it exists to
+ * explain.
+ *
  * @package Spacery
  */
-
-declare( strict_types=1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit( 1 );
