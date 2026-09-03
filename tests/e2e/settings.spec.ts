@@ -108,7 +108,7 @@ test.describe('settings screen', () => {
 		 * and that the ranges are disjoint, which is the claim -- a tier's lower
 		 * edge is the next tier's boundary, not zero.
 		 */
-		await expect(app.getByText('Source: spacery')).toBeVisible();
+		await expect(app.getByText("From: Spacery's own set")).toBeVisible();
 		await expect(app.getByText('over 1024px, up to 1280px')).toBeVisible();
 		await expect(app.getByText('over 782px, up to 1024px')).toBeVisible();
 		await expect(app.getByText('over 480px, up to 782px')).toBeVisible();

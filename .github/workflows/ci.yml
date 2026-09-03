@@ -33,6 +33,13 @@ jobs:
       - name: PHP syntax check
         run: find spacery.php includes -name '*.php' -print0 | xargs -0 -n1 -P4 php -l
 
+      # Versions that disagree ship an update WordPress never offers anyone, and
+      # packaging lists that disagree put a file on WordPress.org that is absent
+      # from the zip. Neither shows up until someone is looking at the directory
+      # wondering what happened.
+      - name: Release metadata agrees with itself
+        run: python3 bin/check-release.py
+
       - name: PHPCS
         run: composer run lint
 

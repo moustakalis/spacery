@@ -1,0 +1,46 @@
+# Everything that is not the plugin.
+#
+# Used by the WordPress.org deploy action, which publishes the repository minus
+# these paths. `package.json#files` says the same thing for `wp-scripts
+# plugin-zip`; the two are checked against each other by CI, because a file that
+# reaches WordPress.org but not the zip (or the reverse) is a difference nobody
+# would notice until a review comment.
+
+/.git
+/.github
+/.idea
+/.vscode
+/node_modules
+/vendor
+/artifacts
+/dist
+/docs
+/src
+/tests
+/bin
+/assets
+
+/.distignore
+/.editorconfig
+/.gitignore
+/.npmrc
+/.nvmrc
+/.prettierrc.js
+/.wp-env.json
+/CHANGELOG.md
+/README.md
+/composer.json
+/composer.lock
+/eslint.config.cjs
+/package.json
+/playwright.config.ts
+/playwright-locale.config.ts
+/pnpm-lock.yaml
+/pnpm-workspace.yaml
+/tsconfig.json
+/vitest.config.ts
+/webpack.config.js
+
+*.dist
+*.zip
+*.log

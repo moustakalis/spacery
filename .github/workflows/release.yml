@@ -1,0 +1,63 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publish to WordPress.org
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      # A tag is not a version. Publishing v1.0.1 from a tree whose plugin
+      # header still says 1.0.0 ships an update WordPress will never offer
+      # anyone, because it compares the header against the directory's version
+      # rather than the tag. Cheaper to refuse here than to withdraw a release.
+      - name: The tag and the plugin must agree
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          header="$(grep -oP '^\s*\*\s*Version:\s*\K.+' spacery.php | tr -d '[:space:]')"
+          stable="$(grep -oP '^Stable tag:\s*\K.+' readme.txt | tr -d '[:space:]')"
+
+          echo "tag=$tag header=$header stable=$stable"
+
+          if [ "$tag" != "$header" ] || [ "$tag" != "$stable" ]; then
+            echo "::error::Tag $tag does not match the plugin header ($header) or readme.txt Stable tag ($stable)."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Deploy
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        with:
+          generate-zip: true
+        env:
+          SLUG: spacery
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          BUILD_DIR: ./
+          ASSETS_DIR: assets
+
+      - name: Attach the zip to the GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ github.workspace }}/spacery.zip
+          generate_release_notes: true

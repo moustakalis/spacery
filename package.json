@@ -1,6 +1,6 @@
 {
 	"name": "spacery",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"description": "Responsive spacing for the block editor \u2014 unlimited, theme-defined breakpoints for any block.",
 	"author": "Nickos Moustakas (https://github.com/moustakalis)",
 	"license": "GPL-2.0-or-later",

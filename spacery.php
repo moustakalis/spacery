@@ -3,7 +3,7 @@
  * Plugin Name:       Spacery
  * Plugin URI:        https://github.com/moustakalis/spacery
  * Description:       Responsive spacing for the block editor — unlimited, theme-defined breakpoints for any block.
- * Version:           0.1.0
+ * Version:           1.0.0
  * Requires at least: 7.1
  * Requires PHP:      8.2
  * Author:            Nickos Moustakas
@@ -32,7 +32,7 @@ const PLUGIN_FILE = __FILE__;
  * Plugin version. Kept in sync with the header above and readme.txt by
  * `npm run sync-version`; the header is the source of truth.
  */
-const VERSION = '0.1.0';
+const VERSION = '1.0.0';
 
 /**
  * Minimum supported environment. Checked at load so an unsupported site gets an

@@ -4,7 +4,7 @@
 # compiled from it.
 msgid ""
 msgstr ""
-"Project-Id-Version: Spacery 0.1.0\n"
+"Project-Id-Version: Spacery 1.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/moustakalis/spacery/issues\n"
 "Last-Translator: Nickos Moustakas\n"
 "Language-Team: Greek\n"
@@ -93,7 +93,7 @@ msgstr "Προσαρμοσμένα σημεία διακοπής"
 msgid "Breakpoints defined on the Spacery settings screen."
 msgstr "Σημεία διακοπής ορισμένα στην οθόνη ρυθμίσεων του Spacery."
 
-#: includes/Settings/Options.php:159
+#: includes/Settings/Options.php:172
 msgid "Those breakpoints were not saved. Every breakpoint needs a name and a width in px, em or rem, widths must all differ, and there is a maximum of 12."
 msgstr "Αυτά τα σημεία διακοπής δεν αποθηκεύτηκαν. Κάθε σημείο διακοπής χρειάζεται όνομα και πλάτος σε px, em ή rem, όλα τα πλάτη πρέπει να διαφέρουν, και το ανώτατο όριο είναι 12."
 
@@ -275,8 +275,8 @@ msgstr "Αυτό το θέμα — δεν δηλώνει σημεία διακο
 #. translators: %s: the source that will be followed.
 #: src/settings/App.js:94
 #, js-format
-msgid "Decide for me (currently %s)"
-msgstr "Ας αποφασίσει το Spacery (τώρα: %s)"
+msgid "Decide for me — currently %s"
+msgstr "Ας αποφασίσει το Spacery — τώρα: %s"
 
 #. translators: %s: comma-separated breakpoint names.
 #: src/settings/App.js:101
@@ -292,11 +292,11 @@ msgstr "Σημεία διακοπής που ορίζω παρακάτω"
 msgid "No breakpoints are active."
 msgstr "Δεν υπάρχουν ενεργά σημεία διακοπής."
 
-#. translators: %s: the source in use, e.g. "theme".
+#. translators: %s: where the breakpoints come from.
 #: src/settings/App.js:123
 #, js-format
-msgid "Source: %s"
-msgstr "Πηγή: %s"
+msgid "From: %s"
+msgstr "Από: %s"
 
 #. translators: %s: a CSS length, e.g. "480px".
 #: src/settings/App.js:141
@@ -310,15 +310,27 @@ msgstr "έως %s"
 msgid "over %1$s, up to %2$s"
 msgstr "πάνω από %1$s, έως %2$s"
 
-#: src/settings/App.js:166
+#: src/settings/App.js:161
+msgid "your theme"
+msgstr "το θέμα σας"
+
+#: src/settings/App.js:163
+msgid "the breakpoints you defined"
+msgstr "τα σημεία διακοπής που ορίσατε"
+
+#: src/settings/App.js:165
+msgid "Spacery's own set"
+msgstr "το δικό του σύνολο του Spacery"
+
+#: src/settings/App.js:187
 msgid "Settings saved."
 msgstr "Οι ρυθμίσεις αποθηκεύτηκαν."
 
-#: src/settings/App.js:174
+#: src/settings/App.js:195
 msgid "Those breakpoints were not saved, and nothing changed. Every breakpoint needs a name and a width in px, em or rem, and no two may share a width."
 msgstr "Αυτά τα σημεία διακοπής δεν αποθηκεύτηκαν και δεν άλλαξε τίποτα. Κάθε σημείο διακοπής χρειάζεται όνομα και πλάτος σε px, em ή rem, και δύο σημεία δεν μπορούν να έχουν το ίδιο πλάτος."
 
-#: src/settings/App.js:194
+#: src/settings/App.js:215
 msgid "Something went wrong talking to the site."
 msgstr "Κάτι πήγε στραβά στην επικοινωνία με τον ιστότοπο."
 

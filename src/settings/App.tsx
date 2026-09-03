@@ -23,6 +23,7 @@ import { fetchInfo, fetchSettings, saveSettings, wasAccepted } from './data';
 import type {
 	Breakpoint,
 	BreakpointInfo,
+	EffectiveSource,
 	StoredSettings,
 	StoredSource,
 } from './types';
@@ -225,8 +226,8 @@ function sourceOptions(
 			value: '',
 			label: sprintf(
 				/* translators: %s: the source that will be followed. */
-				__('Decide for me (currently %s)', 'spacery'),
-				info.defaultSource
+				__('Decide for me — currently %s', 'spacery'),
+				sourceName(info.defaultSource)
 			),
 		},
 		{ value: 'theme', label: themeLabel },
@@ -267,9 +268,9 @@ function ResolvedSet({ info }: { info: BreakpointInfo }): React.ReactElement {
 			<FlexItem>
 				<Text variant="muted" size={12}>
 					{sprintf(
-						/* translators: %s: the source in use, e.g. "theme". */
-						__('Source: %s', 'spacery'),
-						info.effectiveSource
+						/* translators: %s: where the breakpoints come from. */
+						__('From: %s', 'spacery'),
+						sourceName(info.effectiveSource)
 					)}
 				</Text>
 			</FlexItem>
@@ -319,6 +320,28 @@ function band(tiers: Breakpoint[], index: number): string {
 		narrower.max,
 		tier.max
 	);
+}
+
+/**
+ * A readable name for a source.
+ *
+ * The stored value is a slug, and a settings screen that prints `spacery` at
+ * someone is showing them the database rather than an answer. Exhaustive over
+ * `EffectiveSource` on purpose: adding a fourth source should fail the
+ * typecheck here rather than quietly render its slug.
+ *
+ * @param source The source in effect.
+ * @return A human-readable name.
+ */
+function sourceName(source: EffectiveSource): string {
+	switch (source) {
+		case 'theme':
+			return __('your theme', 'spacery');
+		case 'custom':
+			return __('the breakpoints you defined', 'spacery');
+		default:
+			return __("Spacery's own set", 'spacery');
+	}
 }
 
 /**

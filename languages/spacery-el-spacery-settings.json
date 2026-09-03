@@ -84,8 +84,8 @@
 			"This theme — it declares no breakpoints": [
 				"Αυτό το θέμα — δεν δηλώνει σημεία διακοπής"
 			],
-			"Decide for me (currently %s)": [
-				"Ας αποφασίσει το Spacery (τώρα: %s)"
+			"Decide for me — currently %s": [
+				"Ας αποφασίσει το Spacery — τώρα: %s"
 			],
 			"Spacery's own — %s": [
 				"Του ίδιου του Spacery — %s"
@@ -96,14 +96,23 @@
 			"No breakpoints are active.": [
 				"Δεν υπάρχουν ενεργά σημεία διακοπής."
 			],
-			"Source: %s": [
-				"Πηγή: %s"
+			"From: %s": [
+				"Από: %s"
 			],
 			"up to %s": [
 				"έως %s"
 			],
 			"over %1$s, up to %2$s": [
 				"πάνω από %1$s, έως %2$s"
+			],
+			"your theme": [
+				"το θέμα σας"
+			],
+			"the breakpoints you defined": [
+				"τα σημεία διακοπής που ορίσατε"
+			],
+			"Spacery's own set": [
+				"το δικό του σύνολο του Spacery"
 			],
 			"Settings saved.": [
 				"Οι ρυθμίσεις αποθηκεύτηκαν."
