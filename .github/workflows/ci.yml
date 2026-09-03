@@ -198,17 +198,28 @@ jobs:
         run: pnpm run test:e2e
 
       # M6's exit criterion. The site is switched to Greek and both halves of the
-      # translation pipeline are exercised: `wp eval` proves PHP loads the .mo
-      # through WordPress's own just-in-time mechanism, and the Playwright spec
-      # proves the browser loads the per-handle .json.
+      # translation pipeline are exercised: the PHP check proves WordPress's
+      # just-in-time loading finds the .mo, and the Playwright spec proves the
+      # browser loads the per-handle .json.
+      #
+      # Setting the option alone does not switch the site. `sanitize_option()`
+      # restricts WPLANG to the locales that have a core language pack in
+      # WP_LANG_DIR and silently restores the previous value otherwise, so
+      # `wp option update WPLANG el` reports success on a site with no Greek
+      # installed and leaves it in English. Installing the pack is what makes
+      # the option stick, and it is what a Greek site actually looks like.
       - name: Switch the test site to Greek
-        run: pnpm run env run tests-cli wp option update WPLANG el
+        run: pnpm run env run tests-cli wp language core install el --activate
 
+      # The assertion lives in a PHP file rather than in a pipe to `grep`, so
+      # that a failure says which link broke -- locale, boot, registered path,
+      # missing .mo -- instead of only that the output was English.
       - name: A second locale renders (PHP)
         run: |
-          pnpm run env run tests-cli wp eval 'echo __( "Save changes", "spacery" );' \
-            | tee /tmp/translated.txt
-          grep -q 'Αποθήκευση αλλαγών' /tmp/translated.txt
+          pnpm run env run tests-cli \
+            wp eval-file wp-content/plugins/spacery/bin/locale-check.php \
+            | tee /tmp/locale-check.txt
+          grep -q '^OK:' /tmp/locale-check.txt
 
       - name: A second locale renders (editor and admin)
         run: pnpm exec playwright test --config playwright-locale.config.ts
