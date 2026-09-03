@@ -19,19 +19,11 @@ these, so the 1x and 2x variants cannot drift apart.
 ## Still outstanding
 
 Screenshots. They need a running WordPress with the plugin active, so they
-cannot be generated the way the icon and banner can. The order of the files has
-to match a `== Screenshots ==` list in `readme.txt`, which is deliberately not
-there yet: a section pointing at files that do not exist renders as broken
-images on the plugin page.
+cannot be generated the way the icon and banner can.
 
-Worth capturing, in this order:
-
-1. The block inspector's Responsive spacing panel on a Group block, with a
-   breakpoint being edited.
-2. The settings screen, showing the three breakpoint sources and the resolved
-   set beneath them.
-3. The spacer block with a different height at two breakpoints.
-
-Add `== Screenshots ==` to `readme.txt` in the same order when the files exist.
+[`docs/asset-brief.md`](../docs/asset-brief.md) is the handoff: what each shot
+must show, how to run the site to capture it, the palette and mark if anything
+is being redrawn, and why `readme.txt` has no `== Screenshots ==` section until
+the files exist.
 
 See https://developer.wordpress.org/plugins/wordpress-org/plugin-assets/

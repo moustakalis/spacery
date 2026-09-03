@@ -104,6 +104,7 @@ tests/{php,unit,e2e,contract}
 docs/PLAN.md             Architecture and roadmap
 docs/FILTERS.md          Developer API
 docs/blockgap-spike.md   Why responsive blockGap is core's job, not Spacery's
+docs/asset-brief.md      Handoff for the WordPress.org icon, banner and screenshots
 ```
 
 ## License
