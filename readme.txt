@@ -1,5 +1,5 @@
 === Spacery ===
-Contributors: moustakalis
+Contributors: nikosmoustakas
 Tags: spacer, responsive, spacing, breakpoints, block editor
 Requires at least: 7.1
 Tested up to: 7.1
