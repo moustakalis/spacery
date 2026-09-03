@@ -26,6 +26,21 @@ const OPTIONS = {
  */
 const appRoot = '#spacery-settings';
 
+/**
+ * A CSS selector for a source radio, addressed by the value it submits.
+ *
+ * Not by its label: the "Decide for me" option names the source it would
+ * currently fall back to, so every source name appears in two labels by
+ * design. On a site whose default is Spacery's own preset, a label match for
+ * /Spacery's own/ finds both "Decide for me -- currently Spacery's own set"
+ * and "Spacery's own -- Desktop (1280px), ...", and strict mode fails. The
+ * value is the option's stable identity; the label is prose meant to change.
+ *
+ * @param value The option's submitted value: '', 'theme', 'spacery' or 'custom'.
+ * @return A selector to scope to the app root.
+ */
+const sourceRadio = (value: string) => `input[type="radio"][value="${value}"]`;
+
 test.describe('settings screen', () => {
 	/**
 	 * Server errors, surfaced as failures rather than as console noise.
@@ -69,7 +84,7 @@ test.describe('settings screen', () => {
 		await admin.visitAdminPage('options-general.php', 'page=spacery');
 
 		const app = page.locator(appRoot);
-		const preset = page.getByRole('radio', { name: /Spacery's own/ });
+		const preset = app.locator(sourceRadio('spacery'));
 
 		await expect(preset).toBeVisible();
 		await preset.check();
@@ -79,9 +94,7 @@ test.describe('settings screen', () => {
 
 		await page.reload();
 
-		await expect(
-			page.getByRole('radio', { name: /Spacery's own/ })
-		).toBeChecked();
+		await expect(app.locator(sourceRadio('spacery'))).toBeChecked();
 	});
 
 	/**
@@ -98,7 +111,7 @@ test.describe('settings screen', () => {
 
 		const app = page.locator(appRoot);
 
-		await page.getByRole('radio', { name: /Spacery's own/ }).check();
+		await app.locator(sourceRadio('spacery')).check();
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(app.getByText('Settings saved.')).toBeVisible();
 
@@ -135,7 +148,7 @@ test.describe('settings screen', () => {
 
 		const app = page.locator(appRoot);
 
-		await page.getByRole('radio', { name: /I define below/ }).check();
+		await app.locator(sourceRadio('custom')).check();
 		await page.getByRole('button', { name: 'Add breakpoint' }).click();
 
 		await page.getByLabel('Name').fill('Broken');
