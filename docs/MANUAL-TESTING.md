@@ -38,19 +38,39 @@ Three preconditions, each of which fails in a way that looks like a plugin bug:
    findings in a pass like this arrive as notices rather than as visible
    breakage.
 
-Commands below assume WP-CLI on the `PATH` and are run from the site root. The
-`spacery_breakpoints` and `spacery_denied_blocks` experiments want a file in
-`wp-content/mu-plugins/` (create the directory if it is not there), because both
-filters have to run on every request.
+**No WP-CLI on this machine**, so everything below is done through the admin
+screens or through files. The pieces that would normally be a `wp` command have
+a file-based equivalent, and each one says so.
 
-Reset the plugin's own state between experiments with:
+Several sections want a file in `wp-content/mu-plugins/` (create the directory
+if it is not there). Must-use plugins load on every request without being
+activated, which is what the filter experiments need and also what makes them
+easy to forget — delete each one when its section is done.
 
-```bash
-wp option delete spacery_breakpoint_source spacery_custom_breakpoints
+For resetting the plugin's own state between experiments, drop this in once and
+leave it for the whole pass:
+
+`wp-content/mu-plugins/spacery-dev-reset.php`
+
+```php
+<?php
+/**
+ * Dev helper. Visit any admin URL with ?spacery_reset=1 to clear Spacery's
+ * options. Never put this on a real site.
+ */
+add_action( 'admin_init', function () {
+	if ( isset( $_GET['spacery_reset'] ) && current_user_can( 'manage_options' ) ) {
+		delete_option( 'spacery_breakpoint_source' );
+		delete_option( 'spacery_custom_breakpoints' );
+	}
+} );
 ```
 
-Take a database snapshot (`wp db export`) before the theme-switching sections so
-you can get back without rebuilding the site.
+Before the theme-switching sections, export the database from the phpMyAdmin
+that ships with MAMP Pro, so you can get back without rebuilding the site.
+
+If you would rather have WP-CLI after all, `brew install wp-cli` gives you the
+`wp` commands this document replaces — but nothing here needs it.
 
 ## What CI already covers
 
@@ -88,12 +108,18 @@ Settings → Spacery.
 - [ ] Add a `spacery_breakpoints` filter in a mu-plugin. It must win over every
       source *and* the screen must say so, rather than showing the option's value
       as though it were in effect.
-- [ ] `curl` the REST route as an authenticated admin and check it agrees with
-      the screen:
+- [ ] Check the REST route agrees with the screen. Visiting
+      `/wp-json/spacery/v1/breakpoints` in the browser returns 401 — the route
+      requires `manage_options`, and a plain page load carries no REST nonce — so
+      ask from inside the editor instead. Open any post in the block editor and
+      run this in the browser console:
 
-      ```bash
-      wp eval 'echo wp_json_encode( rest_do_request( new WP_REST_Request( "GET", "/spacery/v1/breakpoints" ) )->get_data() );' --user=admin
+      ```js
+      wp.apiFetch( { path: '/spacery/v1/breakpoints' } ).then( console.log );
       ```
+
+      `effectiveSource`, `resolved` and `maxBreakpoints` should match what the
+      settings screen is showing.
 
 ## 2. Editor, responsive editing on (D12)
 
@@ -124,7 +150,8 @@ add_filter( 'block_editor_settings_all', function ( $settings ) {
       explaining why.
 - [ ] Values set through it land in the same places and render identically.
 
-Delete the file afterwards; it changes every later section if left in place.
+Delete the file afterwards; it changes every later section if left in place, and
+a stale mu-plugin is invisible in the admin.
 
 ## 4. Takeover (D11)
 
@@ -145,9 +172,10 @@ View source. Spacery's declarations belong in
 
 - [ ] **Block theme** (Twenty Twenty-Five / -Four / -Three, all three installed):
       the tag is in `<head>`.
-- [ ] **Classic theme** — none is installed on this site, so
-      `wp theme install twentytwentyone --activate` first. The tag must still be
-      in `<head>`, lifted there by core's `wp_hoist_late_printed_styles()`.
+- [ ] **Classic theme** — none is installed on this site, so install one first:
+      Appearance → Themes → Add New → **Twenty Twenty-One**, activate. The tag
+      must still be in `<head>`, lifted there by core's
+      `wp_hoist_late_printed_styles()`.
       Spacery must not be printing it anywhere itself; this is the only place
       that claim gets tested.
 - [ ] Bands are disjoint (`480px < width <= 782px`), widest first, and never
