@@ -135,10 +135,17 @@ Any block with spacing support — Group, Cover, Columns, a Paragraph.
 - [ ] With five or fewer tiers the selector is segmented; switch the source to a
       set with more and confirm it becomes a dropdown rather than twelve
       unreadable segments.
-- [ ] Link the sides in a padding or margin box, type once, and confirm all four
-      sides take the value; unlink and confirm they part company again.
-- [ ] Empty a side that a wider tier sets. The line under the box should name the
-      side and the value it falls back to.
+- [ ] All four sides of padding and margin are editable at once. Link them, type
+      once, and confirm the four fields move together; unlink and confirm they
+      part company again.
+- [ ] Empty a side that a wider tier sets. Its field should show the inherited
+      value as a placeholder — and the *right* one per side, not one value
+      repeated across all four.
+- [ ] Change a box's unit. The numbers stay and the unit swaps; nothing is
+      converted behind your back.
+- [ ] On a set whose tiers land on distinct device widths the selector shows
+      icons; on one where two tiers would share an icon it falls back to names.
+      Hovering an icon must still name its tier.
 - [ ] Set a value at the widest tier, then a different one at a narrower tier.
       The narrower one must win in the editor preview *and* on the front end.
 - [ ] Set a value at a middle tier only. Narrower tiers should inherit it; wider

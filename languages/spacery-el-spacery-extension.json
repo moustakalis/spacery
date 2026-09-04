@@ -66,6 +66,15 @@
 			"%d breakpoints is the maximum. Beyond that the editor asks more of an author than it gives back.": [
 				"Τα %d σημεία διακοπής είναι το ανώτατο όριο. Πέρα από αυτό, ο επεξεργαστής ζητά από τον συντάκτη περισσότερα απ' όσα του δίνει."
 			],
+			"Unit": [
+				"Μονάδα"
+			],
+			"Unlink sides": [
+				"Αποσύνδεση πλευρών"
+			],
+			"Link sides — one value for all four": [
+				"Σύνδεση πλευρών — μία τιμή και για τις τέσσερις"
+			],
 			"Spacery": [
 				""
 			],
@@ -159,12 +168,6 @@
 			],
 			"This theme has spacing controls switched off for this block.": [
 				"Αυτό το θέμα έχει απενεργοποιημένα τα χειριστήρια κενών για αυτό το μπλοκ."
-			],
-			"%1$s %2$s": [
-				"%1$s %2$s"
-			],
-			"Inherited from wider screens: %s.": [
-				"Κληρονομείται από ευρύτερες οθόνες: %s."
 			],
 			"Height": [
 				"Ύψος"

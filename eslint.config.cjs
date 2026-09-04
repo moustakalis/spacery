@@ -58,6 +58,8 @@ module.exports = [
 						'__experimentalHeading',
 						'__experimentalToggleGroupControl',
 						'__experimentalToggleGroupControlOption',
+						'__experimentalToggleGroupControlOptionIcon',
+						'__experimentalNumberControl',
 					],
 				},
 			],

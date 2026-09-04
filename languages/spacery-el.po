@@ -106,7 +106,7 @@ msgstr "Προεπιλογή"
 msgid "Applies at every width unless a narrower breakpoint overrides it."
 msgstr "Ισχύει σε κάθε πλάτος, εκτός αν το αντικαταστήσει ένα στενότερο σημείο διακοπής."
 
-#: src/breakpoints/TierSelector.js:32
+#: src/breakpoints/TierSelector.js:40
 msgid "Breakpoint"
 msgstr "Σημείο διακοπής"
 
@@ -116,13 +116,13 @@ msgstr "Ορισμένα σε"
 
 #. translators: 1: breakpoint name, 2: its upper bound, e.g. "Laptop · ≤1024px".
 #: src/blocks/spacer/edit.js:71
-#: src/extension/SpacingPanel.js:99
+#: src/extension/SpacingPanel.js:100
 #, js-format
 msgid "%1$s · ≤%2$s"
 msgstr "%1$s · ≤%2$s"
 
 #: src/blocks/spacer/edit.js:71
-#: src/extension/SpacingPanel.js:101
+#: src/extension/SpacingPanel.js:102
 msgid "Reset"
 msgstr "Επαναφορά"
 
@@ -150,11 +150,11 @@ msgstr "Κληρονομείται από την Προεπιλογή"
 msgid "Responsive spacing"
 msgstr "Αποκρίσιμα κενά"
 
-#: src/extension/SpacingPanel.js:62
+#: src/extension/SpacingPanel.js:63
 msgid "This site has no breakpoints, so there is nothing to set here yet."
 msgstr "Αυτός ο ιστότοπος δεν έχει σημεία διακοπής, οπότε δεν υπάρχει ακόμη κάτι να οριστεί εδώ."
 
-#: src/extension/SpacingPanel.js:70
+#: src/extension/SpacingPanel.js:71
 msgid "This theme has spacing controls switched off for this block."
 msgstr "Αυτό το θέμα έχει απενεργοποιημένα τα χειριστήρια κενών για αυτό το μπλοκ."
 
@@ -376,23 +376,23 @@ msgid "breakpoint"
 msgstr "σημείο διακοπής"
 
 #. translators: %s: breakpoint name.
-#: src/breakpoints/TierSelector.js:37
+#: src/breakpoints/TierSelector.js:45
 #, js-format
 msgid "The canvas is still previewing %s."
 msgstr "Ο καμβάς εξακολουθεί να προβάλλει %s."
 
-#: src/breakpoints/TierSelector.js:37
+#: src/breakpoints/TierSelector.js:45
 msgid "Responsive editing is switched off for this site, so the canvas does not follow along."
 msgstr "Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε ο καμβάς δεν ακολουθεί."
 
-#. translators: 1: side name, e.g. "Top". 2: a CSS length, e.g. "2rem".
-#: src/extension/SpacingPanel.js:132
-#, js-format
-msgid "%1$s %2$s"
-msgstr "%1$s %2$s"
+#: src/extension/SpacingBox.js:74
+msgid "Unit"
+msgstr "Μονάδα"
 
-#. translators: %s: comma-separated list of sides and their inherited lengths.
-#: src/extension/SpacingPanel.js:138
-#, js-format
-msgid "Inherited from wider screens: %s."
-msgstr "Κληρονομείται από ευρύτερες οθόνες: %s."
+#: src/extension/SpacingBox.js:75
+msgid "Unlink sides"
+msgstr "Αποσύνδεση πλευρών"
+
+#: src/extension/SpacingBox.js:76
+msgid "Link sides — one value for all four"
+msgstr "Σύνδεση πλευρών — μία τιμή και για τις τέσσερις"

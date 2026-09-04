@@ -13,9 +13,11 @@ import {
 	__experimentalText as Text,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
+import { iconFor, iconsAreDistinct } from './icons';
 import type { Breakpoint } from './types';
 
 /**
@@ -55,6 +57,14 @@ export function TierSelector({
 }: TierSelectorProps): React.ReactElement {
 	const canvasTier = breakpoints.find((b) => b.slug === canvasSlug);
 
+	/*
+	 * Icons only when they distinguish. A tier's name is arbitrary — themes and
+	 * authors choose it — so the icon is picked from the tier's width, and a set
+	 * whose widths collapse onto the same glyph keeps its labels instead. The
+	 * name is still the accessible name and the tooltip either way.
+	 */
+	const withIcons = iconsAreDistinct(breakpoints);
+
 	return (
 		<Flex direction="column" gap={2}>
 			<FlexItem>
@@ -69,13 +79,22 @@ export function TierSelector({
 							onChange(String(next))
 						}
 					>
-						{breakpoints.map((breakpoint) => (
-							<ToggleGroupControlOption
-								key={breakpoint.slug}
-								value={breakpoint.slug}
-								label={breakpoint.label}
-							/>
-						))}
+						{breakpoints.map((breakpoint) =>
+							withIcons ? (
+								<ToggleGroupControlOptionIcon
+									key={breakpoint.slug}
+									value={breakpoint.slug}
+									icon={iconFor(breakpoint)}
+									label={breakpoint.label}
+								/>
+							) : (
+								<ToggleGroupControlOption
+									key={breakpoint.slug}
+									value={breakpoint.slug}
+									label={breakpoint.label}
+								/>
+							)
+						)}
 					</ToggleGroupControl>
 				) : (
 					<SelectControl

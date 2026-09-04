@@ -168,6 +168,10 @@ declare module '@wordpress/components' {
 		disabled?: boolean;
 		isBusy?: boolean;
 		isDestructive?: boolean;
+		/** Pressed state for a toggle button, announced as aria-pressed. */
+		isPressed?: boolean;
+		/** An SVG element; Button wraps it in `Icon` itself. */
+		icon?: React.ReactNode;
 		/** Accessible name, when the visible text is not enough on its own. */
 		label?: string;
 		children?: React.ReactNode;
@@ -227,6 +231,7 @@ declare module '@wordpress/components' {
 
 	export const SelectControl: React.ComponentType<{
 		label?: string;
+		hideLabelFromVision?: boolean;
 		help?: string;
 		value?: string;
 		options?: Array<{ value: string; label: string }>;
@@ -251,38 +256,35 @@ declare module '@wordpress/components' {
 	}>;
 
 	/**
-	 * Core's own four-sided spacing control, with the link toggle and the
-	 * single unit selector that make four inputs fit an inspector column.
+	 * A number field with no unit of its own.
 	 *
-	 * Stable in WordPress 7.1: `wp-includes/js/dist/components.js` exports both
-	 * `BoxControl` and the older `__experimentalBoxControl`, and they resolve to
-	 * the same module. The stable name is used because the plugin requires 7.1
-	 * and has no older runtime to support.
+	 * The spacing box pairs four of these with one unit picker, which is the
+	 * only way four sides fit an inspector column — `UnitControl` carries a unit
+	 * select per field and needs the width for it.
 	 *
-	 * Whether a name is stable has to be checked against that bundle, and the
-	 * check has to be anchored. Searching it for `BoxControl:` also matches the
-	 * tails of `__experimentalBoxControl:` and `BorderBoxControl:`, which is how
-	 * `ToggleGroupControl` was once declared stable here when it is not — a
-	 * component that resolves to `undefined` at runtime and takes the editor
-	 * down with React error #130. The anchored form:
+	 * Experimental in WordPress 7.1. Whether a name is stable has to be checked
+	 * against `wp-includes/js/dist/components.js`, and the check has to be
+	 * anchored: searching it for `NumberControl:` also matches the tail of
+	 * `__experimentalNumberControl:`, which is how `ToggleGroupControl` was once
+	 * declared stable here when it is not — a component that resolves to
+	 * `undefined` at runtime and takes the editor down with React error #130.
+	 * The anchored form:
 	 *
 	 * ```
-	 * grep -oE '(^|[,{])BoxControl:\(\)=>' wp-includes/js/dist/components.js
+	 * grep -oE '(^|[,{])NumberControl:\(\)=>' wp-includes/js/dist/components.js
 	 * ```
-	 *
-	 * `values` and the `onChange` payload are partial on purpose. A block
-	 * declares which sides it supports, and the control is given only those.
 	 */
-	export const BoxControl: React.ComponentType<{
+	export const __experimentalNumberControl: React.ComponentType<{
 		label?: string;
-		values?: Partial<Record<string, string | undefined>> | undefined;
-		onChange?: (next: Partial<Record<string, string | undefined>>) => void;
-		sides?: readonly string[];
-		units?: Array<{ value: string; label: string }>;
-		allowReset?: boolean;
-		splitOnAxis?: boolean;
-		inputProps?: Record<string, unknown>;
-		__next40pxDefaultSize?: boolean;
+		labelPosition?: 'top' | 'side' | 'bottom' | 'edge';
+		size?: 'default' | 'compact' | 'small';
+		spinControls?: 'none' | 'native' | 'custom';
+		value?: string | number | undefined;
+		placeholder?: string | undefined;
+		min?: number;
+		max?: number;
+		step?: number;
+		onChange?: (value?: string) => void;
 	}>;
 
 	/**
@@ -309,10 +311,21 @@ declare module '@wordpress/components' {
 		showTooltip?: boolean;
 	}>;
 
+	/**
+	 * The same option drawn as an icon. `label` becomes both the tooltip and
+	 * the accessible name, so an icon-only selector still announces its tiers.
+	 */
+	export const __experimentalToggleGroupControlOptionIcon: React.ComponentType<{
+		value: string | number;
+		icon: React.ReactNode;
+		label: string;
+	}>;
+
 	export const __experimentalText: React.ComponentType<{
 		variant?: string | undefined;
 		size?: number | string;
 		weight?: number | string;
+		upperCase?: boolean;
 		children?: React.ReactNode;
 	}>;
 }

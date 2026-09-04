@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-04T11:51:23+00:00\n"
+"POT-Creation-Date: 2026-09-04T12:58:17+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: spacery\n"
@@ -113,13 +113,13 @@ msgstr ""
 
 #. translators: 1: breakpoint name, 2: its upper bound, e.g. "Laptop · ≤1024px".
 #: src/blocks/spacer/edit.js:71
-#: src/extension/SpacingPanel.js:99
+#: src/extension/SpacingPanel.js:100
 #, js-format
 msgid "%1$s · ≤%2$s"
 msgstr ""
 
 #: src/blocks/spacer/edit.js:71
-#: src/extension/SpacingPanel.js:101
+#: src/extension/SpacingPanel.js:102
 msgid "Reset"
 msgstr ""
 
@@ -143,17 +143,17 @@ msgstr ""
 msgid "Inherited from Default"
 msgstr ""
 
-#: src/breakpoints/TierSelector.js:32
+#: src/breakpoints/TierSelector.js:40
 msgid "Breakpoint"
 msgstr ""
 
 #. translators: %s: breakpoint name.
-#: src/breakpoints/TierSelector.js:37
+#: src/breakpoints/TierSelector.js:45
 #, js-format
 msgid "The canvas is still previewing %s."
 msgstr ""
 
-#: src/breakpoints/TierSelector.js:37
+#: src/breakpoints/TierSelector.js:45
 msgid "Responsive editing is switched off for this site, so the canvas does not follow along."
 msgstr ""
 
@@ -161,24 +161,24 @@ msgstr ""
 msgid "Responsive spacing"
 msgstr ""
 
-#: src/extension/SpacingPanel.js:62
+#: src/extension/SpacingBox.js:74
+msgid "Unit"
+msgstr ""
+
+#: src/extension/SpacingBox.js:75
+msgid "Unlink sides"
+msgstr ""
+
+#: src/extension/SpacingBox.js:76
+msgid "Link sides — one value for all four"
+msgstr ""
+
+#: src/extension/SpacingPanel.js:63
 msgid "This site has no breakpoints, so there is nothing to set here yet."
 msgstr ""
 
-#: src/extension/SpacingPanel.js:70
+#: src/extension/SpacingPanel.js:71
 msgid "This theme has spacing controls switched off for this block."
-msgstr ""
-
-#. translators: 1: side name, e.g. "Top". 2: a CSS length, e.g. "2rem".
-#: src/extension/SpacingPanel.js:132
-#, js-format
-msgid "%1$s %2$s"
-msgstr ""
-
-#. translators: %s: comma-separated list of sides and their inherited lengths.
-#: src/extension/SpacingPanel.js:138
-#, js-format
-msgid "Inherited from wider screens: %s."
 msgstr ""
 
 #: src/extension/supports.js:99

@@ -15,7 +15,6 @@
 import { useSettings } from '@wordpress/block-editor';
 import { getBlockSupport } from '@wordpress/blocks';
 import {
-	BoxControl,
 	Button,
 	Flex,
 	FlexItem,
@@ -39,10 +38,10 @@ import { useCanvasWindow } from '../breakpoints/useCanvasWindow';
 import { useCoreViewports } from '../breakpoints/useCoreViewports';
 import { useResponsiveEditing } from '../breakpoints/useResponsiveEditing';
 import { useSelectedTier } from '../breakpoints/useSelectedTier';
+import { SpacingBox } from './SpacingBox';
 import {
 	pathFor,
 	type Side,
-	sideLabel,
 	type SpacingFeature,
 	spacingFeatures,
 } from './supports';
@@ -258,12 +257,17 @@ function TierFields({
 
 			{features.map((feature) => (
 				<FlexItem key={feature.feature}>
-					<BoxControl
-						__next40pxDefaultSize
+					<SpacingBox
 						label={feature.label}
 						sides={feature.sides}
 						units={units}
 						values={boxValues(attributes, breakpoint.slug, feature)}
+						placeholders={boxPlaceholders(
+							attributes,
+							breakpoints,
+							breakpoint.slug,
+							feature
+						)}
 						onChange={(next) =>
 							setAttributes({
 								spacery: writeBox(
@@ -275,97 +279,17 @@ function TierFields({
 							})
 						}
 					/>
-
-					<InheritedNote
-						attributes={attributes}
-						breakpoints={breakpoints}
-						slug={breakpoint.slug}
-						feature={feature}
-					/>
 				</FlexItem>
 			))}
 		</Flex>
 	);
 }
 
-interface InheritedNoteProps {
-	attributes: ExtendedAttributes;
-	breakpoints: Breakpoint[];
-	slug: string;
-	feature: SpacingFeature;
-}
-
 /**
- * What the empty sides of one box will actually render as.
+ * One tier's authored values for one feature, keyed by side.
  *
- * This replaces the per-side placeholders the stacked layout used to carry.
- * `BoxControl` takes one set of input props for all four sides, so a
- * placeholder there could only ever show one tier's inherited value on every
- * side — wrong three times out of four. A sentence can name each side it
- * applies to, and says where the value comes from besides.
- *
- * @param root0             Component props.
- * @param root0.attributes  The block's attributes.
- * @param root0.breakpoints The active set, widest first.
- * @param root0.slug        The tier being edited.
- * @param root0.feature     The feature this box edits.
- * @return The note, or nothing when every side is set here.
- */
-function InheritedNote({
-	attributes,
-	breakpoints,
-	slug,
-	feature,
-}: InheritedNoteProps): React.ReactElement {
-	const inherited = feature.sides
-		.filter(
-			(side) =>
-				undefined ===
-				authoredAt(
-					attributes.spacery,
-					slug,
-					pathFor(feature.feature, side)
-				)
-		)
-		.map((side) => ({
-			side,
-			value: inheritedValue(
-				attributes,
-				breakpoints,
-				slug,
-				pathFor(feature.feature, side)
-			),
-		}))
-		.filter((entry) => '' !== entry.value)
-		.map((entry) =>
-			sprintf(
-				/* translators: 1: side name, e.g. "Top". 2: a CSS length, e.g. "2rem". */
-				__('%1$s %2$s', 'spacery'),
-				sideLabel(entry.side),
-				entry.value
-			)
-		);
-
-	if (0 === inherited.length) {
-		return <></>;
-	}
-
-	return (
-		<Text variant="muted" size={12}>
-			{sprintf(
-				/* translators: %s: comma-separated list of sides and their inherited lengths. */
-				__('Inherited from wider screens: %s.', 'spacery'),
-				inherited.join(', ')
-			)}
-		</Text>
-	);
-}
-
-/**
- * One tier's authored values for one feature, shaped for `BoxControl`.
- *
- * Only the sides the block supports. A key `BoxControl` was not given a side
- * for is one it will not render.
+ * Only the sides the block supports; the box renders a field per key it is
+ * given a side for.
  *
  * @param attributes The block's attributes.
  * @param slug       The tier being edited.
@@ -395,7 +319,40 @@ function boxValues(
 }
 
 /**
- * Applies a `BoxControl` change to one tier.
+ * What each empty side of one box would fall back to.
+ *
+ * @param attributes  The block's attributes.
+ * @param breakpoints The active set, widest first.
+ * @param slug        The tier being edited.
+ * @param feature     The feature this box edits.
+ * @return Inherited values keyed by side, for the sides that have one.
+ */
+function boxPlaceholders(
+	attributes: ExtendedAttributes,
+	breakpoints: Breakpoint[],
+	slug: string,
+	feature: SpacingFeature
+): Partial<Record<Side, string>> {
+	const placeholders: Partial<Record<Side, string>> = {};
+
+	for (const side of feature.sides) {
+		const value = inheritedValue(
+			attributes,
+			breakpoints,
+			slug,
+			pathFor(feature.feature, side)
+		);
+
+		if ('' !== value) {
+			placeholders[side] = value;
+		}
+	}
+
+	return placeholders;
+}
+
+/**
+ * Applies a spacing box's change to one tier.
  *
  * Every supported side is written on every change, including the ones that
  * came back empty: linking the box and clearing it emits blanks rather than
