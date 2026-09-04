@@ -113,13 +113,12 @@ msgstr ""
 
 #. translators: 1: breakpoint name, 2: its upper bound, e.g. "Laptop · ≤1024px".
 #: src/blocks/spacer/edit.js:71
-#: src/extension/SpacingPanel.js:100
+#: src/extension/SpacingPanel.js:105
 #, js-format
 msgid "%1$s · ≤%2$s"
 msgstr ""
 
 #: src/blocks/spacer/edit.js:71
-#: src/extension/SpacingPanel.js:102
 msgid "Reset"
 msgstr ""
 
@@ -161,16 +160,22 @@ msgstr ""
 msgid "Responsive spacing"
 msgstr ""
 
-#: src/extension/SpacingBox.js:72
+#: src/extension/SpacingBox.js:76
 msgid "Unit"
 msgstr ""
 
-#: src/extension/SpacingBox.js:73
+#: src/extension/SpacingBox.js:77
 msgid "Unlink sides"
 msgstr ""
 
-#: src/extension/SpacingBox.js:74
+#: src/extension/SpacingBox.js:78
 msgid "Link sides — one value for all four"
+msgstr ""
+
+#. translators: %s: a spacing property, e.g. "Padding".
+#: src/extension/SpacingBox.js:80
+#, js-format
+msgid "Reset %s"
 msgstr ""
 
 #: src/extension/SpacingPanel.js:63
@@ -179,6 +184,10 @@ msgstr ""
 
 #: src/extension/SpacingPanel.js:71
 msgid "This theme has spacing controls switched off for this block."
+msgstr ""
+
+#: src/extension/SpacingPanel.js:107
+msgid "Reset all"
 msgstr ""
 
 #: src/extension/supports.js:99

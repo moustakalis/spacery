@@ -206,7 +206,13 @@ function TierFields({
 	setAttributes,
 }: TierFieldsProps): React.ReactElement {
 	const units = useAllowedUnits();
-	const authoredHere = features.some((feature) =>
+
+	/*
+	 * The tier reset appears only when it would do more than one box's reset
+	 * already does. On a block supporting margin alone, two buttons a line
+	 * apart with identical effect is a puzzle, not a convenience.
+	 */
+	const authoredBoxes = features.filter((feature) =>
 		feature.sides.some(
 			(side) =>
 				undefined !==
@@ -216,7 +222,7 @@ function TierFields({
 					pathFor(feature.feature, side)
 				)
 		)
-	);
+	).length;
 
 	return (
 		<Flex direction="column" gap={3}>
@@ -233,7 +239,7 @@ function TierFields({
 						</Text>
 					</FlexItem>
 
-					{authoredHere && (
+					{authoredBoxes > 1 && (
 						<FlexItem>
 							<Button
 								size="small"
@@ -248,7 +254,7 @@ function TierFields({
 									})
 								}
 							>
-								{__('Reset', 'spacery')}
+								{__('Reset all', 'spacery')}
 							</Button>
 						</FlexItem>
 					)}

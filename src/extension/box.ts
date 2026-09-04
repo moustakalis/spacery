@@ -91,3 +91,38 @@ export function retagUnit(
 
 	return next;
 }
+
+/**
+ * The box emptied.
+ *
+ * Every supported side, explicitly undefined, so the caller writes them all —
+ * a partial object would leave whichever sides it omitted untouched, which is
+ * the opposite of a reset.
+ *
+ * "Reset" here means clearing the values authored at this tier so the sides
+ * inherit from the nearest wider one. Not zero, which is a value someone
+ * chooses, and not the theme's default, which Spacery does not store.
+ *
+ * @param sides Sides the block supports.
+ * @return Every supported side, cleared.
+ */
+export function clearBox(sides: Side[]): BoxValues {
+	const next: BoxValues = {};
+
+	for (const side of sides) {
+		next[side] = undefined;
+	}
+
+	return next;
+}
+
+/**
+ * Whether a box holds anything authored at this tier.
+ *
+ * @param sides  Sides the block supports.
+ * @param values What the box currently holds.
+ * @return True when at least one side is set here.
+ */
+export function isAuthored(sides: Side[], values: BoxValues): boolean {
+	return sides.some((side) => undefined !== values[side]);
+}

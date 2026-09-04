@@ -10,7 +10,12 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { applyEdit, retagUnit } from '../../src/extension/box';
+import {
+	applyEdit,
+	clearBox,
+	isAuthored,
+	retagUnit,
+} from '../../src/extension/box';
 import { SIDES } from '../../src/extension/supports';
 
 const ALL = [...SIDES];
@@ -151,5 +156,36 @@ describe('retagUnit', () => {
 		expect(
 			retagUnit(['top'], { top: 'var:preset|spacing|40' }, 'rem')
 		).toEqual({ top: 'var:preset|spacing|40' });
+	});
+});
+
+describe('clearBox', () => {
+	it('names every supported side, so none is left behind', () => {
+		expect(clearBox(ALL)).toEqual({
+			top: undefined,
+			right: undefined,
+			bottom: undefined,
+			left: undefined,
+		});
+
+		expect(Object.keys(clearBox(['top', 'bottom']))).toEqual([
+			'top',
+			'bottom',
+		]);
+	});
+});
+
+describe('isAuthored', () => {
+	it('is true for any side set at this tier', () => {
+		expect(isAuthored(ALL, { bottom: '4px' })).toBe(true);
+	});
+
+	it('is false for an empty box', () => {
+		expect(isAuthored(ALL, {})).toBe(false);
+		expect(isAuthored(ALL, { top: undefined })).toBe(false);
+	});
+
+	it('ignores sides the block does not support', () => {
+		expect(isAuthored(['top'], { left: '4px' })).toBe(false);
 	});
 });

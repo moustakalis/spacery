@@ -155,7 +155,12 @@ Any block with spacing support — Group, Cover, Columns, a Paragraph.
       The narrower one must win in the editor preview *and* on the front end.
 - [ ] Set a value at a middle tier only. Narrower tiers should inherit it; wider
       ones should not.
-- [ ] Reset a tier. The inherited value should reappear, not zero.
+- [ ] Reset one box. Only that property clears, and its fields fall back to the
+      inherited values rather than to zero.
+- [ ] A box with nothing set at this tier shows no reset button at all.
+- [ ] "Reset all" appears only once *both* padding and margin hold values at the
+      tier — on a block supporting one of them it must stay hidden, or it
+      duplicates the box's own reset.
 - [ ] Undo/redo across a takeover and a reset. Nothing half-applied.
 
 ## 3. Editor, responsive editing off

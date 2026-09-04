@@ -25,10 +25,10 @@ import {
 	__experimentalNumberControl as NumberControl,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useState } from 'react';
 
-import { applyEdit, retagUnit } from './box';
+import { applyEdit, clearBox, isAuthored, retagUnit } from './box';
 import { parseLength, unitFor } from './length';
 import { type Side, sideLabel } from './supports';
 
@@ -47,6 +47,18 @@ const UNLINKED = (
 		<path
 			fill="currentColor"
 			d="M15.6 7.2H14v1.5h1.6c2 0 3.7 1.7 3.7 3.8s-1.7 3.8-3.7 3.8H14v1.5h1.6c2.8 0 5.2-2.4 5.2-5.3s-2.3-5.3-5.2-5.3ZM4.7 12.5c0-2.1 1.7-3.8 3.7-3.8H10V7.2H8.4c-2.9 0-5.2 2.4-5.2 5.3s2.3 5.3 5.2 5.3H10v-1.5H8.4c-2 0-3.7-1.7-3.7-3.8Z"
+		/>
+	</svg>
+);
+
+/**
+ * A counter-clockwise arrow, for the same reason the link glyph is drawn here.
+ */
+const RESET = (
+	<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+		<path
+			fill="currentColor"
+			d="M12 4.5a7.5 7.5 0 1 0 7.4 8.7h-1.5A6 6 0 1 1 12 6c1.6 0 3 .6 4 1.6l-2.3 2.3h5.6V4.3l-2.2 2.2A7.5 7.5 0 0 0 12 4.5Z"
 		/>
 	</svg>
 );
@@ -160,6 +172,29 @@ export function SpacingBox({
 									onClick={() => setLinked(!linked)}
 								/>
 							</FlexItem>
+
+							{/*
+							 * Only when there is something to reset. A control
+							 * that spends most of its life disabled is clutter
+							 * that also lies about being available, and this row
+							 * is already carrying three things.
+							 */}
+							{isAuthored(sides, values) && (
+								<FlexItem>
+									<Button
+										size="small"
+										icon={RESET}
+										label={sprintf(
+											/* translators: %s: a spacing property, e.g. "Padding". */
+											__('Reset %s', 'spacery'),
+											label
+										)}
+										onClick={() =>
+											onChange(clearBox(sides))
+										}
+									/>
+								</FlexItem>
+							)}
 						</Flex>
 					</FlexItem>
 				</Flex>
