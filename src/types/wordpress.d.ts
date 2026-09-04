@@ -250,6 +250,51 @@ declare module '@wordpress/components' {
 		onChange?: (value?: string) => void;
 	}>;
 
+	/**
+	 * Core's own four-sided spacing control, with the link toggle and the
+	 * single unit selector that make four inputs fit an inspector column.
+	 *
+	 * Stable in WordPress 7.1: `wp-includes/js/dist/components.js` exports both
+	 * `BoxControl` and the older `__experimentalBoxControl`, and they resolve to
+	 * the same module. The stable name is used because the plugin requires 7.1
+	 * and has no older runtime to support.
+	 *
+	 * `values` and the `onChange` payload are partial on purpose. A block
+	 * declares which sides it supports, and the control is given only those.
+	 */
+	export const BoxControl: React.ComponentType<{
+		label?: string;
+		values?: Partial<Record<string, string | undefined>> | undefined;
+		onChange?: (next: Partial<Record<string, string | undefined>>) => void;
+		sides?: readonly string[];
+		units?: Array<{ value: string; label: string }>;
+		allowReset?: boolean;
+		splitOnAxis?: boolean;
+		inputProps?: Record<string, unknown>;
+		__next40pxDefaultSize?: boolean;
+	}>;
+
+	/**
+	 * Segmented radio group. Also stable in 7.1, alongside its experimental
+	 * alias. `onChange` is typed loosely because the control reports whatever
+	 * was put in `value`, which may be a number for other callers.
+	 */
+	export const ToggleGroupControl: React.ComponentType<{
+		label?: string;
+		hideLabelFromVision?: boolean;
+		isBlock?: boolean;
+		value?: string | number | undefined;
+		onChange?: (next?: string | number) => void;
+		__next40pxDefaultSize?: boolean;
+		children?: React.ReactNode;
+	}>;
+
+	export const ToggleGroupControlOption: React.ComponentType<{
+		value: string | number;
+		label: string;
+		showTooltip?: boolean;
+	}>;
+
 	export const __experimentalText: React.ComponentType<{
 		variant?: string | undefined;
 		size?: number | string;

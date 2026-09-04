@@ -21,7 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dedupe, and a `render_block` filter that adds a class without touching saved markup.
 - The `spacery/spacer` block, with a height per breakpoint.
 - An editor that follows the canvas rather than the browser window, so the preview and the
-  rendered page agree at every tier.
+  rendered page agree at every tier — with a tier selector in the panel for stepping
+  through breakpoints without moving the preview.
+- Padding and margin as four-sided boxes with a link toggle, matching the control core uses
+  for its own spacing.
 - Responsive padding and margin on **any** block declaring `supports.spacing`, core or
   third-party, with a `spacery_denied_blocks` filter for blocks a site wants left alone.
 - A takeover flow for values WordPress 7.1 already sets responsively: Spacery surfaces

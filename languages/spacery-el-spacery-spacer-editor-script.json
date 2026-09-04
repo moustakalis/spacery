@@ -142,9 +142,6 @@
 			"Breakpoint": [
 				"Σημείο διακοπής"
 			],
-			"Responsive editing is switched off for this site, so choose a breakpoint here.": [
-				"Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε επιλέξτε σημείο διακοπής εδώ."
-			],
 			"%1$s · ≤%2$s": [
 				"%1$s · ≤%2$s"
 			],
@@ -157,17 +154,17 @@
 			"This theme has spacing controls switched off for this block.": [
 				"Αυτό το θέμα έχει απενεργοποιημένα τα χειριστήρια κενών για αυτό το μπλοκ."
 			],
-			"None": [
-				"Κανένα"
+			"The canvas is still previewing %s.": [
+				"Ο καμβάς εξακολουθεί να προβάλλει %s."
 			],
-			"Resize the canvas or switch device view to set spacing for narrower screens.": [
-				"Αλλάξτε το μέγεθος του καμβά ή την προβολή συσκευής για να ορίσετε κενά για στενότερες οθόνες."
+			"Responsive editing is switched off for this site, so the canvas does not follow along.": [
+				"Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε ο καμβάς δεν ακολουθεί."
 			],
-			"Choose a breakpoint above to set spacing for narrower screens.": [
-				"Επιλέξτε σημείο διακοπής παραπάνω για να ορίσετε κενά για στενότερες οθόνες."
+			"%1$s %2$s": [
+				"%1$s %2$s"
 			],
-			"Empty fields inherit from the nearest wider breakpoint.": [
-				"Τα κενά πεδία κληρονομούν από το πλησιέστερο ευρύτερο σημείο διακοπής."
+			"Inherited from wider screens: %s.": [
+				"Κληρονομείται από ευρύτερες οθόνες: %s."
 			],
 			"Height": [
 				"Ύψος"
@@ -177,6 +174,9 @@
 			],
 			"Applies at every width unless a narrower breakpoint overrides it.": [
 				"Ισχύει σε κάθε πλάτος, εκτός αν το αντικαταστήσει ένα στενότερο σημείο διακοπής."
+			],
+			"Responsive editing is switched off for this site, so choose a breakpoint here.": [
+				"Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε επιλέξτε σημείο διακοπής εδώ."
 			],
 			"Breakpoints": [
 				"Σημεία διακοπής"

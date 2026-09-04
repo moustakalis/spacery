@@ -125,8 +125,20 @@ though this pass does not.
 
 Any block with spacing support — Group, Cover, Columns, a Paragraph.
 
-- [ ] Resize the canvas. The Spacery panel follows core's viewport rather than
-      offering a switcher of its own.
+- [ ] Resize the canvas. The panel's tier selector follows core's viewport, and
+      the fields below it change with it.
+- [ ] Click a different tier in the selector. The canvas must **not** move, and
+      a line under the selector should say which tier the canvas is still
+      previewing (D17).
+- [ ] Change the preview viewport again. The selector re-points at the matching
+      tier, discarding the manual choice — that is the intended precedence.
+- [ ] With five or fewer tiers the selector is segmented; switch the source to a
+      set with more and confirm it becomes a dropdown rather than twelve
+      unreadable segments.
+- [ ] Link the sides in a padding or margin box, type once, and confirm all four
+      sides take the value; unlink and confirm they part company again.
+- [ ] Empty a side that a wider tier sets. The line under the box should name the
+      side and the value it falls back to.
 - [ ] Set a value at the widest tier, then a different one at a narrower tier.
       The narrower one must win in the editor preview *and* on the front end.
 - [ ] Set a value at a middle tier only. Narrower tiers should inherit it; wider
@@ -146,8 +158,8 @@ add_filter( 'block_editor_settings_all', function ( $settings ) {
 } );
 ```
 
-- [ ] Spacery supplies its own **Breakpoint** select, with the help text
-      explaining why.
+- [ ] The tier selector still works, with a line saying the canvas does not
+      follow along.
 - [ ] Values set through it land in the same places and render identically.
 
 Delete the file afterwards; it changes every later section if left in place, and

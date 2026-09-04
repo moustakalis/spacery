@@ -428,6 +428,13 @@ not always agree: at a 900px canvas core says "Desktop" (>782px) while Spacery s
 be worse than naming it. Spacery's panel header states the active Spacery tier and its
 boundary — "Laptop · ≤1024px" — so the user always knows which rule they are writing.
 
+**Revised in D17: the panel does carry a tier selector, but it is not a viewport
+switcher.** Following the canvas is still how a tier gets selected, and clicking a tier in
+the panel deliberately does *not* move the canvas — so the competing-announcement problem
+D12 was avoiding never arises. What the selector buys is the case D12 did not consider: an
+author who wants to fill in four tiers in a row had to drag the canvas four times, and two
+of those widths have no device preset to click. See D17.
+
 **Spacery is absent at the default tier.** Core's ordinary spacing controls already *are*
 the default tier, so a Spacery panel there would duplicate them for no gain. At the default
 the panel collapses to a single hint — "Resize the canvas or switch device view to set
@@ -679,6 +686,7 @@ premise changes.
 | D14 | **Spacery never places its own CSS; it fills a Style Engine store and core places it** | Investigating M2's open delivery question found the seam: `wp_enqueue_stored_styles()` explicitly iterates third-party stores, and core already solves both theme types — block themes render the entire template before `wp_head()`, and WordPress 6.9 added `wp_hoist_late_printed_styles()` to lift classic themes' footer styles into the head. Choosing placement inside the plugin would mean re-deriving that logic and drifting from it as core evolves. This deleted the placement code rather than fixing it. |
 | D15 | **No v1 migration path** | v1 never built and never shipped. Its `block.json` pointed at a `build/` directory nothing generated, so the block could not register even locally, and the code lived on Bitbucket rather than WP.org. A `deprecated` entry exists to keep *existing content* valid; there is no existing content. Writing one would mean maintaining a parser for a save format no post has ever contained, and testing it against fixtures invented for the purpose. D9 already reached the same conclusion from the other direction when it numbered the first public release `1.0.0`: the 2023 code is a reference, not a predecessor. |
 | D16 | **Top-level admin menu, not Settings → Spacery** | The handbook's advice to put a single settings screen under an existing menu assumes the screen is configuration a site owner visits once. Spacery's is not: the breakpoint set is the thing the whole plugin is about, it is edited while designing rather than while installing, and every tier control in the editor refers back to it. Burying it three clicks deep under Settings made it read as an afterthought. Placed just below Appearance (position `60.8`, a float so a colliding integer cannot silently displace another plugin's menu), it sits with the design tools it belongs to. The cost is one more top-level item on sites that install many plugins, and a reviewer may say so; the answer is that the screen is the product's control surface, not its settings page. Decided before 1.0.0 shipped, so no bookmark or documented URL breaks. |
+| D17 | **A tier selector inside the panel, revising D12's "no switcher"** | D12 read core correctly and drew one conclusion too many. Its real argument was against a *competing viewport switcher* — two controls announcing different device names for the same canvas. A selector that changes only which tier the fields edit, and leaves the canvas alone, does not compete: the canvas still selects a tier when the preview moves, and the panel says so in words when the two have diverged. What D12 missed is that following the canvas is the only way to reach a tier, and most tiers have no device preset behind them — filling in four tiers meant four canvas drags, two of them by hand to an unmarked width. The tier being edited and the width being previewed are separate questions, and this makes them separately answerable. Rendered as `ToggleGroupControl` up to five tiers and a dropdown beyond, because a segmented control does not wrap and twelve labels in a 250px column is not a design. |
 
 ### Deferred to 1.1+
 

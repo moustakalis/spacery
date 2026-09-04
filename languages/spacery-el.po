@@ -1,20 +1,17 @@
-# Greek translation for Spacery.
-# Proves the translation pipeline end to end: every string here was extracted
-# from source by bin/make-pot.sh, and the .mo and .json beside this file are
-# compiled from it.
 msgid ""
 msgstr ""
 "Project-Id-Version: Spacery 1.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/moustakalis/spacery/issues\n"
 "Last-Translator: Nickos Moustakas\n"
 "Language-Team: Greek\n"
-"Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-09-04T11:32:49+00:00\n"
+"PO-Revision-Date: 2026-09-04T11:32:49+00:00\n"
+"Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Domain: spacery\n"
-
 
 #. Plugin Name of the plugin
 #: spacery.php
@@ -111,12 +108,11 @@ msgid "Applies at every width unless a narrower breakpoint overrides it."
 msgstr "Ισχύει σε κάθε πλάτος, εκτός αν το αντικαταστήσει ένα στενότερο σημείο διακοπής."
 
 #: src/blocks/spacer/edit.js:46
-#: src/extension/SpacingPanel.js:72
+#: src/extension/SpacingPanel.js:118
 msgid "Breakpoint"
 msgstr "Σημείο διακοπής"
 
 #: src/blocks/spacer/edit.js:46
-#: src/extension/SpacingPanel.js:72
 msgid "Responsive editing is switched off for this site, so choose a breakpoint here."
 msgstr "Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε επιλέξτε σημείο διακοπής εδώ."
 
@@ -138,13 +134,13 @@ msgstr "Ορισμένα σε"
 
 #. translators: 1: breakpoint name, 2: its upper bound, e.g. "Laptop · ≤1024px".
 #: src/blocks/spacer/edit.js:76
-#: src/extension/SpacingPanel.js:104
+#: src/extension/SpacingPanel.js:147
 #, js-format
 msgid "%1$s · ≤%2$s"
 msgstr "%1$s · ≤%2$s"
 
 #: src/blocks/spacer/edit.js:76
-#: src/extension/SpacingPanel.js:106
+#: src/extension/SpacingPanel.js:149
 msgid "Reset"
 msgstr "Επαναφορά"
 
@@ -172,29 +168,13 @@ msgstr "Κληρονομείται από την Προεπιλογή"
 msgid "Responsive spacing"
 msgstr "Αποκρίσιμα κενά"
 
-#: src/extension/SpacingPanel.js:62
+#: src/extension/SpacingPanel.js:79
 msgid "This site has no breakpoints, so there is nothing to set here yet."
 msgstr "Αυτός ο ιστότοπος δεν έχει σημεία διακοπής, οπότε δεν υπάρχει ακόμη κάτι να οριστεί εδώ."
 
-#: src/extension/SpacingPanel.js:70
+#: src/extension/SpacingPanel.js:87
 msgid "This theme has spacing controls switched off for this block."
 msgstr "Αυτό το θέμα έχει απενεργοποιημένα τα χειριστήρια κενών για αυτό το μπλοκ."
-
-#: src/extension/SpacingPanel.js:73
-msgid "None"
-msgstr "Κανένα"
-
-#: src/extension/SpacingPanel.js:79
-msgid "Resize the canvas or switch device view to set spacing for narrower screens."
-msgstr "Αλλάξτε το μέγεθος του καμβά ή την προβολή συσκευής για να ορίσετε κενά για στενότερες οθόνες."
-
-#: src/extension/SpacingPanel.js:80
-msgid "Choose a breakpoint above to set spacing for narrower screens."
-msgstr "Επιλέξτε σημείο διακοπής παραπάνω για να ορίσετε κενά για στενότερες οθόνες."
-
-#: src/extension/SpacingPanel.js:111
-msgid "Empty fields inherit from the nearest wider breakpoint."
-msgstr "Τα κενά πεδία κληρονομούν από το πλησιέστερο ευρύτερο σημείο διακοπής."
 
 #: src/extension/supports.js:99
 msgid "Padding"
@@ -413,3 +393,24 @@ msgctxt "block keyword"
 msgid "breakpoint"
 msgstr "σημείο διακοπής"
 
+#. translators: %s: breakpoint name.
+#: src/extension/SpacingPanel.js:123
+#, js-format
+msgid "The canvas is still previewing %s."
+msgstr "Ο καμβάς εξακολουθεί να προβάλλει %s."
+
+#: src/extension/SpacingPanel.js:123
+msgid "Responsive editing is switched off for this site, so the canvas does not follow along."
+msgstr "Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε ο καμβάς δεν ακολουθεί."
+
+#. translators: 1: side name, e.g. "Top". 2: a CSS length, e.g. "2rem".
+#: src/extension/SpacingPanel.js:180
+#, js-format
+msgid "%1$s %2$s"
+msgstr "%1$s %2$s"
+
+#. translators: %s: comma-separated list of sides and their inherited lengths.
+#: src/extension/SpacingPanel.js:186
+#, js-format
+msgid "Inherited from wider screens: %s."
+msgstr "Κληρονομείται από ευρύτερες οθόνες: %s."
