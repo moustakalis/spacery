@@ -135,9 +135,14 @@ Any block with spacing support — Group, Cover, Columns, a Paragraph.
 - [ ] With five or fewer tiers the selector is segmented; switch the source to a
       set with more and confirm it becomes a dropdown rather than twelve
       unreadable segments.
-- [ ] All four sides of padding and margin are editable at once. Link them, type
-      once, and confirm the four fields move together; unlink and confirm they
-      part company again.
+- [ ] All four sides of padding and margin are editable at once, linked by
+      default. Type once and confirm the four fields move together; unlink and
+      confirm they part company again.
+- [ ] Unlink, set the four sides to four different values, then link again and
+      edit one. All four must take the new value — linking is not "fill in the
+      blanks".
+- [ ] Pick a unit, type a value, then clear the field. The unit must stay as you
+      set it rather than reverting to px.
 - [ ] Empty a side that a wider tier sets. Its field should show the inherited
       value as a placeholder — and the *right* one per side, not one value
       repeated across all four.

@@ -11,7 +11,9 @@
  * three times out of four.
  *
  * Linking here syncs the fields rather than collapsing them, so the four values
- * stay visible while they are being kept equal.
+ * stay visible while they are being kept equal, and it is **on by default**:
+ * equal sides are what most spacing is, and a box that starts apart makes the
+ * common case four edits instead of one.
  */
 
 import {
@@ -26,7 +28,8 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useState } from 'react';
 
-import { formatLength, parseLength, unitFor } from './length';
+import { applyEdit, retagUnit } from './box';
+import { parseLength, unitFor } from './length';
 import { type Side, sideLabel } from './supports';
 
 /** The link glyph, drawn here for the same reason the device icons are. */
@@ -79,13 +82,25 @@ export function SpacingBox({
 	units,
 	onChange,
 }: SpacingBoxProps): React.ReactElement {
-	const [linked, setLinked] = useState(false);
+	const [linked, setLinked] = useState(true);
+
+	/*
+	 * A unit the author picked outlives the values.
+	 *
+	 * Reading the unit from the stored values alone looks right until the box
+	 * is emptied: with nothing left to read, `rem` would silently become `px`,
+	 * and the next number typed would mean something the author did not choose.
+	 */
+	const [chosen, setChosen] = useState<string | undefined>(undefined);
 
 	const allowed = units.map((unit) => unit.value);
-	const unit = unitFor(
-		sides.map((side) => values[side]),
-		allowed
-	);
+	const unit =
+		chosen && allowed.includes(chosen)
+			? chosen
+			: unitFor(
+					sides.map((side) => values[side]),
+					allowed
+				);
 
 	/**
 	 * Applies one field's new number.
@@ -94,37 +109,17 @@ export function SpacingBox({
 	 * @param input The field's contents.
 	 */
 	const change = (side: Side, input: string | undefined): void => {
-		const value = formatLength(input, unit);
-		const next: Partial<Record<Side, string | undefined>> = {};
-
-		for (const each of sides) {
-			next[each] = linked || each === side ? value : values[each];
-		}
-
-		onChange(next);
+		onChange(applyEdit({ sides, values, side, input, unit, linked }));
 	};
 
 	/**
 	 * Re-labels every authored side with a new unit.
 	 *
-	 * The numbers are kept and the unit swapped, rather than converted: 2rem
-	 * becoming 32px would be arithmetic the author did not ask for, and it is
-	 * only correct until the root font size changes.
-	 *
 	 * @param next The chosen unit.
 	 */
 	const changeUnit = (next: string): void => {
-		const values_: Partial<Record<Side, string | undefined>> = {};
-
-		for (const side of sides) {
-			const parsed = parseLength(values[side]);
-
-			values_[side] = parsed
-				? formatLength(parsed.value, next)
-				: values[side];
-		}
-
-		onChange(values_);
+		setChosen(next);
+		onChange(retagUnit(sides, values, next));
 	};
 
 	return (

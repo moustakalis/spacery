@@ -385,14 +385,14 @@ msgstr "Ο καμβάς εξακολουθεί να προβάλλει %s."
 msgid "Responsive editing is switched off for this site, so the canvas does not follow along."
 msgstr "Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε ο καμβάς δεν ακολουθεί."
 
-#: src/extension/SpacingBox.js:74
+#: src/extension/SpacingBox.js:72
 msgid "Unit"
 msgstr "Μονάδα"
 
-#: src/extension/SpacingBox.js:75
+#: src/extension/SpacingBox.js:73
 msgid "Unlink sides"
 msgstr "Αποσύνδεση πλευρών"
 
-#: src/extension/SpacingBox.js:76
+#: src/extension/SpacingBox.js:74
 msgid "Link sides — one value for all four"
 msgstr "Σύνδεση πλευρών — μία τιμή και για τις τέσσερις"

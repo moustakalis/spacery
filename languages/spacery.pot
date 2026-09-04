@@ -161,15 +161,15 @@ msgstr ""
 msgid "Responsive spacing"
 msgstr ""
 
-#: src/extension/SpacingBox.js:74
+#: src/extension/SpacingBox.js:72
 msgid "Unit"
 msgstr ""
 
-#: src/extension/SpacingBox.js:75
+#: src/extension/SpacingBox.js:73
 msgid "Unlink sides"
 msgstr ""
 
-#: src/extension/SpacingBox.js:76
+#: src/extension/SpacingBox.js:74
 msgid "Link sides — one value for all four"
 msgstr ""
 
