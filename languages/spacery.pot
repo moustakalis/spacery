@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-04T11:32:30+00:00\n"
+"POT-Creation-Date: 2026-09-04T11:51:23+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: spacery\n"
@@ -95,106 +95,88 @@ msgstr ""
 msgid "Those breakpoints were not saved. Every breakpoint needs a name and a width in px, em or rem, widths must all differ, and there is a maximum of 12."
 msgstr ""
 
-#: src/blocks/spacer/edit.js:46
+#: src/blocks/spacer/edit.js:45
 msgid "Height"
 msgstr ""
 
-#: src/blocks/spacer/edit.js:46
-#: src/blocks/spacer/edit.js:47
+#: src/blocks/spacer/edit.js:45
 msgid "Default"
 msgstr ""
 
-#: src/blocks/spacer/edit.js:46
+#: src/blocks/spacer/edit.js:45
 msgid "Applies at every width unless a narrower breakpoint overrides it."
 msgstr ""
 
-#: src/blocks/spacer/edit.js:46
-#: src/extension/SpacingPanel.js:118
-msgid "Breakpoint"
-msgstr ""
-
-#: src/blocks/spacer/edit.js:46
-msgid "Responsive editing is switched off for this site, so choose a breakpoint here."
-msgstr ""
-
-#: src/blocks/spacer/edit.js:52
-msgid "Breakpoints"
-msgstr ""
-
-#: src/blocks/spacer/edit.js:53
-msgid "Resize the canvas or switch device view to set a height for narrower screens."
-msgstr ""
-
-#: src/blocks/spacer/edit.js:54
-msgid "Choose a breakpoint above to set a height for narrower screens."
-msgstr ""
-
-#: src/blocks/spacer/edit.js:54
+#: src/blocks/spacer/edit.js:45
 msgid "Set at"
 msgstr ""
 
 #. translators: 1: breakpoint name, 2: its upper bound, e.g. "Laptop · ≤1024px".
-#: src/blocks/spacer/edit.js:76
-#: src/extension/SpacingPanel.js:147
+#: src/blocks/spacer/edit.js:71
+#: src/extension/SpacingPanel.js:99
 #, js-format
 msgid "%1$s · ≤%2$s"
 msgstr ""
 
-#: src/blocks/spacer/edit.js:76
-#: src/extension/SpacingPanel.js:149
+#: src/blocks/spacer/edit.js:71
+#: src/extension/SpacingPanel.js:101
 msgid "Reset"
 msgstr ""
 
 #. translators: %s: breakpoint name.
-#: src/blocks/spacer/edit.js:96
+#: src/blocks/spacer/edit.js:92
 #, js-format
 msgid "%s (editing)"
 msgstr ""
 
-#: src/blocks/spacer/edit.js:113
+#: src/blocks/spacer/edit.js:109
 msgid "Set here"
 msgstr ""
 
 #. translators: %s: the breakpoint a value is inherited from.
-#: src/blocks/spacer/edit.js:118
+#: src/blocks/spacer/edit.js:114
 #, js-format
 msgid "Inherited from %s"
 msgstr ""
 
-#: src/blocks/spacer/edit.js:120
+#: src/blocks/spacer/edit.js:116
 msgid "Inherited from Default"
+msgstr ""
+
+#: src/breakpoints/TierSelector.js:32
+msgid "Breakpoint"
+msgstr ""
+
+#. translators: %s: breakpoint name.
+#: src/breakpoints/TierSelector.js:37
+#, js-format
+msgid "The canvas is still previewing %s."
+msgstr ""
+
+#: src/breakpoints/TierSelector.js:37
+msgid "Responsive editing is switched off for this site, so the canvas does not follow along."
 msgstr ""
 
 #: src/extension/register.js:57
 msgid "Responsive spacing"
 msgstr ""
 
-#: src/extension/SpacingPanel.js:79
+#: src/extension/SpacingPanel.js:62
 msgid "This site has no breakpoints, so there is nothing to set here yet."
 msgstr ""
 
-#: src/extension/SpacingPanel.js:87
+#: src/extension/SpacingPanel.js:70
 msgid "This theme has spacing controls switched off for this block."
 msgstr ""
 
-#. translators: %s: breakpoint name.
-#: src/extension/SpacingPanel.js:123
-#, js-format
-msgid "The canvas is still previewing %s."
-msgstr ""
-
-#: src/extension/SpacingPanel.js:123
-msgid "Responsive editing is switched off for this site, so the canvas does not follow along."
-msgstr ""
-
 #. translators: 1: side name, e.g. "Top". 2: a CSS length, e.g. "2rem".
-#: src/extension/SpacingPanel.js:180
+#: src/extension/SpacingPanel.js:132
 #, js-format
 msgid "%1$s %2$s"
 msgstr ""
 
 #. translators: %s: comma-separated list of sides and their inherited lengths.
-#: src/extension/SpacingPanel.js:186
+#: src/extension/SpacingPanel.js:138
 #, js-format
 msgid "Inherited from wider screens: %s."
 msgstr ""

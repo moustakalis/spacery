@@ -198,7 +198,12 @@ View source. Spacery's declarations belong in
 ## 6. The Spacer block
 
 - [ ] Insert **Spacery**, set a different height per tier, check the front end at
-      each width.
+      each width. The block's panel carries the same tier selector as the
+      spacing panel — stepping through tiers there must not move the canvas.
+- [ ] With a tier selected that the canvas is not previewing, the block's own
+      preview height must still be the canvas's, not the selected tier's.
+      Selecting a tier says which value you are writing, never what the page
+      looks like.
 - [ ] Its own margin controls still work alongside the height.
 - [ ] It never appears in the Spacery inspector panel — the block is excluded
       from the extension, but still renders its own CSS. Those are two separate

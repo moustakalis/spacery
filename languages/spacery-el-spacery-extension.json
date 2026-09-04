@@ -9,6 +9,15 @@
 				"lang": "el",
 				"plural-forms": "nplurals=2; plural=(n != 1);"
 			},
+			"Breakpoint": [
+				"Σημείο διακοπής"
+			],
+			"The canvas is still previewing %s.": [
+				"Ο καμβάς εξακολουθεί να προβάλλει %s."
+			],
+			"Responsive editing is switched off for this site, so the canvas does not follow along.": [
+				"Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε ο καμβάς δεν ακολουθεί."
+			],
 			"Padding": [
 				"Εσωτερικό περιθώριο"
 			],
@@ -139,9 +148,6 @@
 			"Responsive spacing": [
 				"Αποκρίσιμα κενά"
 			],
-			"Breakpoint": [
-				"Σημείο διακοπής"
-			],
 			"%1$s · ≤%2$s": [
 				"%1$s · ≤%2$s"
 			],
@@ -153,12 +159,6 @@
 			],
 			"This theme has spacing controls switched off for this block.": [
 				"Αυτό το θέμα έχει απενεργοποιημένα τα χειριστήρια κενών για αυτό το μπλοκ."
-			],
-			"The canvas is still previewing %s.": [
-				"Ο καμβάς εξακολουθεί να προβάλλει %s."
-			],
-			"Responsive editing is switched off for this site, so the canvas does not follow along.": [
-				"Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε ο καμβάς δεν ακολουθεί."
 			],
 			"%1$s %2$s": [
 				"%1$s %2$s"
@@ -174,18 +174,6 @@
 			],
 			"Applies at every width unless a narrower breakpoint overrides it.": [
 				"Ισχύει σε κάθε πλάτος, εκτός αν το αντικαταστήσει ένα στενότερο σημείο διακοπής."
-			],
-			"Responsive editing is switched off for this site, so choose a breakpoint here.": [
-				"Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε επιλέξτε σημείο διακοπής εδώ."
-			],
-			"Breakpoints": [
-				"Σημεία διακοπής"
-			],
-			"Resize the canvas or switch device view to set a height for narrower screens.": [
-				"Αλλάξτε το μέγεθος του καμβά ή την προβολή συσκευής για να ορίσετε ύψος για στενότερες οθόνες."
-			],
-			"Choose a breakpoint above to set a height for narrower screens.": [
-				"Επιλέξτε σημείο διακοπής παραπάνω για να ορίσετε ύψος για στενότερες οθόνες."
 			],
 			"Set at": [
 				"Ορισμένα σε"

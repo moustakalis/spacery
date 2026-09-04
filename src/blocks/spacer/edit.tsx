@@ -1,13 +1,12 @@
 /**
  * Editor UI for the spacer block.
  *
- * Spacery has no viewport switcher of its own. Core 7.1 makes responsive
- * editing a mode: the author turns on "Responsive styles", picks a device or
- * drags the canvas edge, and every inspector control then edits that viewport.
- * A second switcher here would compete with it — the editor announcing "Tablet"
- * while Spacery announced "Laptop". Following the canvas instead means core's
- * own resize handle becomes Spacery's tier selector, including for the tiers
- * core has no device preset for.
+ * The tier being edited follows core's preview viewport and can also be chosen
+ * here (D17), using the same selector the spacing extension uses — one control
+ * and one behaviour across both panels. Choosing a tier here moves neither the
+ * canvas nor core's viewport, so nothing competes with core's own device UI;
+ * what it buys is reaching the tiers core has no device preset for without
+ * dragging the canvas edge to an unmarked width.
  */
 
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
@@ -16,17 +15,17 @@ import {
 	Flex,
 	FlexItem,
 	PanelBody,
-	SelectControl,
 	__experimentalText as Text,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useState } from 'react';
 
+import { TierSelector } from '../../breakpoints/TierSelector';
 import type { Breakpoint } from '../../breakpoints/types';
 import { useBreakpoints } from '../../breakpoints/useBreakpoints';
 import { useCanvasBreakpoint } from '../../breakpoints/useCanvasBreakpoint';
 import { useResponsiveEditing } from '../../breakpoints/useResponsiveEditing';
+import { useSelectedTier } from '../../breakpoints/useSelectedTier';
 import { authoredHeight, heightAt, inheritedFrom, withHeight } from './height';
 import type { SpacerAttributes } from './types';
 
@@ -47,18 +46,16 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 	const responsiveEditing = useResponsiveEditing();
 	const canvas = useCanvasBreakpoint(breakpoints);
 
+	const canvasSlug = responsiveEditing ? canvas.slug : undefined;
+	const { tier: active, select } = useSelectedTier(breakpoints, canvasSlug);
+
 	/*
-	 * With core's responsive editing switched off there is no canvas to follow,
-	 * so the author picks a tier here instead.
+	 * The canvas shows the height that applies at its *own* width, not at the
+	 * tier the inspector happens to be editing. Selecting a tier is a statement
+	 * about which values you are writing, never about what the page looks like.
 	 */
-	const [picked, setPicked] = useState<string>('');
-	const activeSlug = responsiveEditing ? canvas.slug : picked || undefined;
-
-	const active = breakpoints.find((b) => b.slug === activeSlug);
-
-	// The canvas shows the height that would actually apply at its width.
-	const previewHeight = active
-		? heightAt(attributes, breakpoints, active.slug)
+	const previewHeight = canvasSlug
+		? heightAt(attributes, breakpoints, canvasSlug)
 		: attributes.height;
 
 	const blockProps = useBlockProps({
@@ -82,48 +79,18 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 							setAttributes({ height: next ?? '' })
 						}
 					/>
-
-					{!responsiveEditing && breakpoints.length > 0 && (
-						<SelectControl
-							label={__('Breakpoint', 'spacery')}
-							help={__(
-								'Responsive editing is switched off for this site, so choose a breakpoint here.',
-								'spacery'
-							)}
-							value={picked}
-							options={[
-								{ value: '', label: __('Default', 'spacery') },
-								...breakpoints.map((b) => ({
-									value: b.slug,
-									label: b.label,
-								})),
-							]}
-							onChange={setPicked}
-						/>
-					)}
 				</PanelBody>
 
-				{active ? (
+				{active && (
 					<ActiveTier
 						breakpoint={active}
 						breakpoints={breakpoints}
 						attributes={attributes}
 						setAttributes={setAttributes}
+						canvasSlug={canvasSlug}
+						responsiveEditing={responsiveEditing}
+						onSelect={select}
 					/>
-				) : (
-					<PanelBody title={__('Breakpoints', 'spacery')}>
-						<Text variant="muted">
-							{responsiveEditing
-								? __(
-										'Resize the canvas or switch device view to set a height for narrower screens.',
-										'spacery'
-									)
-								: __(
-										'Choose a breakpoint above to set a height for narrower screens.',
-										'spacery'
-									)}
-						</Text>
-					</PanelBody>
 				)}
 
 				{breakpoints.length > 0 && (
@@ -134,7 +101,7 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 						<Summary
 							breakpoints={breakpoints}
 							attributes={attributes}
-							activeSlug={activeSlug}
+							activeSlug={active?.slug}
 						/>
 					</PanelBody>
 				)}
@@ -148,20 +115,27 @@ export default function Edit({ attributes, setAttributes }: EditProps) {
 interface ActiveTierProps extends EditProps {
 	breakpoint: Breakpoint;
 	breakpoints: Breakpoint[];
+	canvasSlug: string | undefined;
+	responsiveEditing: boolean;
+	onSelect: (slug: string) => void;
 }
 
 /**
- * The control for whichever tier the canvas is showing.
+ * The selector, and the control for whichever tier it names.
  *
  * The header names the tier and its boundary because core's badge and Spacery's
  * tier legitimately disagree: at a 900px canvas core reads "Desktop" (>782px)
  * while Spacery is on "Laptop" (≤1024px). Both are right within their own set,
  * and hiding the difference would be worse than naming it.
- * @param root0               Component props.
- * @param root0.breakpoint    The tier being edited.
- * @param root0.breakpoints   The active set, widest first.
- * @param root0.attributes    The block's attributes.
- * @param root0.setAttributes Attribute setter.
+ *
+ * @param root0                   Component props.
+ * @param root0.breakpoint        The tier being edited.
+ * @param root0.breakpoints       The active set, widest first.
+ * @param root0.attributes        The block's attributes.
+ * @param root0.setAttributes     Attribute setter.
+ * @param root0.canvasSlug        The tier the canvas is previewing, if any.
+ * @param root0.responsiveEditing Whether core offers a viewport at all.
+ * @param root0.onSelect          Called with the tier the author chose.
  * @return The control for the active tier.
  */
 function ActiveTier({
@@ -169,6 +143,9 @@ function ActiveTier({
 	breakpoints,
 	attributes,
 	setAttributes,
+	canvasSlug,
+	responsiveEditing,
+	onSelect,
 }: ActiveTierProps) {
 	const authored = authoredHeight(attributes, breakpoint.slug);
 	const source = inheritedFrom(attributes, breakpoints, breakpoint.slug);
@@ -183,6 +160,14 @@ function ActiveTier({
 				breakpoint.max
 			)}
 		>
+			<TierSelector
+				breakpoints={breakpoints}
+				value={breakpoint.slug}
+				canvasSlug={canvasSlug}
+				responsiveEditing={responsiveEditing}
+				onChange={onSelect}
+			/>
+
 			<UnitControl
 				value={authored ?? ''}
 				placeholder={effective}
@@ -232,9 +217,10 @@ interface SummaryProps {
 /**
  * Which tiers carry a value.
  *
- * Read-only on purpose. Making these clickable would rebuild the viewport
- * switcher this design deliberately does not have, but the author still needs
- * to see what they have set without dragging the canvas to every width.
+ * Read-only on purpose, even under D17. The selector above already changes
+ * tiers; a second control doing the same thing would be redundant. What this
+ * adds is the one thing neither the selector nor the field can show — every
+ * tier's value at once, without visiting them.
  * @param root0             Component props.
  * @param root0.breakpoints The active set, widest first.
  * @param root0.attributes  The block's attributes.

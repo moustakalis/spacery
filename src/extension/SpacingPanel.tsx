@@ -19,13 +19,10 @@ import {
 	Button,
 	Flex,
 	FlexItem,
-	SelectControl,
-	ToggleGroupControl,
-	ToggleGroupControlOption,
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { readPath } from '../attribute/paths';
 import { authoredAt, effectiveAt, withValue } from '../attribute/tiers';
@@ -34,12 +31,14 @@ import type {
 	StyleNode,
 	StylePath,
 } from '../attribute/types';
+import { TierSelector } from '../breakpoints/TierSelector';
 import type { Breakpoint } from '../breakpoints/types';
 import { useBreakpoints } from '../breakpoints/useBreakpoints';
 import { useCanvasBreakpoint } from '../breakpoints/useCanvasBreakpoint';
 import { useCanvasWindow } from '../breakpoints/useCanvasWindow';
 import { useCoreViewports } from '../breakpoints/useCoreViewports';
 import { useResponsiveEditing } from '../breakpoints/useResponsiveEditing';
+import { useSelectedTier } from '../breakpoints/useSelectedTier';
 import {
 	pathFor,
 	type Side,
@@ -60,15 +59,6 @@ const UNITS = [
 	{ value: '%', label: '%' },
 	{ value: 'vw', label: 'vw' },
 ];
-
-/**
- * How many tiers still fit as segments in an inspector sidebar.
- *
- * `ToggleGroupControl` does not wrap; it divides the width it is given. Four
- * or five short labels are readable at ~250px and twelve are not, so past this
- * count the same choice is offered as a dropdown rather than squeezed.
- */
-const MAX_SEGMENTS = 5;
 
 export interface ExtendedAttributes extends Record<string, unknown> {
 	spacery?: SpaceryAttribute | undefined;
@@ -100,20 +90,8 @@ export function SpacingPanel({
 	const coreViewports = useCoreViewports();
 	const canvas = useCanvasBreakpoint(breakpoints, useCanvasWindow());
 
-	/*
-	 * The canvas proposes; the author disposes. `picked` is what the tier
-	 * selector last set, and the effect re-points it at the canvas whenever
-	 * core's preview viewport moves — so switching device view still lands on
-	 * the matching tier, while clicking a tier here does not move the canvas.
-	 */
 	const canvasSlug = responsiveEditing ? canvas.slug : undefined;
-	const [picked, setPicked] = useState<string | undefined>(undefined);
-
-	useEffect(() => {
-		if (canvasSlug) {
-			setPicked(canvasSlug);
-		}
-	}, [canvasSlug]);
+	const { tier: active, select } = useSelectedTier(breakpoints, canvasSlug);
 
 	const features = useEditableFeatures(name);
 	const paths = useMemo(
@@ -157,15 +135,6 @@ export function SpacingPanel({
 		);
 	}
 
-	/*
-	 * Widest tier as the floor. Above every band the canvas reports no tier,
-	 * and an empty panel saying "resize the canvas" was a dead end: the author
-	 * wanted to set something and the UI asked them to go somewhere else first.
-	 */
-	const active =
-		breakpoints.find((b) => b.slug === (picked ?? canvasSlug)) ??
-		breakpoints[0];
-
 	if (!active) {
 		return <></>;
 	}
@@ -178,7 +147,7 @@ export function SpacingPanel({
 					value={active.slug}
 					canvasSlug={canvasSlug}
 					responsiveEditing={responsiveEditing}
-					onChange={setPicked}
+					onChange={select}
 				/>
 			</FlexItem>
 
@@ -200,103 +169,6 @@ export function SpacingPanel({
 						style={attributes.style}
 						setAttributes={setAttributes}
 					/>
-				</FlexItem>
-			)}
-		</Flex>
-	);
-}
-
-interface TierSelectorProps {
-	breakpoints: Breakpoint[];
-	value: string;
-	canvasSlug: string | undefined;
-	responsiveEditing: boolean;
-	onChange: (slug: string) => void;
-}
-
-/**
- * Chooses which tier the fields below are editing.
- *
- * Segments up to {@link MAX_SEGMENTS} tiers and a dropdown beyond that. Both
- * are one accessible group of radios, which a row of buttons styled to look
- * selected would not have been.
- *
- * @param root0                   Component props.
- * @param root0.breakpoints       The active set, widest first.
- * @param root0.value             The tier being edited.
- * @param root0.canvasSlug        The tier the canvas is previewing, if any.
- * @param root0.responsiveEditing Whether core offers a viewport at all.
- * @param root0.onChange          Called with the chosen slug.
- * @return The selector, with a line explaining any divergence from the canvas.
- */
-function TierSelector({
-	breakpoints,
-	value,
-	canvasSlug,
-	responsiveEditing,
-	onChange,
-}: TierSelectorProps): React.ReactElement {
-	const canvasTier = breakpoints.find((b) => b.slug === canvasSlug);
-
-	return (
-		<Flex direction="column" gap={2}>
-			<FlexItem>
-				{breakpoints.length <= MAX_SEGMENTS ? (
-					<ToggleGroupControl
-						__next40pxDefaultSize
-						isBlock
-						hideLabelFromVision
-						label={__('Breakpoint', 'spacery')}
-						value={value}
-						onChange={(next?: string | number) =>
-							onChange(String(next))
-						}
-					>
-						{breakpoints.map((breakpoint) => (
-							<ToggleGroupControlOption
-								key={breakpoint.slug}
-								value={breakpoint.slug}
-								label={breakpoint.label}
-							/>
-						))}
-					</ToggleGroupControl>
-				) : (
-					<SelectControl
-						label={__('Breakpoint', 'spacery')}
-						value={value}
-						options={breakpoints.map((breakpoint) => ({
-							value: breakpoint.slug,
-							label: breakpoint.label,
-						}))}
-						onChange={onChange}
-					/>
-				)}
-			</FlexItem>
-
-			{/*
-			 * Only when the two disagree. Saying "this matches the canvas" on
-			 * every selection would be noise on the path almost everyone takes.
-			 */}
-			{canvasTier && canvasTier.slug !== value && (
-				<FlexItem>
-					<Text variant="muted" size={12}>
-						{sprintf(
-							/* translators: %s: breakpoint name. */
-							__('The canvas is still previewing %s.', 'spacery'),
-							canvasTier.label
-						)}
-					</Text>
-				</FlexItem>
-			)}
-
-			{!responsiveEditing && (
-				<FlexItem>
-					<Text variant="muted" size={12}>
-						{__(
-							'Responsive editing is switched off for this site, so the canvas does not follow along.',
-							'spacery'
-						)}
-					</Text>
 				</FlexItem>
 			)}
 		</Flex>
