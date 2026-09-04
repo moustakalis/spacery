@@ -93,7 +93,7 @@ though this pass does not.
 
 ## 1. Breakpoint sources (D2)
 
-Settings → Spacery.
+**Spacery** in the admin menu, below Appearance.
 
 - [ ] With **Twenty Twenty-Five** active, "Decide for me" reports the theme, and
       the bands shown match core's `settings.viewport`.

@@ -81,7 +81,7 @@ test.describe('settings screen', () => {
 		admin,
 		page,
 	}) => {
-		await admin.visitAdminPage('options-general.php', 'page=spacery');
+		await admin.visitAdminPage('admin.php', 'page=spacery');
 
 		const app = page.locator(appRoot);
 		const preset = app.locator(sourceRadio('spacery'));
@@ -107,7 +107,7 @@ test.describe('settings screen', () => {
 		admin,
 		page,
 	}) => {
-		await admin.visitAdminPage('options-general.php', 'page=spacery');
+		await admin.visitAdminPage('admin.php', 'page=spacery');
 
 		const app = page.locator(appRoot);
 
@@ -144,7 +144,7 @@ test.describe('settings screen', () => {
 	 * widths, not malformed lengths.
 	 */
 	test('says so when the server refuses a set', async ({ admin, page }) => {
-		await admin.visitAdminPage('options-general.php', 'page=spacery');
+		await admin.visitAdminPage('admin.php', 'page=spacery');
 
 		const app = page.locator(appRoot);
 

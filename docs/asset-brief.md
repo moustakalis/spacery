@@ -145,7 +145,7 @@ screenshot that has to be right; it is the product.
 
 Caption: *Padding and margin per breakpoint, on any block that supports spacing.*
 
-**Screenshot 2 — where breakpoints come from.** Settings → Spacery, showing the
+**Screenshot 2 — where breakpoints come from.** The Spacery admin screen, showing the
 four source options and the **In use now** panel beneath, with its resolved
 tiers and their bands (`over 782px, up to 1024px`, `up to 480px`). Choose
 **Spacery's own** so four tiers are listed rather than the theme's two.
@@ -177,7 +177,7 @@ pnpm run env:start     # WordPress 7.1 on PHP 8.2, needs Docker
 Then `http://localhost:8888/wp-admin`, user `admin`, password `password`.
 Activate Spacery under Plugins if it is not already.
 
-For screenshot 2, Settings → Spacery. For 1 and 3, create a post and insert a
+For screenshot 2, the Spacery screen in the admin menu. For 1 and 3, create a post and insert a
 Group or a Spacery block.
 
 ---

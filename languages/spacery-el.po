@@ -18,8 +18,8 @@ msgstr ""
 
 #. Plugin Name of the plugin
 #: spacery.php
-#: includes/Settings/Screen.php:55
-#: includes/Settings/Screen.php:56
+#: includes/Settings/Screen.php:74
+#: includes/Settings/Screen.php:75
 #: src/settings/App.js:66
 msgid "Spacery"
 msgstr ""

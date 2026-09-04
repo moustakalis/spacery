@@ -38,7 +38,7 @@ Spacery uses one set of breakpoints at a time, and you pick which:
 * **Spacery's own.** Four tiers — Desktop, Laptop, Tablet and Mobile — over the default
   that applies everywhere. Tablet and Mobile use WordPress's own values, so choosing this
   adds tiers without moving the ones you already had.
-* **Your own.** Any set you like, up to twelve tiers, defined under Settings → Spacery.
+* **Your own.** Any set you like, up to twelve tiers, defined on the Spacery screen in the admin menu.
 
 The sets are never blended: values from two different intentions sitting side by side
 produce a set nobody designed. Developers can override the result entirely with the

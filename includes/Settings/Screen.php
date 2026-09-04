@@ -12,7 +12,7 @@ namespace Spacery\Settings;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Mounts the settings app under Settings → Spacery.
+ * Mounts the settings app on its own top-level admin menu (D16).
  *
  * A React app rather than a Settings API form, for one reason that outweighs
  * the extra bundle: the screen's central control is a list of N breakpoints the
@@ -34,7 +34,22 @@ final class Screen {
 	public const HANDLE = 'spacery-settings';
 
 	/**
-	 * Hook suffix returned by add_options_page(), used to enqueue on this page
+	 * Dashicon for the menu. The same one `block.json` gives the Spacer, so the
+	 * menu and the block are recognisably one plugin.
+	 */
+	private const ICON = 'dashicons-image-flip-vertical';
+
+	/**
+	 * Menu position: immediately below Appearance (60), above Plugins (65).
+	 *
+	 * A float on purpose. `$menu` is keyed by position, so two plugins claiming
+	 * the same integer means one of them silently disappears; a fractional
+	 * position is the documented way to make that collision unlikely.
+	 */
+	private const POSITION = 60.8;
+
+	/**
+	 * Hook suffix returned by add_menu_page(), used to enqueue on this page
 	 * alone. Assets on every admin screen would be a plugin behaving badly.
 	 */
 	private string $hook = '';
@@ -48,15 +63,21 @@ final class Screen {
 	}
 
 	/**
-	 * Adds the options page.
+	 * Adds the top-level menu page.
+	 *
+	 * No submenu is registered, so WordPress renders the item on its own with
+	 * no flyout. Adding one would duplicate the parent as its first child,
+	 * which is the usual reason a single-screen plugin's menu looks wrong.
 	 */
 	public function add_page(): void {
-		$hook = add_options_page(
+		$hook = add_menu_page(
 			__( 'Spacery', 'spacery' ),
 			__( 'Spacery', 'spacery' ),
 			'manage_options',
 			self::SLUG,
-			array( $this, 'render' )
+			array( $this, 'render' ),
+			self::ICON,
+			self::POSITION
 		);
 
 		$this->hook = is_string( $hook ) ? $hook : '';

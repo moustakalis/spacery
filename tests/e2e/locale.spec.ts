@@ -15,7 +15,7 @@
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 test('the settings screen renders in Greek', async ({ admin, page }) => {
-	await admin.visitAdminPage('options-general.php', 'page=spacery');
+	await admin.visitAdminPage('admin.php', 'page=spacery');
 
 	// From languages/spacery-el.mo, through PHP.
 	await expect(
