@@ -10,9 +10,9 @@ import {
 	Flex,
 	FlexItem,
 	SelectControl,
-	ToggleGroupControl,
-	ToggleGroupControlOption,
 	__experimentalText as Text,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 

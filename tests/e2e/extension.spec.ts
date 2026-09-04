@@ -28,8 +28,11 @@ const PLUGIN = 'spacery';
  *
  * Spacery names none of them anywhere in its source — they are here because
  * core declares spacing support on them, which is the whole claim.
+ *
+ * `core/heading` earns its place: it is a text block rather than a container,
+ * so it is the one that catches a panel which only works inside layout blocks.
  */
-const SUPPORTED = ['core/group', 'core/columns', 'core/cover'];
+const SUPPORTED = ['core/group', 'core/columns', 'core/cover', 'core/heading'];
 
 /**
  * The block's own padding, and the value WordPress sets for tablets.
@@ -66,9 +69,29 @@ test.describe('spacing extension', () => {
 			await editor.insertBlock({ name });
 			await editor.openDocumentSettingsSidebar();
 
-			await expect(
-				page.getByRole('button', { name: PANEL })
-			).toBeVisible();
+			const heading = page.getByRole('button', { name: PANEL });
+
+			await expect(heading).toBeVisible();
+
+			/*
+			 * Expanded, and asserted on what is inside it.
+			 *
+			 * A visible panel heading only proves the fill was registered. The
+			 * body is where the editor components live, and one of those
+			 * resolving to `undefined` — an experimental export imported under a
+			 * stable name it does not have — takes the whole editor down with
+			 * React error #130 rather than rendering an empty panel. That
+			 * shipped once. The tier line and the two boxes are the smallest
+			 * assertion that the body actually rendered.
+			 */
+			await heading.click();
+
+			const panel = page
+				.locator('.components-panel__body')
+				.filter({ has: heading });
+
+			await expect(panel.getByText(/·\s*≤/)).toBeVisible();
+			await expect(panel.getByRole('radio').first()).toBeVisible();
 		});
 	}
 

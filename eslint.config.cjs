@@ -31,13 +31,23 @@ module.exports = [
 			'import/no-extraneous-dependencies': 'off',
 
 			/*
+			 * Experimental exports Spacery uses on purpose, named one by one so
+			 * the rule keeps working for everything else.
+			 *
 			 * `UnitControl` is the only control in @wordpress/components that
 			 * edits a number and a CSS unit together, and a height field without
 			 * units would be a worse control. It has been exported as
 			 * `__experimentalUnitControl` since 2019 and is still experimental in
 			 * v40, with no promoted replacement -- core's own Spacer block uses
-			 * it. Naming exactly these two, rather than switching the rule off,
-			 * keeps the warning working for everything else.
+			 * it.
+			 *
+			 * `ToggleGroupControl` and its option are the segmented radio group
+			 * the tier selector needs. Unlike `BoxControl`, which Spacery imports
+			 * under its stable name, WordPress 7.1 exports these two *only* as
+			 * experimental: `wp-includes/js/dist/components.js` has no
+			 * `ToggleGroupControl:` key of its own, only the `__experimental`
+			 * one. Importing the stable name is not a lint error but a runtime
+			 * `undefined`, which takes the editor down with React error #130.
 			 */
 			'@wordpress/no-unsafe-wp-apis': [
 				'error',
@@ -46,6 +56,8 @@ module.exports = [
 						'__experimentalUnitControl',
 						'__experimentalText',
 						'__experimentalHeading',
+						'__experimentalToggleGroupControl',
+						'__experimentalToggleGroupControlOption',
 					],
 				},
 			],

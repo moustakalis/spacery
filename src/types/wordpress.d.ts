@@ -259,6 +259,17 @@ declare module '@wordpress/components' {
 	 * the same module. The stable name is used because the plugin requires 7.1
 	 * and has no older runtime to support.
 	 *
+	 * Whether a name is stable has to be checked against that bundle, and the
+	 * check has to be anchored. Searching it for `BoxControl:` also matches the
+	 * tails of `__experimentalBoxControl:` and `BorderBoxControl:`, which is how
+	 * `ToggleGroupControl` was once declared stable here when it is not — a
+	 * component that resolves to `undefined` at runtime and takes the editor
+	 * down with React error #130. The anchored form:
+	 *
+	 * ```
+	 * grep -oE '(^|[,{])BoxControl:\(\)=>' wp-includes/js/dist/components.js
+	 * ```
+	 *
 	 * `values` and the `onChange` payload are partial on purpose. A block
 	 * declares which sides it supports, and the control is given only those.
 	 */
@@ -275,11 +286,14 @@ declare module '@wordpress/components' {
 	}>;
 
 	/**
-	 * Segmented radio group. Also stable in 7.1, alongside its experimental
-	 * alias. `onChange` is typed loosely because the control reports whatever
-	 * was put in `value`, which may be a number for other callers.
+	 * Segmented radio group. **Experimental only** in WordPress 7.1 — unlike
+	 * `BoxControl`, no stable alias is exported, so this is the name that
+	 * exists at runtime.
+	 *
+	 * `onChange` is typed loosely because the control reports whatever was put
+	 * in `value`, which may be a number for other callers.
 	 */
-	export const ToggleGroupControl: React.ComponentType<{
+	export const __experimentalToggleGroupControl: React.ComponentType<{
 		label?: string;
 		hideLabelFromVision?: boolean;
 		isBlock?: boolean;
@@ -289,7 +303,7 @@ declare module '@wordpress/components' {
 		children?: React.ReactNode;
 	}>;
 
-	export const ToggleGroupControlOption: React.ComponentType<{
+	export const __experimentalToggleGroupControlOption: React.ComponentType<{
 		value: string | number;
 		label: string;
 		showTooltip?: boolean;
