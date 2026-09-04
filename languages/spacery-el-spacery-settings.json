@@ -9,6 +9,9 @@
 				"lang": "el",
 				"plural-forms": "nplurals=2; plural=(n != 1);"
 			},
+			"Responsive spacing": [
+				"Αποκρίσιμα κενά"
+			],
 			"Breakpoint": [
 				"Σημείο διακοπής"
 			],
@@ -18,23 +21,48 @@
 			"Responsive editing is switched off for this site, so the canvas does not follow along.": [
 				"Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε ο καμβάς δεν ακολουθεί."
 			],
-			"Padding": [
-				"Εσωτερικό περιθώριο"
+			"Height": [
+				"Ύψος"
 			],
-			"Margin": [
-				"Εξωτερικό περιθώριο"
+			"Default": [
+				"Προεπιλογή"
 			],
-			"Top": [
-				"Πάνω"
+			"Applies at every width unless a narrower breakpoint overrides it.": [
+				"Ισχύει σε κάθε πλάτος, εκτός αν το αντικαταστήσει ένα στενότερο σημείο διακοπής."
 			],
-			"Right": [
-				"Δεξιά"
+			"Set at": [
+				"Ορισμένα σε"
 			],
-			"Bottom": [
-				"Κάτω"
+			"%1$s · ≤%2$s": [
+				"%1$s · ≤%2$s"
 			],
-			"Left": [
-				"Αριστερά"
+			"Reset": [
+				"Επαναφορά"
+			],
+			"%s (editing)": [
+				"%s (σε επεξεργασία)"
+			],
+			"Set here": [
+				"Ορίστηκε εδώ"
+			],
+			"Inherited from %s": [
+				"Κληρονομείται από %s"
+			],
+			"Inherited from Default": [
+				"Κληρονομείται από την Προεπιλογή"
+			],
+			"WordPress already sets %d value here for narrower screens.": [
+				"Το WordPress ορίζει ήδη %d τιμή εδώ για στενότερες οθόνες.",
+				"Το WordPress ορίζει ήδη %d τιμές εδώ για στενότερες οθόνες."
+			],
+			"Moved into Spacery they follow its breakpoints, so narrower screens inherit them too unless a narrower breakpoint sets its own value.": [
+				"Μεταφερόμενες στο Spacery ακολουθούν τα δικά του σημεία διακοπής, οπότε τις κληρονομούν και οι στενότερες οθόνες, εκτός αν κάποιο στενότερο σημείο διακοπής ορίσει δική του τιμή."
+			],
+			"Manage these in Spacery": [
+				"Διαχείριση από το Spacery"
+			],
+			"Leaving %s to WordPress: no Spacery breakpoint covers the same widths.": [
+				"Το %s παραμένει στο WordPress: κανένα σημείο διακοπής του Spacery δεν καλύπτει τα ίδια πλάτη."
 			],
 			"Name": [
 				"Όνομα"
@@ -66,6 +94,15 @@
 			"%d breakpoints is the maximum. Beyond that the editor asks more of an author than it gives back.": [
 				"Τα %d σημεία διακοπής είναι το ανώτατο όριο. Πέρα από αυτό, ο επεξεργαστής ζητά από τον συντάκτη περισσότερα απ' όσα του δίνει."
 			],
+			"This site has no breakpoints, so there is nothing to set here yet.": [
+				"Αυτός ο ιστότοπος δεν έχει σημεία διακοπής, οπότε δεν υπάρχει ακόμη κάτι να οριστεί εδώ."
+			],
+			"This theme has spacing controls switched off for this block.": [
+				"Αυτό το θέμα έχει απενεργοποιημένα τα χειριστήρια κενών για αυτό το μπλοκ."
+			],
+			"Reset all": [
+				"Επαναφορά όλων"
+			],
 			"Unit": [
 				"Μονάδα"
 			],
@@ -74,6 +111,9 @@
 			],
 			"Link sides — one value for all four": [
 				"Σύνδεση πλευρών — μία τιμή και για τις τέσσερις"
+			],
+			"Reset %s": [
+				"Επαναφορά: %s"
 			],
 			"Spacery": [
 				""
@@ -141,63 +181,23 @@
 			"Something went wrong talking to the site.": [
 				"Κάτι πήγε στραβά στην επικοινωνία με τον ιστότοπο."
 			],
-			"WordPress already sets %d value here for narrower screens.": [
-				"Το WordPress ορίζει ήδη %d τιμή εδώ για στενότερες οθόνες.",
-				"Το WordPress ορίζει ήδη %d τιμές εδώ για στενότερες οθόνες."
+			"Padding": [
+				"Εσωτερικό περιθώριο"
 			],
-			"Moved into Spacery they follow its breakpoints, so narrower screens inherit them too unless a narrower breakpoint sets its own value.": [
-				"Μεταφερόμενες στο Spacery ακολουθούν τα δικά του σημεία διακοπής, οπότε τις κληρονομούν και οι στενότερες οθόνες, εκτός αν κάποιο στενότερο σημείο διακοπής ορίσει δική του τιμή."
+			"Margin": [
+				"Εξωτερικό περιθώριο"
 			],
-			"Manage these in Spacery": [
-				"Διαχείριση από το Spacery"
+			"Top": [
+				"Πάνω"
 			],
-			"Leaving %s to WordPress: no Spacery breakpoint covers the same widths.": [
-				"Το %s παραμένει στο WordPress: κανένα σημείο διακοπής του Spacery δεν καλύπτει τα ίδια πλάτη."
+			"Right": [
+				"Δεξιά"
 			],
-			"Responsive spacing": [
-				"Αποκρίσιμα κενά"
+			"Bottom": [
+				"Κάτω"
 			],
-			"%1$s · ≤%2$s": [
-				"%1$s · ≤%2$s"
-			],
-			"Reset": [
-				"Επαναφορά"
-			],
-			"This site has no breakpoints, so there is nothing to set here yet.": [
-				"Αυτός ο ιστότοπος δεν έχει σημεία διακοπής, οπότε δεν υπάρχει ακόμη κάτι να οριστεί εδώ."
-			],
-			"This theme has spacing controls switched off for this block.": [
-				"Αυτό το θέμα έχει απενεργοποιημένα τα χειριστήρια κενών για αυτό το μπλοκ."
-			],
-			"Height": [
-				"Ύψος"
-			],
-			"Default": [
-				"Προεπιλογή"
-			],
-			"Applies at every width unless a narrower breakpoint overrides it.": [
-				"Ισχύει σε κάθε πλάτος, εκτός αν το αντικαταστήσει ένα στενότερο σημείο διακοπής."
-			],
-			"Set at": [
-				"Ορισμένα σε"
-			],
-			"%s (editing)": [
-				"%s (σε επεξεργασία)"
-			],
-			"Set here": [
-				"Ορίστηκε εδώ"
-			],
-			"Inherited from %s": [
-				"Κληρονομείται από %s"
-			],
-			"Inherited from Default": [
-				"Κληρονομείται από την Προεπιλογή"
-			],
-			"Reset %s": [
-				"Επαναφορά: %s"
-			],
-			"Reset all": [
-				"Επαναφορά όλων"
+			"Left": [
+				"Αριστερά"
 			]
 		}
 	},
