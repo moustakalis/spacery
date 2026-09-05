@@ -274,6 +274,19 @@ declare module '@wordpress/components' {
 	 * grep -oE '(^|[,{])NumberControl:\(\)=>' wp-includes/js/dist/components.js
 	 * ```
 	 */
+	/**
+	 * The text sibling of `NumberControl`, sharing its label placement and
+	 * sizing so a box's fields keep the same shape in custom mode.
+	 */
+	export const __experimentalInputControl: React.ComponentType<{
+		label?: string;
+		labelPosition?: 'top' | 'side' | 'bottom' | 'edge';
+		size?: 'default' | 'compact' | 'small';
+		value?: string | undefined;
+		placeholder?: string | undefined;
+		onChange?: (value?: string) => void;
+	}>;
+
 	export const __experimentalNumberControl: React.ComponentType<{
 		label?: string;
 		labelPosition?: 'top' | 'side' | 'bottom' | 'edge';

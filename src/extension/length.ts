@@ -8,6 +8,16 @@
  * than inside a component.
  */
 
+/**
+ * The pseudo-unit for values a number field cannot hold.
+ *
+ * Not a CSS unit and never written into a value — it is the box's mode. In it
+ * the four fields take whole CSS values, which is the only way to author a
+ * mixture (`0`, `30rem`, `calc(100% - 2rem)`) or to see a preset reference that
+ * something else has already stored on the block.
+ */
+export const CUSTOM = 'custom';
+
 /** A CSS length split into its number and its unit. */
 export interface Length {
 	value: number;
@@ -101,6 +111,17 @@ export function unitFor(
 		if (unit && allowed.includes(unit)) {
 			return unit;
 		}
+	}
+
+	/*
+	 * A stored value no number field can hold puts the box in custom mode.
+	 * Otherwise it would render as an empty field: invisible to the author,
+	 * still applied on the front end, and destroyed by the next linked edit.
+	 * Values reach a block that way through core's own controls and through
+	 * Spacery's takeover, not only by being typed here.
+	 */
+	if (values.some((value) => value && !parseLength(value))) {
+		return CUSTOM;
 	}
 
 	return fallback;

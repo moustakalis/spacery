@@ -198,6 +198,12 @@
 			],
 			"Left": [
 				"Αριστερά"
+			],
+			"custom": [
+				"προσαρμοσμένο"
+			],
+			"Any CSS value, one per side — a length, calc() or a preset. WordPress drops anything it cannot verify.": [
+				"Οποιαδήποτε τιμή CSS, μία ανά πλευρά — μήκος, calc() ή προεπιλογή. Το WordPress απορρίπτει ό,τι δεν μπορεί να επαληθεύσει."
 			]
 		}
 	},

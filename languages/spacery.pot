@@ -160,22 +160,30 @@ msgstr ""
 msgid "Responsive spacing"
 msgstr ""
 
-#: src/extension/SpacingBox.js:76
+#: src/extension/SpacingBox.js:62
+msgid "custom"
+msgstr ""
+
+#: src/extension/SpacingBox.js:85
 msgid "Unit"
 msgstr ""
 
-#: src/extension/SpacingBox.js:77
+#: src/extension/SpacingBox.js:86
 msgid "Unlink sides"
 msgstr ""
 
-#: src/extension/SpacingBox.js:78
+#: src/extension/SpacingBox.js:87
 msgid "Link sides — one value for all four"
 msgstr ""
 
 #. translators: %s: a spacing property, e.g. "Padding".
-#: src/extension/SpacingBox.js:80
+#: src/extension/SpacingBox.js:89
 #, js-format
 msgid "Reset %s"
+msgstr ""
+
+#: src/extension/SpacingBox.js:89
+msgid "Any CSS value, one per side — a length, calc() or a preset. WordPress drops anything it cannot verify."
 msgstr ""
 
 #: src/extension/SpacingPanel.js:63

@@ -384,20 +384,20 @@ msgstr "Ο καμβάς εξακολουθεί να προβάλλει %s."
 msgid "Responsive editing is switched off for this site, so the canvas does not follow along."
 msgstr "Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε ο καμβάς δεν ακολουθεί."
 
-#: src/extension/SpacingBox.js:76
+#: src/extension/SpacingBox.js:85
 msgid "Unit"
 msgstr "Μονάδα"
 
-#: src/extension/SpacingBox.js:77
+#: src/extension/SpacingBox.js:86
 msgid "Unlink sides"
 msgstr "Αποσύνδεση πλευρών"
 
-#: src/extension/SpacingBox.js:78
+#: src/extension/SpacingBox.js:87
 msgid "Link sides — one value for all four"
 msgstr "Σύνδεση πλευρών — μία τιμή και για τις τέσσερις"
 
 #. translators: %s: a spacing property, e.g. "Padding".
-#: src/extension/SpacingBox.js:80
+#: src/extension/SpacingBox.js:89
 #, js-format
 msgid "Reset %s"
 msgstr "Επαναφορά: %s"
@@ -405,3 +405,11 @@ msgstr "Επαναφορά: %s"
 #: src/extension/SpacingPanel.js:107
 msgid "Reset all"
 msgstr "Επαναφορά όλων"
+
+#: src/extension/SpacingBox.js:62
+msgid "custom"
+msgstr "προσαρμοσμένο"
+
+#: src/extension/SpacingBox.js:89
+msgid "Any CSS value, one per side — a length, calc() or a preset. WordPress drops anything it cannot verify."
+msgstr "Οποιαδήποτε τιμή CSS, μία ανά πλευρά — μήκος, calc() ή προεπιλογή. Το WordPress απορρίπτει ό,τι δεν μπορεί να επαληθεύσει."

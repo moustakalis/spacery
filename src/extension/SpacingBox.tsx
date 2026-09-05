@@ -10,6 +10,11 @@
  * wider tier and showing one side's inheritance on all four would be wrong
  * three times out of four.
  *
+ * The unit picker also carries a `custom` mode, in which the four fields take
+ * whole CSS values instead of numbers. That is the only way to author a mixture
+ * — `0`, `30rem`, `calc(100% - 2rem)` — and the only way to *see* a value some
+ * other tool stored that no number field can hold.
+ *
  * Linking here syncs the fields rather than collapsing them, so the four values
  * stay visible while they are being kept equal, and it is **on by default**:
  * equal sides are what most spacing is, and a box that starts apart makes the
@@ -22,14 +27,15 @@ import {
 	FlexBlock,
 	FlexItem,
 	SelectControl,
+	__experimentalInputControl as InputControl,
 	__experimentalNumberControl as NumberControl,
 	__experimentalText as Text,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from 'react';
 
-import { applyEdit, clearBox, isAuthored, retagUnit } from './box';
-import { parseLength, unitFor } from './length';
+import { applyEdit, clearBox, isAuthored, switchUnit } from './box';
+import { CUSTOM, parseLength, unitFor } from './length';
 import { type Side, sideLabel } from './supports';
 
 /** The link glyph, drawn here for the same reason the device icons are. */
@@ -106,8 +112,12 @@ export function SpacingBox({
 	const [chosen, setChosen] = useState<string | undefined>(undefined);
 
 	const allowed = units.map((unit) => unit.value);
+	const options = [
+		...units,
+		{ value: CUSTOM, label: __('custom', 'spacery') },
+	];
 	const unit =
-		chosen && allowed.includes(chosen)
+		chosen && (CUSTOM === chosen || allowed.includes(chosen))
 			? chosen
 			: unitFor(
 					sides.map((side) => values[side]),
@@ -131,7 +141,7 @@ export function SpacingBox({
 	 */
 	const changeUnit = (next: string): void => {
 		setChosen(next);
-		onChange(retagUnit(sides, values, next));
+		onChange(switchUnit(sides, values, unit, next));
 	};
 
 	return (
@@ -151,7 +161,7 @@ export function SpacingBox({
 									hideLabelFromVision
 									label={__('Unit', 'spacery')}
 									value={unit}
-									options={units}
+									options={options}
 									onChange={changeUnit}
 								/>
 							</FlexItem>
@@ -204,22 +214,50 @@ export function SpacingBox({
 				<Flex gap={1} align="flex-start">
 					{sides.map((side) => (
 						<FlexBlock key={side}>
-							<NumberControl
-								label={sideLabel(side)}
-								labelPosition="bottom"
-								size="compact"
-								spinControls="none"
-								value={parseLength(values[side])?.value ?? ''}
-								placeholder={placeholderFor(
-									placeholders[side],
-									unit
-								)}
-								onChange={(next?: string) => change(side, next)}
-							/>
+							{CUSTOM === unit ? (
+								<InputControl
+									label={sideLabel(side)}
+									labelPosition="bottom"
+									size="compact"
+									value={values[side] ?? ''}
+									placeholder={placeholders[side]}
+									onChange={(next?: string) =>
+										change(side, next)
+									}
+								/>
+							) : (
+								<NumberControl
+									label={sideLabel(side)}
+									labelPosition="bottom"
+									size="compact"
+									spinControls="none"
+									value={
+										parseLength(values[side])?.value ?? ''
+									}
+									placeholder={placeholderFor(
+										placeholders[side],
+										unit
+									)}
+									onChange={(next?: string) =>
+										change(side, next)
+									}
+								/>
+							)}
 						</FlexBlock>
 					))}
 				</Flex>
 			</FlexItem>
+
+			{CUSTOM === unit && (
+				<FlexItem>
+					<Text variant="muted" size={12}>
+						{__(
+							'Any CSS value, one per side — a length, calc() or a preset. WordPress drops anything it cannot verify.',
+							'spacery'
+						)}
+					</Text>
+				</FlexItem>
+			)}
 		</Flex>
 	);
 }

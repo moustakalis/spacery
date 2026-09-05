@@ -7,7 +7,7 @@
  * one where the sides had been set apart earlier.
  */
 
-import { formatLength, parseLength } from './length';
+import { CUSTOM, formatLength, parseLength } from './length';
 import type { Side } from './supports';
 
 /** A box's values, one per side the block supports. */
@@ -22,7 +22,7 @@ interface Edit {
 	side: Side;
 	/** The field's contents; empty or undefined clears. */
 	input: string | number | undefined;
-	/** The unit the box is showing. */
+	/** The unit the box is showing, or {@link CUSTOM}. */
 	unit: string;
 	/** Whether the sides are linked. */
 	linked: boolean;
@@ -53,7 +53,7 @@ export function applyEdit({
 	unit,
 	linked,
 }: Edit): BoxValues {
-	const value = formatLength(input, unit);
+	const value = CUSTOM === unit ? custom(input) : formatLength(input, unit);
 	const next: BoxValues = {};
 
 	for (const each of sides) {
@@ -64,32 +64,72 @@ export function applyEdit({
 }
 
 /**
- * The box's values re-labelled with a different unit.
+ * The box's values after the unit picker changes.
  *
- * The numbers are kept and the unit swapped rather than converted: 2rem
- * becoming 32px would be arithmetic the author never asked for, and it is only
- * correct until the root font size changes. Values that are not plain lengths
- * are left exactly as they are — a preset reference has no number to re-label.
+ * Three cases, and they are not symmetrical:
+ *
+ * - **Between real units**, the numbers are kept and the unit swapped rather
+ *   than converted: 2rem becoming 32px would be arithmetic the author never
+ *   asked for, and it is only correct until the root font size changes.
+ * - **Into custom**, everything is kept exactly as it is. Every length is
+ *   already a valid CSS value, so this direction loses nothing and clearing
+ *   would only destroy work.
+ * - **Out of custom**, everything is cleared. `calc(100% - 2rem)` has no number
+ *   to put in a number field, and keeping the parseable ones while dropping the
+ *   rest would make the outcome depend on what each side happened to hold.
  *
  * @param sides  Sides the block supports.
  * @param values What the box currently holds.
- * @param unit   The chosen unit.
+ * @param from   The unit the box was showing.
+ * @param to     The chosen unit.
  * @return Every supported side.
  */
-export function retagUnit(
+export function switchUnit(
 	sides: Side[],
 	values: BoxValues,
-	unit: string
+	from: string,
+	to: string
 ): BoxValues {
+	if (CUSTOM === to) {
+		const kept: BoxValues = {};
+
+		for (const side of sides) {
+			kept[side] = values[side];
+		}
+
+		return kept;
+	}
+
+	if (CUSTOM === from) {
+		return clearBox(sides);
+	}
+
 	const next: BoxValues = {};
 
 	for (const side of sides) {
 		const parsed = parseLength(values[side]);
 
-		next[side] = parsed ? formatLength(parsed.value, unit) : values[side];
+		next[side] = parsed ? formatLength(parsed.value, to) : values[side];
 	}
 
 	return next;
+}
+
+/**
+ * A free-text field's contents, ready to store.
+ *
+ * Trimmed, and empty means clear. Nothing else is done to it: what is and is
+ * not a usable CSS value is WordPress's judgement, made by
+ * `safecss_filter_attr()` when the declaration is built, and a second opinion
+ * here would only be a worse copy of it that drifts.
+ *
+ * @param input The field's contents.
+ * @return The value to store, or undefined to clear it.
+ */
+function custom(input: string | number | undefined): string | undefined {
+	const value = String(input ?? '').trim();
+
+	return '' === value ? undefined : value;
 }
 
 /**

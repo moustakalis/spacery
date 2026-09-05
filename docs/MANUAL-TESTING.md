@@ -148,6 +148,17 @@ Any block with spacing support — Group, Cover, Columns, a Paragraph.
       repeated across all four.
 - [ ] Change a box's unit. The numbers stay and the unit swaps; nothing is
       converted behind your back.
+- [ ] Switch a box to **custom**. The fields become free text and keep what they
+      held. Set four different values — `0`, `30rem`, `1vw`,
+      `calc(100% - 2rem)` — and check all four on the front end.
+- [ ] Switch back to a real unit. Everything clears, deliberately: `calc()` has
+      no number to put in a number field.
+- [ ] Type something WordPress will refuse (`red`, or a value with a stray `;`).
+      No CSS should be emitted for that side, and nothing malformed should reach
+      the stylesheet — `safecss_filter_attr()` drops the whole declaration.
+- [ ] Give a block a preset spacing value through core's own control, then open
+      the Spacery panel at a tier. The box should open in custom mode showing
+      that value, not as an empty px field.
 - [ ] On a set whose tiers land on distinct device widths the selector shows
       icons; on one where two tiers would share an icon it falls back to names.
       Hovering an icon must still name its tier.

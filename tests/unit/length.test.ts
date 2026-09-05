@@ -9,7 +9,12 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { formatLength, parseLength, unitFor } from '../../src/extension/length';
+import {
+	CUSTOM,
+	formatLength,
+	parseLength,
+	unitFor,
+} from '../../src/extension/length';
 
 describe('parseLength', () => {
 	it('splits a length into number and unit', () => {
@@ -67,5 +72,24 @@ describe('unitFor', () => {
 		expect(unitFor([], ['px', 'rem'])).toBe('px');
 		expect(unitFor([], ['em', 'rem'])).toBe('em');
 		expect(unitFor([], [])).toBe('px');
+	});
+
+	/*
+	 * A value no number field can hold has to put the box in custom mode.
+	 * Reported as `px`, it would render as an empty field: invisible to the
+	 * author, still applied on the front end, and lost to the next linked edit.
+	 */
+	it('reports custom for a value a number field cannot hold', () => {
+		expect(unitFor(['calc(100% - 2rem)'], ['px', 'rem'])).toBe(CUSTOM);
+		expect(unitFor(['var:preset|spacing|40'], ['px'])).toBe(CUSTOM);
+		expect(unitFor([undefined, '', 'clamp(1rem, 2vw, 3rem)'], ['px'])).toBe(
+			CUSTOM
+		);
+	});
+
+	it('prefers a real unit when one of the values has it', () => {
+		expect(unitFor(['2rem', 'calc(100% - 2rem)'], ['px', 'rem'])).toBe(
+			'rem'
+		);
 	});
 });

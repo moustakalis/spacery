@@ -14,8 +14,9 @@ import {
 	applyEdit,
 	clearBox,
 	isAuthored,
-	retagUnit,
+	switchUnit,
 } from '../../src/extension/box';
+import { CUSTOM } from '../../src/extension/length';
 import { SIDES } from '../../src/extension/supports';
 
 const ALL = [...SIDES];
@@ -142,9 +143,11 @@ describe('applyEdit, only the sides a block supports', () => {
 	});
 });
 
-describe('retagUnit', () => {
+describe('switchUnit', () => {
 	it('swaps the unit and keeps the number', () => {
-		expect(retagUnit(ALL, { top: '16px', left: '8px' }, 'rem')).toEqual({
+		expect(
+			switchUnit(ALL, { top: '16px', left: '8px' }, 'px', 'rem')
+		).toEqual({
 			top: '16rem',
 			right: undefined,
 			bottom: undefined,
@@ -154,8 +157,117 @@ describe('retagUnit', () => {
 
 	it('leaves values with no number to re-label', () => {
 		expect(
-			retagUnit(['top'], { top: 'var:preset|spacing|40' }, 'rem')
+			switchUnit(['top'], { top: 'var:preset|spacing|40' }, 'px', 'rem')
 		).toEqual({ top: 'var:preset|spacing|40' });
+	});
+
+	it('keeps everything on the way into custom', () => {
+		expect(
+			switchUnit(ALL, { top: '16px', left: '2rem' }, 'px', CUSTOM)
+		).toEqual({
+			top: '16px',
+			right: undefined,
+			bottom: undefined,
+			left: '2rem',
+		});
+	});
+
+	it('clears everything on the way out of custom', () => {
+		expect(
+			switchUnit(
+				ALL,
+				{ top: 'calc(100% - 2rem)', left: '8px' },
+				CUSTOM,
+				'px'
+			)
+		).toEqual({
+			top: undefined,
+			right: undefined,
+			bottom: undefined,
+			left: undefined,
+		});
+	});
+});
+
+describe('applyEdit, custom mode', () => {
+	it('stores whole values verbatim, trimmed', () => {
+		expect(
+			applyEdit({
+				sides: ALL,
+				values: {},
+				side: 'top',
+				input: '  calc(100% - 2rem) ',
+				unit: CUSTOM,
+				linked: false,
+			}).top
+		).toBe('calc(100% - 2rem)');
+	});
+
+	it('lets the four sides hold different units', () => {
+		let values = applyEdit({
+			sides: ALL,
+			values: {},
+			side: 'top',
+			input: '0',
+			unit: CUSTOM,
+			linked: false,
+		});
+
+		values = applyEdit({
+			sides: ALL,
+			values,
+			side: 'right',
+			input: '30rem',
+			unit: CUSTOM,
+			linked: false,
+		});
+
+		values = applyEdit({
+			sides: ALL,
+			values,
+			side: 'bottom',
+			input: '1vw',
+			unit: CUSTOM,
+			linked: false,
+		});
+
+		expect(values).toEqual({
+			top: '0',
+			right: '30rem',
+			bottom: '1vw',
+			left: undefined,
+		});
+	});
+
+	it('clears on an empty or whitespace-only field', () => {
+		expect(
+			applyEdit({
+				sides: ['top'],
+				values: { top: '3px' },
+				side: 'top',
+				input: '   ',
+				unit: CUSTOM,
+				linked: false,
+			}).top
+		).toBeUndefined();
+	});
+
+	it('still links', () => {
+		expect(
+			applyEdit({
+				sides: ALL,
+				values: { top: '1px', right: '2px' },
+				side: 'top',
+				input: 'calc(1rem + 2px)',
+				unit: CUSTOM,
+				linked: true,
+			})
+		).toEqual({
+			top: 'calc(1rem + 2px)',
+			right: 'calc(1rem + 2px)',
+			bottom: 'calc(1rem + 2px)',
+			left: 'calc(1rem + 2px)',
+		});
 	});
 });
 
