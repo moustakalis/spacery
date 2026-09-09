@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-09T21:41:01+00:00\n"
+"POT-Creation-Date: 2026-09-09T22:03:25+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: spacery\n"
@@ -18,7 +18,7 @@ msgstr ""
 #: spacery.php
 #: includes/Settings/Screen.php:101
 #: includes/Settings/Screen.php:102
-#: src/settings/App.js:103
+#: src/settings/App.js:109
 msgid "Spacery"
 msgstr ""
 
@@ -75,8 +75,8 @@ msgid "Spacery requires WordPress %1$s or newer. This site is running WordPress 
 msgstr ""
 
 #: includes/Settings/Options.php:59
-#: src/settings/App.js:103
-#: src/settings/App.js:117
+#: src/settings/App.js:109
+#: src/settings/App.js:123
 msgid "Breakpoint source"
 msgstr ""
 
@@ -148,17 +148,17 @@ msgstr ""
 msgid "Inherited from Default"
 msgstr ""
 
-#: src/breakpoints/TierSelector.js:40
+#: src/breakpoints/TierSelector.js:33
 msgid "Breakpoint"
 msgstr ""
 
 #. translators: %s: breakpoint name.
-#: src/breakpoints/TierSelector.js:45
+#: src/breakpoints/TierSelector.js:38
 #, js-format
 msgid "The canvas is still previewing %s."
 msgstr ""
 
-#: src/breakpoints/TierSelector.js:45
+#: src/breakpoints/TierSelector.js:38
 msgid "Responsive editing is switched off for this site, so the canvas does not follow along."
 msgstr ""
 
@@ -250,103 +250,103 @@ msgstr ""
 msgid "Leaving %s to WordPress: no Spacery breakpoint covers the same widths."
 msgstr ""
 
-#: src/settings/App.js:103
+#: src/settings/App.js:109
 msgid "Spacery adds responsive padding and margin to any block that supports spacing. These are the breakpoints it offers."
 msgstr ""
 
-#: src/settings/App.js:117
+#: src/settings/App.js:123
 msgid "One source is used at a time. Spacery never mixes two sets: values from different intentions sitting side by side produce a set nobody designed."
 msgstr ""
 
-#: src/settings/App.js:117
+#: src/settings/App.js:123
 msgid "Your breakpoints"
 msgstr ""
 
-#: src/settings/App.js:117
+#: src/settings/App.js:123
 msgid "In use now"
 msgstr ""
 
-#: src/settings/App.js:117
+#: src/settings/App.js:123
 msgid "Save changes"
 msgstr ""
 
 #. translators: %s: comma-separated breakpoint names.
-#: src/settings/App.js:132
+#: src/settings/App.js:138
 #, js-format
 msgid "This theme — %s"
 msgstr ""
 
-#: src/settings/App.js:133
+#: src/settings/App.js:139
 msgid "This theme — it declares no breakpoints"
 msgstr ""
 
 #. translators: %s: the source that will be followed.
-#: src/settings/App.js:139
+#: src/settings/App.js:145
 #, js-format
 msgid "Decide for me — currently %s"
 msgstr ""
 
 #. translators: %s: comma-separated breakpoint names.
-#: src/settings/App.js:146
+#: src/settings/App.js:152
 #, js-format
 msgid "Spacery's own — %s"
 msgstr ""
 
-#: src/settings/App.js:148
+#: src/settings/App.js:154
 msgid "Breakpoints I define below"
 msgstr ""
 
-#: src/settings/App.js:164
+#: src/settings/App.js:170
 msgid "No breakpoints are active."
 msgstr ""
 
 #. translators: %s: where the breakpoints come from.
-#: src/settings/App.js:168
+#: src/settings/App.js:174
 #, js-format
 msgid "From: %s"
 msgstr ""
 
 #. translators: %s: a CSS length, e.g. "480px".
-#: src/settings/App.js:186
+#: src/settings/App.js:192
 #, js-format
 msgid "up to %s"
 msgstr ""
 
 #. translators: 1: a CSS length. 2: a wider CSS length.
-#: src/settings/App.js:190
+#: src/settings/App.js:196
 #, js-format
 msgid "over %1$s, up to %2$s"
 msgstr ""
 
-#: src/settings/App.js:206
+#: src/settings/App.js:212
 msgid "your theme"
 msgstr ""
 
-#: src/settings/App.js:208
+#: src/settings/App.js:214
 msgid "the breakpoints you defined"
 msgstr ""
 
-#: src/settings/App.js:210
+#: src/settings/App.js:216
 msgid "Spacery's own set"
 msgstr ""
 
-#: src/settings/App.js:232
+#: src/settings/App.js:238
 msgid "Settings saved."
 msgstr ""
 
-#: src/settings/App.js:240
+#: src/settings/App.js:246
 msgid "Settings saved. What is in use could not be read back — reload the page to see it."
 msgstr ""
 
-#: src/settings/App.js:244
+#: src/settings/App.js:250
 msgid "Your breakpoint source was saved. Those breakpoints were not: every breakpoint needs a name and a width in px, em or rem, and no two may share a width."
 msgstr ""
 
-#: src/settings/App.js:245
+#: src/settings/App.js:251
 msgid "Those breakpoints were not saved, and nothing changed. Every breakpoint needs a name and a width in px, em or rem, and no two may share a width."
 msgstr ""
 
-#: src/settings/App.js:265
+#: src/settings/App.js:271
 msgid "Something went wrong talking to the site."
 msgstr ""
 
