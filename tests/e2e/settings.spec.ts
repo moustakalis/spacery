@@ -135,6 +135,13 @@ test.describe('settings screen', () => {
 	 * so the screen has to notice that nothing changed rather than report a
 	 * success it cannot verify.
 	 *
+	 * It also has to say *which* half was refused. The two options are
+	 * sanitised independently, so switching the source while a row is
+	 * half-typed stores the source and refuses the rows -- and this test used
+	 * to assert the screen said "nothing changed" in exactly that case, which
+	 * was the bug (S4) rather than the behaviour. Both branches are covered
+	 * below, in the order that reaches them without depending on another test.
+	 *
 	 * The invalid set here is a breakpoint with no width, which is what someone
 	 * gets by adding a row and saving before filling it in. An earlier version
 	 * of this test typed `80%` into the width instead and could not: the control
@@ -148,11 +155,23 @@ test.describe('settings screen', () => {
 
 		const app = page.locator(appRoot);
 
+		// The source changes here, so half of this save succeeds.
 		await app.locator(sourceRadio('custom')).check();
 		await page.getByRole('button', { name: 'Add breakpoint' }).click();
-
 		await page.getByLabel('Name').fill('Broken');
+		await page.getByRole('button', { name: 'Save changes' }).click();
 
+		await expect(
+			app.getByText('Your breakpoint source was saved')
+		).toBeVisible();
+
+		/*
+		 * The refused rows were replaced by what the server holds, so the row
+		 * has to be rebuilt -- and the source is now stored as `custom`, so
+		 * this second attempt changes nothing that succeeds.
+		 */
+		await page.getByRole('button', { name: 'Add breakpoint' }).click();
+		await page.getByLabel('Name').fill('Broken');
 		await page.getByRole('button', { name: 'Save changes' }).click();
 
 		await expect(

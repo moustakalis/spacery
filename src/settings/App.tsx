@@ -35,8 +35,8 @@ type Status =
 	| { kind: 'saved' }
 	/** Stored, but what is in use could not be read back. */
 	| { kind: 'stale' }
-	/** The breakpoints were refused. The source beside them may not have been. */
-	| { kind: 'rejected'; sourceSaved: boolean }
+	/** The breakpoints were refused. The source beside them may still have changed. */
+	| { kind: 'rejected'; sourceChanged: boolean }
 	| { kind: 'error'; message: string };
 
 /**
@@ -103,6 +103,7 @@ export function App(): React.ReactElement {
 
 		const sent = toBreakpoints(rows);
 		const sentSource = source;
+		const previousSource = settings.spacery_breakpoint_source;
 
 		/*
 		 * The save and the refresh are two outcomes, not one. Reported
@@ -138,8 +139,13 @@ export function App(): React.ReactElement {
 			? { kind: 'saved' }
 			: {
 					kind: 'rejected',
-					sourceSaved:
-						stored.spacery_breakpoint_source === sentSource,
+					/*
+					 * Whether the source *changed*, not whether the server
+					 * accepted it: it accepts an unchanged source too, and
+					 * announcing that as a save would be its own small lie.
+					 */
+					sourceChanged:
+						stored.spacery_breakpoint_source !== previousSource,
 				};
 
 		try {
@@ -442,7 +448,7 @@ function StatusNotice({
 	if ('rejected' === status.kind) {
 		return (
 			<Notice status="error" onRemove={onDismiss}>
-				{status.sourceSaved
+				{status.sourceChanged
 					? __(
 							'Your breakpoint source was saved. Those breakpoints were not: every breakpoint needs a name and a width in px, em or rem, and no two may share a width.',
 							'spacery'
