@@ -148,9 +148,7 @@ export function BreakpointRows({
 				<Button
 					variant="secondary"
 					disabled={rows.length >= max}
-					onClick={() =>
-						onChange([...rows, blankRow()])
-					}
+					onClick={() => onChange([...rows, blankRow()])}
 				>
 					{__('Add breakpoint', 'spacery')}
 				</Button>
