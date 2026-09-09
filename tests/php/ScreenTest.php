@@ -76,6 +76,7 @@ final class ScreenTest extends TestCase {
 	 * @return string
 	 */
 	private function decoded(): string {
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- reading back what icon() wrote.
 		$decoded = base64_decode( substr( Screen::icon(), strlen( 'data:image/svg+xml;base64,' ) ), true );
 
 		return is_string( $decoded ) ? $decoded : '';

@@ -118,6 +118,7 @@ final class Screen {
 	 * so anything else in this plugin's admin can draw it from one place.
 	 */
 	public static function icon(): string {
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- required by add_menu_page().
 		return 'data:image/svg+xml;base64,' . base64_encode( self::ICON_SVG );
 	}
 
