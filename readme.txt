@@ -55,7 +55,7 @@ your spacing.
 1. Upload the plugin to `/wp-content/plugins/spacery`, or install it through the Plugins
    screen.
 2. Activate it through the Plugins screen.
-3. Choose where your breakpoints come from under Settings > Spacery.
+3. Open Spacery in the admin menu and choose where your breakpoints come from.
 4. Spacing controls appear in the block inspector under Responsive spacing.
 
 == Frequently Asked Questions ==
