@@ -99,6 +99,7 @@ export function TierSelector({
 				) : (
 					<SelectControl
 						label={__('Breakpoint', 'spacery')}
+						hideLabelFromVision
 						value={value}
 						options={breakpoints.map((breakpoint) => ({
 							value: breakpoint.slug,

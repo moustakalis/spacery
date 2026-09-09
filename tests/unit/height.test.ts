@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { Breakpoint } from '../../src/breakpoints/types';
 import {
 	authoredHeight,
+	describeProvenance,
 	heightAt,
 	inheritedFrom,
 	withHeight,
@@ -143,5 +144,34 @@ describe('withHeight', () => {
 		expect(withHeight(attributes, 'mobile', undefined).spacery).toEqual({
 			mobile: { spacing: { margin: { bottom: '1rem' } } },
 		});
+	});
+});
+
+describe('describeProvenance', () => {
+	it('names a value the author set at this tier', () => {
+		expect(describeProvenance('32px', undefined, '32px')).toBe('Set here');
+	});
+
+	it('names the tier a value is inherited from', () => {
+		expect(describeProvenance(undefined, 'Laptop', '80px')).toBe(
+			'Inherited from Laptop'
+		);
+	});
+
+	it('calls the base height the Default tier', () => {
+		expect(describeProvenance(undefined, undefined, '100px')).toBe(
+			'Inherited from Default'
+		);
+	});
+
+	/**
+	 * The bug: with no wider tier and no base height there is nothing to
+	 * inherit, and the line claimed an inheritance anyway -- while the field
+	 * beside it showed an empty placeholder, so the two disagreed on screen.
+	 */
+	it('claims no inheritance when the spacer has no height at all', () => {
+		expect(describeProvenance(undefined, undefined, '')).toBe(
+			'No height set'
+		);
 	});
 });

@@ -26,7 +26,13 @@ import { useBreakpoints } from '../../breakpoints/useBreakpoints';
 import { useCanvasBreakpoint } from '../../breakpoints/useCanvasBreakpoint';
 import { useResponsiveEditing } from '../../breakpoints/useResponsiveEditing';
 import { useSelectedTier } from '../../breakpoints/useSelectedTier';
-import { authoredHeight, heightAt, inheritedFrom, withHeight } from './height';
+import {
+	authoredHeight,
+	describeProvenance,
+	heightAt,
+	inheritedFrom,
+	withHeight,
+} from './height';
 import type { SpacerAttributes } from './types';
 
 const UNITS = [
@@ -169,6 +175,14 @@ function ActiveTier({
 			/>
 
 			<UnitControl
+				/*
+				 * Named "Height" rather than after the tier: the tier is
+				 * already this panel's title, so repeating it would tell a
+				 * screen-reader user the breakpoint twice and the property
+				 * never. Hidden from vision because the title does that work.
+				 */
+				label={__('Height', 'spacery')}
+				hideLabelFromVision
 				value={authored ?? ''}
 				placeholder={effective}
 				units={UNITS}
@@ -180,7 +194,7 @@ function ActiveTier({
 			<Flex justify="space-between" align="center">
 				<FlexItem>
 					<Text variant="muted" size={12}>
-						{describeProvenance(authored, source)}
+						{describeProvenance(authored, source, effective)}
 					</Text>
 				</FlexItem>
 
@@ -261,34 +275,4 @@ function Summary({ breakpoints, attributes, activeSlug }: SummaryProps) {
 			})}
 		</Flex>
 	);
-}
-
-/**
- * Says where a tier's height actually comes from.
- *
- * Authors need to distinguish a value they set from one that merely reaches
- * this tier — which is the reason the attribute stores only authored values and
- * lets the server expand them.
- *
- * @param authored The height set at this tier, if any.
- * @param source   The label of the tier inherited from, if any.
- * @return A short phrase naming where the value comes from.
- */
-function describeProvenance(
-	authored: string | undefined,
-	source: string | undefined
-): string {
-	if (undefined !== authored) {
-		return __('Set here', 'spacery');
-	}
-
-	if (undefined !== source) {
-		return sprintf(
-			/* translators: %s: the breakpoint a value is inherited from. */
-			__('Inherited from %s', 'spacery'),
-			source
-		);
-	}
-
-	return __('Inherited from Default', 'spacery');
 }

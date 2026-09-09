@@ -87,6 +87,18 @@
 			"Any CSS value, one per side — a length, calc() or a preset. WordPress drops anything it cannot verify.": [
 				"Οποιαδήποτε τιμή CSS, μία ανά πλευρά — μήκος, calc() ή προεπιλογή. Το WordPress απορρίπτει ό,τι δεν μπορεί να επαληθεύσει."
 			],
+			"Set here": [
+				"Ορίστηκε εδώ"
+			],
+			"Inherited from %s": [
+				"Κληρονομείται από %s"
+			],
+			"Inherited from Default": [
+				"Κληρονομείται από την Προεπιλογή"
+			],
+			"No height set": [
+				"Δεν έχει οριστεί ύψος"
+			],
 			"Spacery": [
 				""
 			],
@@ -153,6 +165,12 @@
 			"Something went wrong talking to the site.": [
 				"Κάτι πήγε στραβά στην επικοινωνία με τον ιστότοπο."
 			],
+			"Settings saved. What is in use could not be read back — reload the page to see it.": [
+				"Οι ρυθμίσεις αποθηκεύτηκαν. Δεν ήταν δυνατή η ανάγνωση του τι χρησιμοποιείται — φορτώστε ξανά τη σελίδα για να το δείτε."
+			],
+			"Your breakpoint source was saved. Those breakpoints were not: every breakpoint needs a name and a width in px, em or rem, and no two may share a width.": [
+				"Η πηγή σημείων διακοπής σας αποθηκεύτηκε. Αυτά τα σημεία διακοπής όχι: κάθε σημείο διακοπής χρειάζεται όνομα και πλάτος σε px, em ή rem, και δύο σημεία δεν μπορούν να έχουν το ίδιο πλάτος."
+			],
 			"WordPress already sets %d value here for narrower screens.": [
 				"Το WordPress ορίζει ήδη %d τιμή εδώ για στενότερες οθόνες.",
 				"Το WordPress ορίζει ήδη %d τιμές εδώ για στενότερες οθόνες."
@@ -198,15 +216,6 @@
 			],
 			"%s (editing)": [
 				"%s (σε επεξεργασία)"
-			],
-			"Set here": [
-				"Ορίστηκε εδώ"
-			],
-			"Inherited from %s": [
-				"Κληρονομείται από %s"
-			],
-			"Inherited from Default": [
-				"Κληρονομείται από την Προεπιλογή"
 			]
 		}
 	},

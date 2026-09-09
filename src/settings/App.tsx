@@ -33,7 +33,10 @@ type Status =
 	| { kind: 'idle' }
 	| { kind: 'saving' }
 	| { kind: 'saved' }
-	| { kind: 'rejected' }
+	/** Stored, but what is in use could not be read back. */
+	| { kind: 'stale' }
+	/** The breakpoints were refused. The source beside them may not have been. */
+	| { kind: 'rejected'; sourceSaved: boolean }
 	| { kind: 'error'; message: string };
 
 /**
@@ -99,24 +102,52 @@ export function App(): React.ReactElement {
 		setStatus({ kind: 'saving' });
 
 		const sent = toBreakpoints(rows);
+		const sentSource = source;
+
+		/*
+		 * The save and the refresh are two outcomes, not one. Reported
+		 * together, a failing `fetchInfo()` told the author their settings had
+		 * not saved when the write had already succeeded -- and the obvious
+		 * response to that is to try again.
+		 */
+		let stored: StoredSettings;
 
 		try {
-			const stored = await saveSettings({
-				spacery_breakpoint_source: source,
+			stored = await saveSettings({
+				spacery_breakpoint_source: sentSource,
 				spacery_custom_breakpoints: sent,
-			});
-
-			setSettings(stored);
-			setRows(toRows(stored.spacery_custom_breakpoints));
-			setSource(stored.spacery_breakpoint_source);
-			setInfo(await fetchInfo());
-			setStatus({
-				kind: wasAccepted(sent, stored.spacery_custom_breakpoints)
-					? 'saved'
-					: 'rejected',
 			});
 		} catch (error: unknown) {
 			setStatus({ kind: 'error', message: describe(error) });
+			return;
+		}
+
+		setSettings(stored);
+		setRows(toRows(stored.spacery_custom_breakpoints));
+		setSource(stored.spacery_breakpoint_source);
+
+		/*
+		 * The two options are sanitised independently, so a half-typed row can
+		 * be refused while the source beside it is stored. "Nothing changed" is
+		 * then untrue, and the screen is already showing the new source.
+		 */
+		const outcome: Status = wasAccepted(
+			sent,
+			stored.spacery_custom_breakpoints
+		)
+			? { kind: 'saved' }
+			: {
+					kind: 'rejected',
+					sourceSaved:
+						stored.spacery_breakpoint_source === sentSource,
+				};
+
+		try {
+			setInfo(await fetchInfo());
+			setStatus(outcome);
+		} catch {
+			// A refusal is worth more to the author than a stale panel is.
+			setStatus('saved' === outcome.kind ? { kind: 'stale' } : outcome);
 		}
 	};
 
@@ -146,6 +177,14 @@ export function App(): React.ReactElement {
 					</CardHeader>
 					<CardBody>
 						<RadioControl
+							/*
+							 * The CardHeader's <h2> is a heading, not a label,
+							 * so without this the fieldset has no accessible
+							 * name. Hidden from vision because the heading is
+							 * already doing that work.
+							 */
+							label={__('Breakpoint source', 'spacery')}
+							hideLabelFromVision
 							selected={source}
 							options={sourceOptions(info)}
 							onChange={(next: string) =>
@@ -389,13 +428,29 @@ function StatusNotice({
 	 * so this is not "something went wrong" — it is "nothing changed, and here
 	 * is why". Saying so plainly beats a success notice over an unchanged set.
 	 */
+	if ('stale' === status.kind) {
+		return (
+			<Notice status="warning" onRemove={onDismiss}>
+				{__(
+					'Settings saved. What is in use could not be read back — reload the page to see it.',
+					'spacery'
+				)}
+			</Notice>
+		);
+	}
+
 	if ('rejected' === status.kind) {
 		return (
 			<Notice status="error" onRemove={onDismiss}>
-				{__(
-					'Those breakpoints were not saved, and nothing changed. Every breakpoint needs a name and a width in px, em or rem, and no two may share a width.',
-					'spacery'
-				)}
+				{status.sourceSaved
+					? __(
+							'Your breakpoint source was saved. Those breakpoints were not: every breakpoint needs a name and a width in px, em or rem, and no two may share a width.',
+							'spacery'
+						)
+					: __(
+							'Those breakpoints were not saved, and nothing changed. Every breakpoint needs a name and a width in px, em or rem, and no two may share a width.',
+							'spacery'
+						)}
 			</Notice>
 		);
 	}

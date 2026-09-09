@@ -206,6 +206,13 @@ declare module '@wordpress/components' {
 
 	export const RadioControl: React.ComponentType<{
 		label?: string;
+		/*
+		 * `RadioControlProps` is `Pick<BaseControlProps, 'label' | 'help' |
+		 * 'hideLabelFromVision'>`, so this is inherited rather than declared.
+		 * It renders the label as the fieldset's legend, which is the group's
+		 * only possible accessible name -- a neighbouring heading is not one.
+		 */
+		hideLabelFromVision?: boolean;
 		help?: string;
 		selected?: string;
 		options?: Array<{ label: string; value: string }>;
@@ -248,6 +255,13 @@ declare module '@wordpress/components' {
 	 */
 	export const __experimentalUnitControl: React.ComponentType<{
 		label?: string;
+		/*
+		 * Reached through `Omit<NumberControlProps, 'spinControls' | 'suffix' |
+		 * 'type'>`, which keeps `InputControlProps['hideLabelFromVision']`.
+		 * Checked in packages/components rather than assumed: the prop is not
+		 * declared on `UnitControlProps` itself, only inherited.
+		 */
+		hideLabelFromVision?: boolean;
 		help?: string;
 		value?: string | undefined;
 		placeholder?: string;

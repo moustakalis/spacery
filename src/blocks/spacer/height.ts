@@ -8,6 +8,8 @@
  * same code is what keeps the two from ever disagreeing.
  */
 
+import { __, sprintf } from '@wordpress/i18n';
+
 import {
 	authoredAt,
 	effectiveAt,
@@ -88,4 +90,50 @@ export function withHeight(
 	return {
 		spacery: withValue(attributes.spacery, slug, HEIGHT_PATH, height),
 	};
+}
+
+/**
+ * Says where a tier's height actually comes from.
+ *
+ * Authors need to distinguish a value they set from one that merely reaches
+ * this tier — which is the reason the attribute stores only authored values and
+ * lets the server expand them.
+ *
+ * Pure, and here rather than in the component, because it is a reading of the
+ * same resolution this file performs -- and a sentence the inspector prints as
+ * fact is worth asserting in a test.
+ *
+ * @param authored  The height set at this tier, if any.
+ * @param source    The label of the tier inherited from, if any.
+ * @param effective What actually applies, from heightAt().
+ * @return A short phrase naming where the value comes from.
+ */
+export function describeProvenance(
+	authored: string | undefined,
+	source: string | undefined,
+	effective: string
+): string {
+	if (undefined !== authored) {
+		return __('Set here', 'spacery');
+	}
+
+	if (undefined !== source) {
+		return sprintf(
+			/* translators: %s: the breakpoint a value is inherited from. */
+			__('Inherited from %s', 'spacery'),
+			source
+		);
+	}
+
+	/*
+	 * With no wider tier and no base height there is nothing to inherit, and
+	 * claiming otherwise contradicts the field beside it, whose placeholder is
+	 * simultaneously empty. `heightAt()` falls back to the base height, so an
+	 * empty string here means the spacer has no height from anywhere.
+	 */
+	if ('' === effective) {
+		return __('No height set', 'spacery');
+	}
+
+	return __('Inherited from Default', 'spacery');
 }
