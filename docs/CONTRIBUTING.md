@@ -1,0 +1,116 @@
+# Working on Spacery
+
+Everything here was learned by breaking CI, not by reading documentation. Each
+item names the failure it prevents, because a checklist whose reasons are
+missing gets skipped the first time it is inconvenient.
+
+## Before you push
+
+Run these in order. The first four are what CI runs; the fifth is the one that
+gets forgotten.
+
+```bash
+pnpm run typecheck
+pnpm run lint:js                 # eslint + prettier
+pnpm run test:unit
+composer run lint && composer run analyse && composer run test
+
+pnpm run i18n:pot                # see below -- more often than you think
+pnpm run i18n:build              # only when a string changed
+python3 bin/check-release.py     # only when a version or packaging list changed
+```
+
+E2E (`pnpm run test:e2e`) needs `wp-env` up. It is slow, and CI runs it, but it
+is worth running locally before touching anything the inspector renders.
+
+## The POT goes stale when code *moves*, not when strings change
+
+This is the single most frequent CI failure in this repository, and the rule
+most people assume is narrower than it is.
+
+`languages/spacery.pot` records a **source reference per string** —
+`#: includes/Settings/Screen.php:101`. CI regenerates the POT and diffs it
+against the committed one byte for byte, ignoring only `POT-Creation-Date`. So
+inserting a comment above a `__()` call, extracting a helper, or adding a
+docblock in a file that contains *any* translatable string is enough to fail the
+build, with no string added, removed or altered.
+
+**Regenerate whenever `includes/`, `spacery.php` or anything under `src/`
+changed at all.** It costs seconds. Two separate CI failures came from treating
+it as a strings-only step.
+
+`pnpm run i18n:build` is different: it compiles `.po` into the `.mo` and the
+per-handle `.json`, so it only matters when a translation changed.
+
+## Never add `__next40pxDefaultSize` or `__nextHasNoMarginBottom`
+
+Both are marked deprecated in `packages/components`:
+
+> `__nextHasNoMarginBottom` — Default behavior since WordPress 7.0. Prop can be
+> safely removed.
+> `__next40pxDefaultSize` — Default behavior since WordPress 7.1. Prop can be
+> safely removed.
+
+WordPress 7.1 is Spacery's minimum (D4), so both behaviours are already the
+default and passing the props opts into nothing while using API on its way out.
+Advice to add them — including in `ui-review.md`, written before 7.1 shipped —
+is out of date.
+
+The corollary matters for layout: **a control's default height is 40px on 7.1.**
+A `size="compact"` field beside a default-sized one is a 32px control next to a
+40px one, which is what made the spacing row look wrong. Size the row, do not
+reach for the deprecated props.
+
+## `src/types/wordpress.d.ts` is hand-written — verify before you extend it
+
+`@wordpress/components` is a script external, so this repo declares the props it
+uses itself. Nothing checks those declarations against reality.
+
+**Before adding a prop, find it in `packages/components`.** Inherited props are
+the trap: `hideLabelFromVision` is not declared on `UnitControlProps` at all, it
+arrives through `Omit<NumberControlProps, …>`, and `RadioControlProps` picks it
+from `BaseControlProps`. Both are real; neither is where you would look.
+
+The cost of guessing is in the file already: `ToggleGroupControl` was once
+declared stable here when it is experimental in 7.1, which resolves to
+`undefined` at runtime and takes the editor down with React error #130. The
+docblock there gives the anchored grep for checking a name against
+`wp-includes/js/dist/components.js`.
+
+## A failing E2E test may be defending a bug
+
+`settings.spec.ts` asserted that a refused save reported "nothing changed" — in
+a scenario where the source *had* changed and been stored. That was S4, written
+down as an expectation. Fixing the behaviour broke the test, and the right
+response was to correct the assertion, not the code.
+
+So when a behavioural fix breaks a test: read what the test claims before
+assuming the code regressed. Then make the test assert the new claim, and cover
+the branch that made the old one look right.
+
+## `base64_encode` needs a reason, not a wider ruleset
+
+WordPress-Extra warns on it under `DiscouragedPHPFunctions.obfuscation`, and
+`phpcs` exits non-zero on warnings. Silence it per call with
+`phpcs:ignore … -- reason`, never by excluding the sniff: it exists because
+base64 in a plugin is usually hiding something, which is exactly what a
+directory reviewer will want answered.
+
+## The admin menu icon has two constraints, both invisible when broken
+
+`wp-admin/js/svg-painter.js` recolours it by running
+`xml.replace( /fill="(.+?)"/g, … )` over the decoded SVG, so **every shape needs
+a `fill`** — any value will do — and **nothing may carry a `style` attribute**,
+because the next line replaces the whole of any `style="…"` with `style="fill:…"`.
+`#adminmenu div.wp-menu-image.svg` also sets `background-size: 20px auto`, so the
+declared size is decorative. `tests/php/ScreenTest.php` guards all of it.
+
+## Pure logic goes in a `.ts` module, not the `.tsx` beside it
+
+`box.ts`, `length.ts`, `takeover.ts`, `segments.ts`, `rows.ts` exist so their
+rules can be asserted. Vitest aliases only `@wordpress/i18n`, deliberately — a
+module importing `@wordpress/components` cannot be unit tested, so anything a
+test should cover must not import it.
+
+When a claim the interface makes turns out to be wrong, moving the function that
+makes it is usually part of the fix.
