@@ -18,16 +18,8 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 
 import { iconFor, iconsAreDistinct } from './icons';
+import { fitsAsSegments } from './segments';
 import type { Breakpoint } from './types';
-
-/**
- * How many tiers still fit as segments in an inspector sidebar.
- *
- * `ToggleGroupControl` does not wrap; it divides the width it is given. Four or
- * five short labels are readable at ~250px and twelve are not, so past this
- * count the same choice is offered as a dropdown rather than squeezed.
- */
-const MAX_SEGMENTS = 5;
 
 interface TierSelectorProps {
 	breakpoints: Breakpoint[];
@@ -68,9 +60,8 @@ export function TierSelector({
 	return (
 		<Flex direction="column" gap={2}>
 			<FlexItem>
-				{breakpoints.length <= MAX_SEGMENTS ? (
+				{fitsAsSegments(breakpoints, withIcons) ? (
 					<ToggleGroupControl
-						__next40pxDefaultSize
 						isBlock
 						hideLabelFromVision
 						label={__('Breakpoint', 'spacery')}
@@ -113,8 +104,13 @@ export function TierSelector({
 			{/*
 			 * Only when the two disagree. Saying "this matches the canvas" on
 			 * every selection would be noise on the path almost everyone takes.
+			 *
+			 * And never alongside the note below: with responsive editing off
+			 * the canvas cannot follow at all, so naming a tier it is "still
+			 * previewing" adds a second explanation of the same fact and a
+			 * third line of muted text before the author reaches a field.
 			 */}
-			{canvasTier && canvasTier.slug !== value && (
+			{responsiveEditing && canvasTier && canvasTier.slug !== value && (
 				<FlexItem>
 					<Text variant="muted" size={12}>
 						{sprintf(

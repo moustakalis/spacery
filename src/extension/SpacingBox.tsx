@@ -157,13 +157,29 @@ export function SpacingBox({
 					<FlexItem>
 						<Flex align="center" gap={1}>
 							<FlexItem>
-								<SelectControl
-									hideLabelFromVision
-									label={__('Unit', 'spacery')}
-									value={unit}
-									options={options}
-									onChange={changeUnit}
-								/>
+								{/*
+								 * Compact, to match the fields it modifies:
+								 * since WordPress 7.1 a control's default
+								 * height is 40px, and the four number fields
+								 * are `size="compact"` at 32, so a
+								 * default-sized picker stood taller than
+								 * everything it sat beside.
+								 *
+								 * Width is pinned because a `<select>` sizes
+								 * to its widest option, which is `custom` --
+								 * so the rarest choice was setting the
+								 * geometry of the whole row.
+								 */}
+								<div style={{ width: '4.5rem' }}>
+									<SelectControl
+										hideLabelFromVision
+										label={__('Unit', 'spacery')}
+										size="compact"
+										value={unit}
+										options={options}
+										onChange={changeUnit}
+									/>
+								</div>
 							</FlexItem>
 
 							<FlexItem>

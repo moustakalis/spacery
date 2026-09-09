@@ -239,6 +239,15 @@ declare module '@wordpress/components' {
 	export const SelectControl: React.ComponentType<{
 		label?: string;
 		hideLabelFromVision?: boolean;
+		/*
+		 * Picked from `InputBaseProps`. Note that `__next40pxDefaultSize` and
+		 * `__nextHasNoMarginBottom` are NOT declared here on purpose: both are
+		 * marked deprecated in packages/components -- "default behavior since
+		 * WordPress 7.1" and "since WordPress 7.0" respectively -- and 7.1 is
+		 * Spacery's minimum (D4). Passing them would opt into behaviour that is
+		 * already the default, using API that is on its way out.
+		 */
+		size?: 'default' | 'compact' | 'small';
 		help?: string;
 		value?: string;
 		options?: Array<{ value: string; label: string }>;

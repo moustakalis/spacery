@@ -50,11 +50,20 @@ const PATHS: Record<DeviceKey, React.ReactElement> = {
 			/>
 		</svg>
 	),
+	/*
+	 * Landscape, and the phone is not.
+	 *
+	 * Both were portrait rounded rectangles differing only in width, which at
+	 * 24px and side by side is not a difference at all -- and since the
+	 * segments carry no text, the glyph is the only thing telling two of the
+	 * four choices apart for anyone scanning the row. Orientation is a
+	 * difference that survives being small.
+	 */
 	tablet: (
 		<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
 			<path
 				fill="currentColor"
-				d="M17 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5v-15A1.5 1.5 0 0 0 17 3Zm0 16.5H7v-15h10v15ZM10.5 18h3v-1h-3v1Z"
+				d="M19.5 5h-15A1.5 1.5 0 0 0 3 6.5v11A1.5 1.5 0 0 0 4.5 19h15a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 19.5 5Zm0 12.5h-15v-11h15v11ZM17 10.5h1v3h-1v-3Z"
 			/>
 		</svg>
 	),
