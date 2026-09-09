@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 
 import { BreakpointRows } from './BreakpointRows';
 import { fetchInfo, fetchSettings, saveSettings, wasAccepted } from './data';
+import { toBreakpoints, toRows, type Row } from './rows';
 import type {
 	Breakpoint,
 	BreakpointInfo,
@@ -48,6 +49,15 @@ type Status =
 export function App(): React.ReactElement {
 	const [settings, setSettings] = useState<StoredSettings | null>(null);
 	const [info, setInfo] = useState<BreakpointInfo | null>(null);
+
+	/*
+	 * The rows are held here rather than read straight off `settings` because
+	 * editing needs identity the wire format does not carry: which React node
+	 * belongs to which breakpoint, and whether a slug is one the server has
+	 * already stored. See `rows.ts`.
+	 */
+	const [rows, setRows] = useState<Row[]>([]);
+	const [source, setSource] = useState<StoredSource>('');
 	const [status, setStatus] = useState<Status>({ kind: 'idle' });
 
 	useEffect(() => {
@@ -57,6 +67,8 @@ export function App(): React.ReactElement {
 			.then(([stored, breakpoints]) => {
 				if (!cancelled) {
 					setSettings(stored);
+					setRows(toRows(stored.spacery_custom_breakpoints));
+					setSource(stored.spacery_breakpoint_source);
 					setInfo(breakpoints);
 				}
 			})
@@ -83,19 +95,23 @@ export function App(): React.ReactElement {
 		return <Spinner />;
 	}
 
-	const source = settings.spacery_breakpoint_source;
-	const rows = settings.spacery_custom_breakpoints;
-
 	const save = async () => {
 		setStatus({ kind: 'saving' });
 
+		const sent = toBreakpoints(rows);
+
 		try {
-			const stored = await saveSettings(settings);
+			const stored = await saveSettings({
+				spacery_breakpoint_source: source,
+				spacery_custom_breakpoints: sent,
+			});
 
 			setSettings(stored);
+			setRows(toRows(stored.spacery_custom_breakpoints));
+			setSource(stored.spacery_breakpoint_source);
 			setInfo(await fetchInfo());
 			setStatus({
-				kind: wasAccepted(rows, stored.spacery_custom_breakpoints)
+				kind: wasAccepted(sent, stored.spacery_custom_breakpoints)
 					? 'saved'
 					: 'rejected',
 			});
@@ -133,11 +149,7 @@ export function App(): React.ReactElement {
 							selected={source}
 							options={sourceOptions(info)}
 							onChange={(next: string) =>
-								setSettings({
-									...settings,
-									spacery_breakpoint_source:
-										next as StoredSource,
-								})
+								setSource(next as StoredSource)
 							}
 						/>
 						<Text variant="muted" size={12}>
@@ -162,12 +174,7 @@ export function App(): React.ReactElement {
 							<BreakpointRows
 								rows={rows}
 								max={info.maxBreakpoints}
-								onChange={(next: Breakpoint[]) =>
-									setSettings({
-										...settings,
-										spacery_custom_breakpoints: next,
-									})
-								}
+								onChange={(next: Row[]) => setRows(next)}
 							/>
 						</CardBody>
 					</Card>

@@ -13,7 +13,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-import type { Breakpoint } from './types';
+import { blankRow, slugFrom, slugHasMoved, type Row } from './rows';
 
 /** Units the server accepts. Matches `Breakpoint::is_valid_length()`. */
 const UNITS = [
@@ -23,9 +23,9 @@ const UNITS = [
 ];
 
 interface BreakpointRowsProps {
-	rows: Breakpoint[];
+	rows: Row[];
 	max: number;
-	onChange: (rows: Breakpoint[]) => void;
+	onChange: (rows: Row[]) => void;
 }
 
 /**
@@ -48,7 +48,7 @@ export function BreakpointRows({
 	max,
 	onChange,
 }: BreakpointRowsProps): React.ReactElement {
-	const update = (index: number, patch: Partial<Breakpoint>) => {
+	const update = (index: number, patch: Partial<Row>) => {
 		onChange(
 			rows.map((row, at) => (at === index ? { ...row, ...patch } : row))
 		);
@@ -57,7 +57,7 @@ export function BreakpointRows({
 	return (
 		<Flex direction="column" gap={4}>
 			{rows.map((row, index) => (
-				<FlexItem key={index}>
+				<FlexItem key={row.id}>
 					<Flex align="flex-end" gap={3}>
 						<FlexBlock>
 							<TextControl
@@ -91,6 +91,18 @@ export function BreakpointRows({
 									update(index, { slug })
 								}
 							/>
+							{slugHasMoved(row) && (
+								<Text variant="muted" size={12}>
+									{sprintf(
+										/* translators: %s: the slug the breakpoint was saved under. */
+										__(
+											'Spacing already saved under %s will stop applying. To change only what this breakpoint is called, edit its name and leave the slug alone.',
+											'spacery'
+										),
+										row.storedSlug ?? ''
+									)}
+								</Text>
+							)}
 						</FlexBlock>
 
 						<FlexBlock>
@@ -114,7 +126,9 @@ export function BreakpointRows({
 								isDestructive
 								onClick={() =>
 									onChange(
-										rows.filter((_, at) => at !== index)
+										rows.filter(
+											(other) => other.id !== row.id
+										)
 									)
 								}
 								label={sprintf(
@@ -135,7 +149,7 @@ export function BreakpointRows({
 					variant="secondary"
 					disabled={rows.length >= max}
 					onClick={() =>
-						onChange([...rows, { slug: '', label: '', max: '' }])
+						onChange([...rows, blankRow()])
 					}
 				>
 					{__('Add breakpoint', 'spacery')}
@@ -158,36 +172,4 @@ export function BreakpointRows({
 			)}
 		</Flex>
 	);
-}
-
-/**
- * Derives a slug from a name, but only while the author has not set their own.
- *
- * Editing the name of a breakpoint whose slug is already in use in content
- * would silently orphan every value stored under the old slug, so the slug
- * stops following once it diverges from the name it came from.
- *
- * @param label The new name.
- * @param row   The row before this edit.
- * @return The slug to store.
- */
-function slugFrom(label: string, row: Breakpoint): string {
-	if ('' !== row.slug && row.slug !== toSlug(row.label)) {
-		return row.slug;
-	}
-
-	return toSlug(label);
-}
-
-/**
- * Lowercases and dashes a name, matching what the server accepts.
- *
- * @param label A human-readable name.
- * @return A candidate slug.
- */
-function toSlug(label: string): string {
-	return label
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, '-')
-		.replace(/^-+|-+$/g, '');
 }
