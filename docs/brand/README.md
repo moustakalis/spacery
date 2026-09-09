@@ -8,6 +8,7 @@ slides). The directory files live in `../../assets/`.
 | `logo-compact.png` | Mark + wordmark, no tagline, at 2×. Mark sized to the wordmark's cap-height. |
 | `icon-48.png` | The 128 icon rendered down to 48 — the size the plugins screen and search results use. Reference for judging, not for upload. |
 
-Both are captures of `Spacery Banner.dc.html`. The uploadable icon and banner
-are produced by `bin/make-assets.py` instead, which is the source of truth for
-the geometry.
+Both are captures of `Spacery Banner.dc.html`, which is also where the
+uploadable icon and banner in `../../assets/` come from. `../asset-brief.md`
+section 2 carries the geometry those exports have to hit, and `../assets.md`
+explains what that directory is for.
