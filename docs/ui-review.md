@@ -141,7 +141,23 @@ The SVG must be **single-colour with `fill="currentColor"`** — WordPress masks
 menu icons to the admin scheme, so anything multi-colour is flattened. The mark
 survives that: its three top bars are distinguished by thickness, not hue.
 
-`brand/menu-icon.php` carries this ready to use as `spacery_menu_icon()`.
+**Corrected at implementation — read `Settings/Screen.php`, not this section.**
+Two claims above are wrong about the mechanism, checked against WordPress
+7.1.0 source rather than guidance:
+
+- WordPress does not "mask" the icon. `wp-admin/js/svg-painter.js` decodes the
+  data URI and runs `xml.replace( /fill="(.+?)"/g, 'fill="' + color + '"' )`,
+  rewriting *every* fill whatever its value. `currentColor` works, but so
+  would any literal — what matters is that each shape carries a `fill` at all,
+  and that nothing carries a `style` attribute, since the next line replaces
+  the whole of any `style="…"` with `style="fill:…"`.
+- The 24px box buys nothing. `#adminmenu div.wp-menu-image.svg` sets
+  `background-size: 20px auto`, so the icon renders at 20px whatever the SVG
+  declares, and the thinnest bar lands near 1px either way. That is the mark
+  at interface scale (D18), not something to design around.
+
+The icon now lives in `Screen.php` as readable markup, encoded at call time,
+with `tests/php/ScreenTest.php` guarding both constraints.
 
 Measured off the same capture, for whoever builds this:
 
