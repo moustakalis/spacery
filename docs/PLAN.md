@@ -642,10 +642,18 @@ transform with no input, and `wp spacery migrate` a command with nothing to conv
 work this milestone described was real, but only against a version that shipped — and this
 one did not.
 
-**M8 — Publish**
+**M8 — Publish — IN FLIGHT**
 Banner and icon assets, readme.txt final pass, a WordPress.org account and slug, and a
 release workflow deploying on tag.
 *Exit:* live on WP.org, release workflow deploying on tag.
+*State at 9 September 2026:* the mark, the icons and the banners are drawn and the release
+metadata agrees with itself, but no tag has been pushed, so `release.yml` has never run and
+nothing has reached the directory. Four things are outstanding: the three screenshots
+`readme.txt` now declares do not exist in `assets/`, and a positional gap renders as a
+broken image; `readme.txt` still sends people to `Settings > Spacery`, which D16 moved;
+`Settings/Screen.php` still passes a stock dashicon where `docs/brand/menu-icon.php` is
+waiting; and the WP.org account and slug are still unconfirmed. The current-state snapshot
+lives in `spacery-status.md`.
 
 ---
 
@@ -687,6 +695,7 @@ premise changes.
 | D15 | **No v1 migration path** | v1 never built and never shipped. Its `block.json` pointed at a `build/` directory nothing generated, so the block could not register even locally, and the code lived on Bitbucket rather than WP.org. A `deprecated` entry exists to keep *existing content* valid; there is no existing content. Writing one would mean maintaining a parser for a save format no post has ever contained, and testing it against fixtures invented for the purpose. D9 already reached the same conclusion from the other direction when it numbered the first public release `1.0.0`: the 2023 code is a reference, not a predecessor. |
 | D16 | **Top-level admin menu, not Settings → Spacery** | The handbook's advice to put a single settings screen under an existing menu assumes the screen is configuration a site owner visits once. Spacery's is not: the breakpoint set is the thing the whole plugin is about, it is edited while designing rather than while installing, and every tier control in the editor refers back to it. Burying it three clicks deep under Settings made it read as an afterthought. Placed just below Appearance (position `60.8`, a float so a colliding integer cannot silently displace another plugin's menu), it sits with the design tools it belongs to. The cost is one more top-level item on sites that install many plugins, and a reviewer may say so; the answer is that the screen is the product's control surface, not its settings page. Decided before 1.0.0 shipped, so no bookmark or documented URL breaks. |
 | D17 | **A tier selector inside the panel, revising D12's "no switcher"** | D12 read core correctly and drew one conclusion too many. Its real argument was against a *competing viewport switcher* — two controls announcing different device names for the same canvas. A selector that changes only which tier the fields edit, and leaves the canvas alone, does not compete: the canvas still selects a tier when the preview moves, and the panel says so in words when the two have diverged. What D12 missed is that following the canvas is the only way to reach a tier, and most tiers have no device preset behind them — filling in four tiers meant four canvas drags, two of them by hand to an unmarked width. The tier being edited and the width being previewed are separate questions, and this makes them separately answerable. Rendered as `ToggleGroupControl` up to five tiers and a dropdown beyond, because a segmented control does not wrap and twelve labels in a 250px column is not a design. |
+| D18 | **An admin design system of WordPress's own values, and one mark used twice per screen** | Settled by the design review in `docs/ui-review.md` and written up in `docs/design-system.md`. Spacery's admin is WordPress's admin: every value is one WordPress already uses, colour *roles* are prescriptive while the sampled values are reference only, and borrowed `@wordpress/components` metrics are descriptive — hand-setting a component's height to match the document breaks the next time WordPress changes it. Only the six components Spacery adds, and its own brand palette, are prescribed. On identity: one mark at every size, drawn from `brand/mark.svg` at the authored 8/6/4 weights — a reduced two-bar variant for small sizes was proposed and rejected, because a mark that drops a bar to fit is a second mark. It appears twice per screen at interface scale, on screens Spacery owns, and nowhere else. The same review settled two product calls: the spacing box stays linked by default with scenario C accepted knowingly, and `ToolsPanel` is not the remedy for the panel's collapsed-state problem — three cheaper additions are. |
 
 ### Deferred to 1.1+
 
