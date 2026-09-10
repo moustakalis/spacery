@@ -10,6 +10,12 @@ comparing the plugin header against the directory's version, not the git tag.
 A release built from a tree whose header was never bumped installs correctly,
 reports the old version, and is offered to nobody.
 
+**A name the directory refuses.** Plugin Check fails the whole distributable
+if any file in it carries a space or a special character, and the message names
+the rule rather than the file. One stray `foo 2.json` -- the shape macOS gives a
+duplicate -- is enough, and it is invisible in a diff that only shows the
+content of files you meant to add.
+
 **Packaging lists that disagree.** `package.json#files` is an allow-list used
 by `wp-scripts plugin-zip`; `.distignore` is a deny-list used by the deploy
 action. They describe the same thing in opposite directions, so nothing forces
@@ -101,6 +107,39 @@ def packaging():
     return shipped, ignored, set(tracked) | GENERATED
 
 
+# Plugin Check rejects any name outside this set, and fails the whole run on
+# one of them. Kept deliberately narrow: it is easier to widen once, with a
+# reason, than to discover the boundary from a red build.
+SAFE_NAME = re.compile(r"^[A-Za-z0-9._-]+$")
+
+
+def unsafe_names(shipped):
+    """Tracked files that ship, whose names WordPress.org would refuse.
+
+    Tracked rather than on-disk, because what ships is what is committed --
+    and the way this fails is a stray local file swept in by `git add <dir>`,
+    which is exactly the case an on-disk walk would call fine.
+    """
+    tracked = subprocess.run(
+        ["git", "ls-files", "-z"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.split("\0")
+
+    bad = []
+
+    for path in tracked:
+        if not path or path.split("/", 1)[0] not in shipped:
+            continue
+
+        if any(not SAFE_NAME.match(part) for part in path.split("/")):
+            bad.append(path)
+
+    return bad
+
+
 def main():
     problems = []
 
@@ -131,6 +170,12 @@ def main():
                 f"{path} is in neither package.json#files nor .distignore; "
                 "it would ship to WordPress.org but not in the zip"
             )
+
+    for path in sorted(unsafe_names(shipped)):
+        problems.append(
+            f"{path} would ship, and Plugin Check refuses names with spaces "
+            "or special characters"
+        )
 
     for stale in sorted(shipped - present):
         problems.append(f"package.json#files lists {stale}, which does not exist")

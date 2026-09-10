@@ -17,7 +17,7 @@ composer run lint && composer run analyse && composer run test
 
 pnpm run i18n:pot                # see below -- more often than you think
 pnpm run i18n:build              # only when a string changed
-python3 bin/check-release.py     # only when a version or packaging list changed
+python3 bin/check-release.py     # whenever a file is added, renamed or removed
 ```
 
 E2E (`pnpm run test:e2e`) needs `wp-env` up. It is slow, and CI runs it, but it
@@ -41,6 +41,23 @@ it as a strings-only step.
 
 `pnpm run i18n:build` is different: it compiles `.po` into the `.mo` and the
 per-handle `.json`, so it only matters when a translation changed.
+
+## Stage explicit paths, never a directory
+
+`git add languages` swept in a stray `spacery-el-spacery-spacer-editor-script
+2.json` that had been sitting there untracked since an earlier session — the
+shape macOS gives a duplicate file. Plugin Check then failed the entire
+distributable with *"File and folder names must not contain spaces or special
+characters"*, which names the rule and not the file, on a build whose diff
+showed nothing wrong.
+
+`git add <dir>` stages whatever happens to be in that directory, including
+things you have never looked at. Name the files.
+
+`python3 bin/check-release.py` now refuses any tracked file that would ship with
+a name outside `[A-Za-z0-9._-]`, so this particular mistake fails locally in a
+second rather than in CI in twelve. Run it before pushing anything that adds a
+file.
 
 ## Never add `__next40pxDefaultSize` or `__nextHasNoMarginBottom`
 
