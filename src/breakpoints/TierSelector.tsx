@@ -18,11 +18,13 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 
 import { iconFor, iconsAreDistinct } from './icons';
-import { fitsAsSegments } from './segments';
+import { fitsAsSegments, markLabel } from './segments';
 import type { Breakpoint } from './types';
 
 interface TierSelectorProps {
 	breakpoints: Breakpoint[];
+	/** Tiers carrying authored values, from `tiersWithValues()`. */
+	markedSlugs: string[];
 	value: string;
 	canvasSlug: string | undefined;
 	responsiveEditing: boolean;
@@ -34,6 +36,7 @@ interface TierSelectorProps {
  *
  * @param root0                   Component props.
  * @param root0.breakpoints       The active set, widest first.
+ * @param root0.markedSlugs       Tiers carrying authored values.
  * @param root0.value             The tier being edited.
  * @param root0.canvasSlug        The tier the canvas is previewing, if any.
  * @param root0.responsiveEditing Whether core offers a viewport at all.
@@ -42,6 +45,7 @@ interface TierSelectorProps {
  */
 export function TierSelector({
 	breakpoints,
+	markedSlugs,
 	value,
 	canvasSlug,
 	responsiveEditing,
@@ -56,6 +60,33 @@ export function TierSelector({
 	 * name is still the accessible name and the tooltip either way.
 	 */
 	const withIcons = iconsAreDistinct(breakpoints);
+
+	/*
+	 * Which tiers carry values, answered where the author is already choosing
+	 * one. Auditing a page previously meant opening the panel on every block
+	 * and clicking every segment; the mark costs no vertical space and answers
+	 * it in place.
+	 */
+	const marked = new Set(markedSlugs);
+
+	/**
+	 * The name a segment announces, saying whether it carries values.
+	 *
+	 * Separate from the visible label because a text segment can only carry the
+	 * marker in its own string, and "Laptop bullet" is not what a screen reader
+	 * should say.
+	 *
+	 * @param breakpoint The tier.
+	 * @return Its accessible name.
+	 */
+	const nameFor = (breakpoint: Breakpoint): string =>
+		marked.has(breakpoint.slug)
+			? sprintf(
+					/* translators: %s: breakpoint name. Marks a tier that has values set. */
+					__('%s (has values)', 'spacery'),
+					breakpoint.label
+				)
+			: breakpoint.label;
 
 	return (
 		<Flex direction="column" gap={2}>
@@ -75,14 +106,22 @@ export function TierSelector({
 								<ToggleGroupControlOptionIcon
 									key={breakpoint.slug}
 									value={breakpoint.slug}
-									icon={iconFor(breakpoint)}
-									label={breakpoint.label}
+									icon={iconFor(
+										breakpoint,
+										marked.has(breakpoint.slug)
+									)}
+									label={nameFor(breakpoint)}
 								/>
 							) : (
 								<ToggleGroupControlOption
 									key={breakpoint.slug}
 									value={breakpoint.slug}
-									label={breakpoint.label}
+									label={
+										marked.has(breakpoint.slug)
+											? markLabel(breakpoint.label)
+											: breakpoint.label
+									}
+									aria-label={nameFor(breakpoint)}
 								/>
 							)
 						)}
@@ -94,7 +133,11 @@ export function TierSelector({
 						value={value}
 						options={breakpoints.map((breakpoint) => ({
 							value: breakpoint.slug,
-							label: breakpoint.label,
+							// An <option> takes a string and nothing else, so
+							// the marker and the name are the same text here.
+							label: marked.has(breakpoint.slug)
+								? markLabel(breakpoint.label)
+								: breakpoint.label,
 						}))}
 						onChange={onChange}
 					/>

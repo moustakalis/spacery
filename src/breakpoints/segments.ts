@@ -27,11 +27,33 @@ const MAX_ICON_SEGMENTS = 4;
  * `Widescreen`/`Desktop`/`Laptop`/`Handheld` are both "four labels" and only
  * one of them fits an inspector column. The budget is what actually runs out.
  *
- * Twenty-eight characters is roughly seven per segment across the ~250px an
- * inspector gives, which is what "Desktop" costs.
+ * Thirty-six characters is roughly nine per segment across the ~250px an
+ * inspector gives -- seven for a name the length of "Desktop", plus the two
+ * the marker costs. Budgeted for every label whether or not it currently
+ * carries one, so the control does not swap itself for a dropdown halfway
+ * through an author setting values.
  */
 const MAX_LABEL_SEGMENTS = 4;
-const LABEL_BUDGET = 28;
+const LABEL_BUDGET = 36;
+
+/**
+ * Appended to a tier that carries authored values.
+ *
+ * A segment holding text has nowhere else to put a marker: its `label` is a
+ * string, not a node. The accessible name says it in words instead — see
+ * `TierSelector`.
+ */
+export const MARK = ' \u2022';
+
+/**
+ * A label with its marker.
+ *
+ * @param label The tier's name.
+ * @return The name, marked.
+ */
+export function markLabel(label: string): string {
+	return `${label}${MARK}`;
+}
 
 /**
  * Whether these tiers can be shown as segments.
@@ -53,7 +75,7 @@ export function fitsAsSegments(
 	}
 
 	const characters = breakpoints.reduce(
-		(total, breakpoint) => total + breakpoint.label.length,
+		(total, breakpoint) => total + breakpoint.label.length + MARK.length,
 		0
 	);
 

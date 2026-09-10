@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-10T21:44:18+00:00\n"
+"POT-Creation-Date: 2026-09-10T21:57:03+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: spacery\n"
@@ -96,46 +96,49 @@ msgstr ""
 msgid "Those breakpoints were not saved. Every breakpoint needs a name and a width in px, em or rem, widths must all differ, and there is a maximum of 12."
 msgstr ""
 
-#: src/blocks/spacer/edit.js:45
-#: src/blocks/spacer/edit.js:85
+#: src/blocks/spacer/edit.js:46
+#: src/blocks/spacer/edit.js:88
 msgid "Height"
 msgstr ""
 
-#: src/blocks/spacer/edit.js:45
+#: src/blocks/spacer/edit.js:46
 msgid "Default"
 msgstr ""
 
-#: src/blocks/spacer/edit.js:45
+#: src/blocks/spacer/edit.js:46
 msgid "Applies at every width unless a narrower breakpoint overrides it."
 msgstr ""
 
-#: src/blocks/spacer/edit.js:45
+#: src/blocks/spacer/edit.js:46
 msgid "Set at"
 msgstr ""
 
 #. translators: 1: breakpoint name, 2: its upper bound, e.g. "Laptop · ≤1024px".
-#: src/blocks/spacer/edit.js:71
-#: src/extension/SpacingPanel.js:108
+#: src/blocks/spacer/edit.js:72
+#: src/extension/SpacingPanel.js:110
 #, js-format
 msgid "%1$s · ≤%2$s"
 msgstr ""
 
-#: src/blocks/spacer/edit.js:85
+#: src/blocks/spacer/edit.js:88
 msgid "Reset"
 msgstr ""
 
 #. translators: %s: breakpoint name.
-#: src/blocks/spacer/edit.js:106
+#: src/blocks/spacer/edit.js:109
 #, js-format
 msgid "%s (editing)"
 msgstr ""
 
 #: src/blocks/spacer/height.js:80
+#: src/extension/provenance.js:65
 msgid "Set here"
 msgstr ""
 
 #. translators: %s: the breakpoint a value is inherited from.
+#. translators: %s: a breakpoint name, or "this block's own spacing".
 #: src/blocks/spacer/height.js:85
+#: src/extension/provenance.js:84
 #, js-format
 msgid "Inherited from %s"
 msgstr ""
@@ -148,22 +151,54 @@ msgstr ""
 msgid "Inherited from Default"
 msgstr ""
 
-#: src/breakpoints/TierSelector.js:33
+#. translators: %s: breakpoint name. Marks a tier that has values set.
+#: src/breakpoints/TierSelector.js:54
+#, js-format
+msgid "%s (has values)"
+msgstr ""
+
+#: src/breakpoints/TierSelector.js:56
+#: src/breakpoints/TierSelector.js:58
 msgid "Breakpoint"
 msgstr ""
 
 #. translators: %s: breakpoint name.
-#: src/breakpoints/TierSelector.js:38
+#: src/breakpoints/TierSelector.js:67
 #, js-format
 msgid "The canvas is still previewing %s."
 msgstr ""
 
-#: src/breakpoints/TierSelector.js:38
+#: src/breakpoints/TierSelector.js:67
 msgid "Responsive editing is switched off for this site, so the canvas does not follow along."
 msgstr ""
 
-#: src/extension/register.js:57
+#: src/extension/provenance.js:50
+msgid "this block's own spacing"
+msgstr ""
+
+#: src/extension/provenance.js:68
+msgid "Partly set here"
+msgstr ""
+
+#. translators: 1: a breakpoint name. 2: another breakpoint name.
+#: src/extension/provenance.js:89
+#, js-format
+msgid "Inherited from %1$s and %2$s"
+msgstr ""
+
+#. translators: %d: how many places a box's values come from.
+#: src/extension/provenance.js:98
+#, js-format
+msgid "Inherited from %d different places"
+msgstr ""
+
+#: src/extension/register.js:77
+#: src/extension/register.js:80
 msgid "Responsive spacing"
+msgstr ""
+
+#: src/extension/register.js:79
+msgid "Responsive spacing — this block has responsive values"
 msgstr ""
 
 #: src/extension/SpacingBox.js:74
@@ -192,15 +227,15 @@ msgstr ""
 msgid "Any CSS value, one per side — a length, calc() or a preset. WordPress drops anything it cannot verify."
 msgstr ""
 
-#: src/extension/SpacingPanel.js:65
+#: src/extension/SpacingPanel.js:67
 msgid "This site has no breakpoints, so there is nothing to set here yet."
 msgstr ""
 
-#: src/extension/SpacingPanel.js:73
+#: src/extension/SpacingPanel.js:75
 msgid "This theme has spacing controls switched off for this block."
 msgstr ""
 
-#: src/extension/SpacingPanel.js:110
+#: src/extension/SpacingPanel.js:112
 msgid "Reset all"
 msgstr ""
 

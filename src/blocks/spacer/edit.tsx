@@ -20,6 +20,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
+import { tiersWithValues } from '../../attribute/tiers';
 import { TierSelector } from '../../breakpoints/TierSelector';
 import type { Breakpoint } from '../../breakpoints/types';
 import { useBreakpoints } from '../../breakpoints/useBreakpoints';
@@ -27,6 +28,7 @@ import { useCanvasBreakpoint } from '../../breakpoints/useCanvasBreakpoint';
 import { useResponsiveEditing } from '../../breakpoints/useResponsiveEditing';
 import { useSelectedTier } from '../../breakpoints/useSelectedTier';
 import {
+	HEIGHT_PATH,
 	authoredHeight,
 	describeProvenance,
 	heightAt,
@@ -168,6 +170,9 @@ function ActiveTier({
 		>
 			<TierSelector
 				breakpoints={breakpoints}
+				markedSlugs={tiersWithValues(attributes.spacery, breakpoints, [
+					HEIGHT_PATH,
+				])}
 				value={breakpoint.slug}
 				canvasSlug={canvasSlug}
 				responsiveEditing={responsiveEditing}

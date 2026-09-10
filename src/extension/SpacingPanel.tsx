@@ -24,7 +24,12 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from 'react';
 
 import { readPath } from '../attribute/paths';
-import { authoredAt, effectiveAt, withValue } from '../attribute/tiers';
+import {
+	authoredAt,
+	effectiveAt,
+	tiersWithValues,
+	withValue,
+} from '../attribute/tiers';
 import type {
 	SpaceryAttribute,
 	StyleNode,
@@ -39,6 +44,7 @@ import { useCoreViewports } from '../breakpoints/useCoreViewports';
 import { useResponsiveEditing } from '../breakpoints/useResponsiveEditing';
 import { useSelectedTier } from '../breakpoints/useSelectedTier';
 import { boxKey } from './boxState';
+import { describeBoxProvenance } from './provenance';
 import { SpacingBox } from './SpacingBox';
 import {
 	pathFor,
@@ -97,12 +103,11 @@ export function SpacingPanel({
 	const { tier: active, select } = useSelectedTier(breakpoints, canvasSlug);
 
 	const features = useEditableFeatures(name);
-	const paths = useMemo(
-		() =>
-			features.flatMap((feature) =>
-				feature.sides.map((side) => pathFor(feature.feature, side))
-			),
-		[features]
+	const paths = usePaths(features);
+
+	const markedSlugs = useMemo(
+		() => tiersWithValues(attributes.spacery, breakpoints, paths),
+		[attributes.spacery, breakpoints, paths]
 	);
 
 	const overrides = useMemo(
@@ -147,6 +152,7 @@ export function SpacingPanel({
 			<FlexItem>
 				<TierSelector
 					breakpoints={breakpoints}
+					markedSlugs={markedSlugs}
 					value={active.slug}
 					canvasSlug={canvasSlug}
 					responsiveEditing={responsiveEditing}
@@ -301,6 +307,13 @@ function TierFields({
 								),
 							})
 						}
+					/>
+
+					<Provenance
+						attributes={attributes}
+						breakpoints={breakpoints}
+						slug={breakpoint.slug}
+						feature={feature}
 					/>
 				</FlexItem>
 			))}
@@ -479,6 +492,48 @@ function clearTier(
  * @param name Block name.
  * @return The features to render.
  */
+/**
+ * Every leaf path this block's spacing can live at.
+ *
+ * Shared with `useMarkedTiers()` so the panel and the dot on its header cannot
+ * disagree about which properties count.
+ *
+ * @param features The block's editable spacing features.
+ * @return One path per feature and side.
+ */
+function usePaths(features: SpacingFeature[]): StylePath[] {
+	return useMemo(
+		() =>
+			features.flatMap((feature) =>
+				feature.sides.map((side) => pathFor(feature.feature, side))
+			),
+		[features]
+	);
+}
+
+/**
+ * Which tiers this block carries values at.
+ *
+ * Exported for the panel header, which is rendered a level up and needs to know
+ * whether there is anything inside before the author opens it.
+ *
+ * @param name       The block name.
+ * @param attributes The block's attributes.
+ * @return The marked slugs, widest first.
+ */
+export function useMarkedTiers(
+	name: string,
+	attributes: ExtendedAttributes
+): string[] {
+	const breakpoints = useBreakpoints();
+	const paths = usePaths(useEditableFeatures(name));
+
+	return useMemo(
+		() => tiersWithValues(attributes.spacery, breakpoints, paths),
+		[attributes.spacery, breakpoints, paths]
+	);
+}
+
 function useEditableFeatures(name: string): SpacingFeature[] {
 	const [padding, margin] = useSettings('spacing.padding', 'spacing.margin');
 
@@ -512,4 +567,45 @@ function useAllowedUnits(): Array<{ value: string; label: string }> {
 		// A theme allowing only units Spacery does not offer still needs one.
 		return narrowed.length > 0 ? narrowed : UNITS;
 	}, [allowed]);
+}
+
+/**
+ * The line under a box saying where its values come from.
+ *
+ * Renders nothing when there is nothing true to say — see `provenance.ts`.
+ *
+ * @param root0             Component props.
+ * @param root0.attributes  The block's attributes.
+ * @param root0.breakpoints The active set, widest first.
+ * @param root0.slug        The tier being edited.
+ * @param root0.feature     The box's feature.
+ * @return The line, or nothing.
+ */
+function Provenance({
+	attributes,
+	breakpoints,
+	slug,
+	feature,
+}: {
+	attributes: ExtendedAttributes;
+	breakpoints: Breakpoint[];
+	slug: string;
+	feature: SpacingFeature;
+}): React.ReactElement | null {
+	const line = describeBoxProvenance(
+		attributes,
+		breakpoints,
+		slug,
+		feature.sides.map((side) => pathFor(feature.feature, side))
+	);
+
+	if (undefined === line) {
+		return null;
+	}
+
+	return (
+		<Text variant="muted" size={12}>
+			{line}
+		</Text>
+	);
 }

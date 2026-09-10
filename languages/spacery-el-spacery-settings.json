@@ -18,6 +18,9 @@
 			"Responsive editing is switched off for this site, so the canvas does not follow along.": [
 				"Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε ο καμβάς δεν ακολουθεί."
 			],
+			"%s (has values)": [
+				"%s (έχει τιμές)"
+			],
 			"Padding": [
 				"Εσωτερικό περιθώριο"
 			],
@@ -186,6 +189,21 @@
 			],
 			"Responsive spacing": [
 				"Αποκρίσιμα κενά"
+			],
+			"Responsive spacing — this block has responsive values": [
+				"Αποκρίσιμα κενά — αυτό το μπλοκ έχει αποκρίσιμες τιμές"
+			],
+			"this block's own spacing": [
+				"τα ίδια τα κενά αυτού του μπλοκ"
+			],
+			"Partly set here": [
+				"Ορίστηκε εν μέρει εδώ"
+			],
+			"Inherited from %1$s and %2$s": [
+				"Κληρονομείται από %1$s και %2$s"
+			],
+			"Inherited from %d different places": [
+				"Κληρονομείται από %d διαφορετικά σημεία"
 			],
 			"%1$s · ≤%2$s": [
 				"%1$s · ≤%2$s"

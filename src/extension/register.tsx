@@ -16,7 +16,11 @@ import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
 import { extendsBlock, isExtendable } from './extendable';
-import { type ExtendedAttributes, SpacingPanel } from './SpacingPanel';
+import {
+	type ExtendedAttributes,
+	SpacingPanel,
+	useMarkedTiers,
+} from './SpacingPanel';
 
 /** Namespace for Spacery's editor filters. */
 const NAMESPACE = 'spacery/spacing';
@@ -71,6 +75,62 @@ interface BlockEditProps {
 /**
  * Adds the inspector panel to blocks carrying the attribute.
  */
+/**
+ * Marks a collapsed panel that has something inside it.
+ *
+ * `PanelBody` types `icon` as a JSX element and renders it in the header beside
+ * the title, which is the whole requirement. Migrating to `ToolsPanel` for this
+ * was considered and rejected: its header carries a menu of resettable items,
+ * not a dot, so the indicator is custom work either way -- and a `ToolsPanel`
+ * models a set of opt-in properties, where this panel is one property set
+ * viewed through a tier switch.
+ */
+const DOT = (
+	<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+		<circle cx="12" cy="12" r="4" fill="currentColor" />
+	</svg>
+);
+
+/**
+ * The panel, and the header that says whether it is worth opening.
+ *
+ * A component of its own so its hooks run only for blocks Spacery extends --
+ * the wrapper below returns early for everything else, and a hook after an
+ * early return is a hook that sometimes does not run.
+ *
+ * @param root0 The block's edit props.
+ * @return The inspector fill.
+ */
+function SpaceryPanel(props: BlockEditProps): React.ReactElement {
+	const marked = useMarkedTiers(props.name, props.attributes);
+	const hasValues = 0 < marked.length;
+
+	return (
+		<InspectorControls>
+			<PanelBody
+				title={__('Responsive spacing', 'spacery')}
+				initialOpen={false}
+				{...(hasValues ? { icon: DOT } : {})}
+				buttonProps={{
+					'aria-label': hasValues
+						? __(
+								'Responsive spacing — this block has responsive values',
+								'spacery'
+							)
+						: __('Responsive spacing', 'spacery'),
+				}}
+			>
+				<SpacingPanel
+					clientId={props.clientId}
+					name={props.name}
+					attributes={props.attributes}
+					setAttributes={props.setAttributes}
+				/>
+			</PanelBody>
+		</InspectorControls>
+	);
+}
+
 const withSpacingPanel = createHigherOrderComponent(
 	(BlockEdit: React.ComponentType<BlockEditProps>) =>
 		function SpaceryBlockEdit(props: BlockEditProps) {
@@ -81,19 +141,7 @@ const withSpacingPanel = createHigherOrderComponent(
 			return (
 				<>
 					<BlockEdit {...props} />
-					<InspectorControls>
-						<PanelBody
-							title={__('Responsive spacing', 'spacery')}
-							initialOpen={false}
-						>
-							<SpacingPanel
-								clientId={props.clientId}
-								name={props.name}
-								attributes={props.attributes}
-								setAttributes={props.setAttributes}
-							/>
-						</PanelBody>
-					</InspectorControls>
+					<SpaceryPanel {...props} />
 				</>
 			);
 		},

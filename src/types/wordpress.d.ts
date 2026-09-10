@@ -158,6 +158,20 @@ declare module '@wordpress/components' {
 	export const PanelBody: React.ComponentType<{
 		title?: string;
 		initialOpen?: boolean | undefined;
+		/*
+		 * `PanelBodyProps` in packages/components: "An icon to be shown next to
+		 * the title", typed `React.JSX.Element` and rendered in the header --
+		 * which is the whole requirement for marking a collapsed panel that has
+		 * something inside it.
+		 */
+		icon?: React.JSX.Element;
+		/*
+		 * "Props that are passed to the `Button` component in title within the
+		 * `PanelBody`." The only way to give that button an accessible name: a
+		 * bare dot says nothing to a screen reader, and `title` is a string, so
+		 * `VisuallyHidden` cannot go inside it.
+		 */
+		buttonProps?: { 'aria-label'?: string };
 		children?: React.ReactNode;
 	}>;
 
@@ -344,6 +358,14 @@ declare module '@wordpress/components' {
 	export const __experimentalToggleGroupControlOption: React.ComponentType<{
 		value: string | number;
 		label: string;
+		/*
+		 * Documented on `ToggleGroupControlOptionProps` in packages/components:
+		 * "Label for the option. If needed, the `aria-label` prop can be used
+		 * in addition to specify a different label for assistive technologies."
+		 * Which is the only way a text segment carries a visible marker without
+		 * a screen reader reading the marker out.
+		 */
+		'aria-label'?: string;
 		showTooltip?: boolean;
 	}>;
 

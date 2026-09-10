@@ -141,3 +141,40 @@ export function withValue(
 
 	return 0 === Object.keys(next).length ? undefined : next;
 }
+
+/**
+ * Which tiers carry a value the author set, for any of these properties.
+ *
+ * Answers the question the panel could not: an author auditing a page had to
+ * open every block and click every tier to find where responsive spacing had
+ * been set. The dot on the panel header and the dots on the tier selector both
+ * come from here, so they cannot disagree about what "has values" means.
+ *
+ * Scoped to the tiers passed in, never the raw attribute's own keys. A value
+ * stored under a breakpoint that has since been deleted renders nothing --
+ * `Generator::normalize()` walks the current set and skips what it does not
+ * recognise -- so marking it would advertise spacing the page has not got.
+ *
+ * @param attribute   The block's `spacery` attribute.
+ * @param breakpoints The active set.
+ * @param paths       Leaf paths to look for, e.g. every side of padding.
+ * @return The slugs that carry a value, in the order given.
+ */
+export function tiersWithValues(
+	attribute: SpaceryAttribute | undefined,
+	breakpoints: Breakpoint[],
+	paths: StylePath[]
+): string[] {
+	if (undefined === attribute) {
+		return [];
+	}
+
+	return breakpoints
+		.filter((breakpoint) =>
+			paths.some(
+				(path) =>
+					undefined !== authoredAt(attribute, breakpoint.slug, path)
+			)
+		)
+		.map((breakpoint) => breakpoint.slug);
+}
