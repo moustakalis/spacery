@@ -115,6 +115,40 @@ test.describe('spacery/spacer', () => {
 	});
 
 	/**
+	 * Two claims the panel makes about itself, both of which were wrong.
+	 *
+	 * The height field for a tier carried no label of any kind -- no `label`,
+	 * no `aria-label` -- so a screen-reader user reached a bare spinbutton with
+	 * nothing saying what it set, directly below a `Default` field that was
+	 * labelled properly. And with no base height and no wider tier there is
+	 * nothing to inherit, but the provenance line said "Inherited from Default"
+	 * regardless, contradicting the empty placeholder beside it.
+	 *
+	 * Inserted with an empty height on purpose: that is the only state in which
+	 * the second claim is reachable, since the block's own default is 100px.
+	 */
+	test('names its height field, and claims no inheritance when there is none', async ({
+		editor,
+		page,
+	}) => {
+		// 1100px puts the canvas in a tier, so the per-tier panel exists at all.
+		await page.setViewportSize({ width: 1100, height: 900 });
+
+		await editor.insertBlock({
+			name: BLOCK,
+			attributes: { height: '' },
+		});
+
+		await editor.openDocumentSettingsSidebar();
+
+		await expect(
+			page.getByRole('spinbutton', { name: 'Height' })
+		).toBeVisible({ timeout: 15_000 });
+
+		await expect(page.getByText('No height set')).toBeVisible();
+	});
+
+	/**
 	 * The generated CSS must reach the front end as disjoint bands, matching
 	 * what the PHP suite asserts about the same input.
 	 */

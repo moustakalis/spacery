@@ -62,6 +62,7 @@ export function addSpacingAttribute(
 }
 
 interface BlockEditProps {
+	clientId: string;
 	name: string;
 	attributes: ExtendedAttributes;
 	setAttributes: (next: Record<string, unknown>) => void;
@@ -86,6 +87,7 @@ const withSpacingPanel = createHigherOrderComponent(
 							initialOpen={false}
 						>
 							<SpacingPanel
+								clientId={props.clientId}
 								name={props.name}
 								attributes={props.attributes}
 								setAttributes={props.setAttributes}

@@ -35,6 +35,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useState } from 'react';
 
 import { applyEdit, clearBox, isAuthored, switchUnit } from './box';
+import { readBoxState, rememberLinked, rememberUnit } from './boxState';
 import { CUSTOM, parseLength, unitFor } from './length';
 import { type Side, sideLabel } from './supports';
 
@@ -70,6 +71,8 @@ const RESET = (
 );
 
 interface SpacingBoxProps {
+	/** Identifies this box's remembered preferences. From `boxKey()`. */
+	stateKey: string;
 	label: string;
 	sides: Side[];
 	/** Values authored at this tier. */
@@ -84,6 +87,7 @@ interface SpacingBoxProps {
  * The control.
  *
  * @param root0              Component props.
+ * @param root0.stateKey     Identifies this box's remembered preferences.
  * @param root0.label        Feature name, e.g. "Padding".
  * @param root0.sides        Sides the block supports, in canonical order.
  * @param root0.values       Values authored at this tier.
@@ -93,6 +97,7 @@ interface SpacingBoxProps {
  * @return The box.
  */
 export function SpacingBox({
+	stateKey,
 	label,
 	sides,
 	values,
@@ -100,7 +105,15 @@ export function SpacingBox({
 	units,
 	onChange,
 }: SpacingBoxProps): React.ReactElement {
-	const [linked, setLinked] = useState(true);
+	/*
+	 * Both of these are seeded from, and written back to, a store that outlives
+	 * this component -- see `boxState.ts`. The inspector unmounts the panel on
+	 * every selection change, so component state alone lost them the moment the
+	 * author clicked another block, which is the commonest thing they do.
+	 */
+	const [linked, setLinkedState] = useState(
+		() => readBoxState(stateKey).linked
+	);
 
 	/*
 	 * A unit the author picked outlives the values.
@@ -109,7 +122,14 @@ export function SpacingBox({
 	 * is emptied: with nothing left to read, `rem` would silently become `px`,
 	 * and the next number typed would mean something the author did not choose.
 	 */
-	const [chosen, setChosen] = useState<string | undefined>(undefined);
+	const [chosen, setChosenState] = useState<string | undefined>(
+		() => readBoxState(stateKey).chosen
+	);
+
+	const setLinked = (next: boolean): void => {
+		rememberLinked(stateKey, next);
+		setLinkedState(next);
+	};
 
 	const allowed = units.map((unit) => unit.value);
 	const options = [
@@ -140,7 +160,8 @@ export function SpacingBox({
 	 * @param next The chosen unit.
 	 */
 	const changeUnit = (next: string): void => {
-		setChosen(next);
+		rememberUnit(stateKey, next);
+		setChosenState(next);
 		onChange(switchUnit(sides, values, unit, next));
 	};
 

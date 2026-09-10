@@ -38,6 +38,7 @@ import { useCanvasWindow } from '../breakpoints/useCanvasWindow';
 import { useCoreViewports } from '../breakpoints/useCoreViewports';
 import { useResponsiveEditing } from '../breakpoints/useResponsiveEditing';
 import { useSelectedTier } from '../breakpoints/useSelectedTier';
+import { boxKey } from './boxState';
 import { SpacingBox } from './SpacingBox';
 import {
 	pathFor,
@@ -65,6 +66,7 @@ export interface ExtendedAttributes extends Record<string, unknown> {
 }
 
 interface SpacingPanelProps {
+	clientId: string;
 	name: string;
 	attributes: ExtendedAttributes;
 	setAttributes: (next: Record<string, unknown>) => void;
@@ -74,12 +76,14 @@ interface SpacingPanelProps {
  * The panel body's contents.
  *
  * @param root0               Component props.
+ * @param root0.clientId      The block being edited, for per-box preferences.
  * @param root0.name          Block name, used to read its spacing supports.
  * @param root0.attributes    The block's attributes.
  * @param root0.setAttributes Attribute setter.
  * @return The panel contents.
  */
 export function SpacingPanel({
+	clientId,
 	name,
 	attributes,
 	setAttributes,
@@ -152,6 +156,7 @@ export function SpacingPanel({
 
 			<FlexItem>
 				<TierFields
+					clientId={clientId}
 					breakpoint={active}
 					breakpoints={breakpoints}
 					features={features}
@@ -175,6 +180,7 @@ export function SpacingPanel({
 }
 
 interface TierFieldsProps {
+	clientId: string;
 	breakpoint: Breakpoint;
 	breakpoints: Breakpoint[];
 	features: SpacingFeature[];
@@ -193,12 +199,14 @@ interface TierFieldsProps {
  * @param root0               Component props.
  * @param root0.breakpoint    The tier being edited.
  * @param root0.breakpoints   The active set, widest first.
+ * @param root0.clientId      The block being edited, for per-box preferences.
  * @param root0.features      Editable spacing features for this block.
  * @param root0.attributes    The block's attributes.
  * @param root0.setAttributes Attribute setter.
  * @return The controls.
  */
 function TierFields({
+	clientId,
 	breakpoint,
 	breakpoints,
 	features,
@@ -262,8 +270,17 @@ function TierFields({
 			</FlexItem>
 
 			{features.map((feature) => (
-				<FlexItem key={feature.feature}>
+				/*
+				 * Keyed by block as well as feature. The box remembers its
+				 * linked state and unit under this key, and reads it once on
+				 * mount -- so if React ever reused this instance across a
+				 * selection change, it would show one block's preferences on
+				 * another. Changing the key makes that impossible rather than
+				 * unlikely.
+				 */
+				<FlexItem key={boxKey(clientId, feature.feature)}>
 					<SpacingBox
+						stateKey={boxKey(clientId, feature.feature)}
 						label={feature.label}
 						sides={feature.sides}
 						units={units}

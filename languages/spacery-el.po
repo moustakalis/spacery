@@ -118,7 +118,7 @@ msgstr "Ορισμένα σε"
 
 #. translators: 1: breakpoint name, 2: its upper bound, e.g. "Laptop · ≤1024px".
 #: src/blocks/spacer/edit.js:71
-#: src/extension/SpacingPanel.js:105
+#: src/extension/SpacingPanel.js:108
 #, js-format
 msgid "%1$s · ≤%2$s"
 msgstr "%1$s · ≤%2$s"
@@ -151,11 +151,11 @@ msgstr "Κληρονομείται από την Προεπιλογή"
 msgid "Responsive spacing"
 msgstr "Αποκρίσιμα κενά"
 
-#: src/extension/SpacingPanel.js:63
+#: src/extension/SpacingPanel.js:65
 msgid "This site has no breakpoints, so there is nothing to set here yet."
 msgstr "Αυτός ο ιστότοπος δεν έχει σημεία διακοπής, οπότε δεν υπάρχει ακόμη κάτι να οριστεί εδώ."
 
-#: src/extension/SpacingPanel.js:71
+#: src/extension/SpacingPanel.js:73
 msgid "This theme has spacing controls switched off for this block."
 msgstr "Αυτό το θέμα έχει απενεργοποιημένα τα χειριστήρια κενών για αυτό το μπλοκ."
 
@@ -386,33 +386,33 @@ msgstr "Ο καμβάς εξακολουθεί να προβάλλει %s."
 msgid "Responsive editing is switched off for this site, so the canvas does not follow along."
 msgstr "Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε ο καμβάς δεν ακολουθεί."
 
-#: src/extension/SpacingBox.js:85
+#: src/extension/SpacingBox.js:98
 msgid "Unit"
 msgstr "Μονάδα"
 
-#: src/extension/SpacingBox.js:86
+#: src/extension/SpacingBox.js:99
 msgid "Unlink sides"
 msgstr "Αποσύνδεση πλευρών"
 
-#: src/extension/SpacingBox.js:87
+#: src/extension/SpacingBox.js:100
 msgid "Link sides — one value for all four"
 msgstr "Σύνδεση πλευρών — μία τιμή και για τις τέσσερις"
 
 #. translators: %s: a spacing property, e.g. "Padding".
-#: src/extension/SpacingBox.js:89
+#: src/extension/SpacingBox.js:102
 #, js-format
 msgid "Reset %s"
 msgstr "Επαναφορά: %s"
 
-#: src/extension/SpacingPanel.js:107
+#: src/extension/SpacingPanel.js:110
 msgid "Reset all"
 msgstr "Επαναφορά όλων"
 
-#: src/extension/SpacingBox.js:62
+#: src/extension/SpacingBox.js:74
 msgid "custom"
 msgstr "προσαρμοσμένο"
 
-#: src/extension/SpacingBox.js:89
+#: src/extension/SpacingBox.js:102
 msgid "Any CSS value, one per side — a length, calc() or a preset. WordPress drops anything it cannot verify."
 msgstr "Οποιαδήποτε τιμή CSS, μία ανά πλευρά — μήκος, calc() ή προεπιλογή. Το WordPress απορρίπτει ό,τι δεν μπορεί να επαληθεύσει."
 
