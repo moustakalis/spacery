@@ -21,6 +21,7 @@ import { useEffect, useState } from 'react';
 import { BreakpointRows } from './BreakpointRows';
 import { fetchInfo, fetchSettings, saveSettings, wasAccepted } from './data';
 import { toBreakpoints, toRows, type Row } from './rows';
+import { isValid, validate } from './validate';
 import type {
 	Breakpoint,
 	BreakpointInfo,
@@ -97,6 +98,16 @@ export function App(): React.ReactElement {
 	if (null === settings || null === info) {
 		return <Spinner />;
 	}
+
+	/*
+	 * Checked on every render rather than on submit, because the server refuses
+	 * an invalid set whole: a rule caught only at save time reads as "nothing
+	 * changed" when the author has been typing for a minute.
+	 */
+	const problems = validate(rows, {
+		...info.rules,
+		maxBreakpoints: info.maxBreakpoints,
+	});
 
 	const save = async () => {
 		setStatus({ kind: 'saving' });
@@ -218,6 +229,7 @@ export function App(): React.ReactElement {
 						<CardBody>
 							<BreakpointRows
 								rows={rows}
+								problems={problems.rows}
 								max={info.maxBreakpoints}
 								onChange={(next: Row[]) => setRows(next)}
 							/>
@@ -244,7 +256,7 @@ export function App(): React.ReactElement {
 					variant="primary"
 					onClick={save}
 					isBusy={'saving' === status.kind}
-					disabled={'saving' === status.kind}
+					disabled={'saving' === status.kind || !isValid(problems)}
 				>
 					{__('Save changes', 'spacery')}
 				</Button>

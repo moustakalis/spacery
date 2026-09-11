@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Spacery\Settings;
 
+use Spacery\Breakpoints\Breakpoint;
 use Spacery\Breakpoints\BreakpointSet;
 use Spacery\Breakpoints\Registry;
 use WP_REST_Response;
@@ -94,6 +95,19 @@ final class RestController {
 				'theme'           => $theme instanceof BreakpointSet ? $theme->to_array() : null,
 				'preset'          => $this->registry->preset()->to_array(),
 				'maxBreakpoints'  => BreakpointSet::MAX_BREAKPOINTS,
+
+				/*
+				 * The sanitiser's own rules, so the screen can refuse a set
+				 * before sending it rather than reporting afterwards that
+				 * nothing changed. `register_setting()` remains the only thing
+				 * that can actually store a breakpoint; this is the same rules
+				 * read out, never a second authority (D19).
+				 */
+				'rules'           => array(
+					'slugPattern'   => Breakpoint::SLUG_PATTERN,
+					'lengthPattern' => Breakpoint::LENGTH_PATTERN,
+					'pixelsPerEm'   => Breakpoint::PIXELS_PER_EM,
+				),
 			)
 		);
 	}

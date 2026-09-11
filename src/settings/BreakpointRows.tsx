@@ -14,6 +14,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 
 import { blankRow, slugFrom, slugHasMoved, type Row } from './rows';
+import type { Field, RowProblem } from './validate';
 
 /** Units the server accepts. Matches `Breakpoint::is_valid_length()`. */
 const UNITS = [
@@ -24,6 +25,8 @@ const UNITS = [
 
 interface BreakpointRowsProps {
 	rows: Row[];
+	/** One problem per row that has one, keyed by the row's client id. */
+	problems: Record<string, RowProblem>;
 	max: number;
 	onChange: (rows: Row[]) => void;
 }
@@ -39,15 +42,35 @@ interface BreakpointRowsProps {
  *
  * @param root0          Component props.
  * @param root0.rows     Current rows.
+ * @param root0.problems One problem per row that has one.
  * @param root0.max      Most breakpoints the server will accept.
  * @param root0.onChange Called with the next rows.
  * @return The repeater.
  */
 export function BreakpointRows({
 	rows,
+	problems,
 	max,
 	onChange,
 }: BreakpointRowsProps): React.ReactElement {
+	/**
+	 * A field's help text: its problem when it has one, its guidance otherwise.
+	 *
+	 * `help` is WordPress's own slot for this and is already tied to the input
+	 * for assistive technology, so a message here is announced with the field
+	 * rather than floating beside it. The guidance it replaces is only useful
+	 * until something is wrong.
+	 *
+	 * @param row      The row.
+	 * @param field    Which field is being rendered.
+	 * @param guidance What to say when the field is fine.
+	 * @return The help text.
+	 */
+	const helpFor = (row: Row, field: Field, guidance: string): string => {
+		const problem = problems[row.id];
+
+		return problem && problem.field === field ? problem.message : guidance;
+	};
 	const update = (index: number, patch: Partial<Row>) => {
 		onChange(
 			rows.map((row, at) => (at === index ? { ...row, ...patch } : row))
@@ -62,9 +85,13 @@ export function BreakpointRows({
 						<FlexBlock>
 							<TextControl
 								label={__('Name', 'spacery')}
-								help={__(
-									'Shown in the editor, e.g. Laptop.',
-									'spacery'
+								help={helpFor(
+									row,
+									'label',
+									__(
+										'Shown in the editor, e.g. Laptop.',
+										'spacery'
+									)
 								)}
 								value={row.label}
 								onChange={(label: string) =>
@@ -82,9 +109,13 @@ export function BreakpointRows({
 						<FlexBlock>
 							<TextControl
 								label={__('Slug', 'spacery')}
-								help={__(
-									'Stored in block attributes. Lowercase letters, numbers and dashes.',
-									'spacery'
+								help={helpFor(
+									row,
+									'slug',
+									__(
+										'Stored in block attributes. Lowercase letters, numbers and dashes.',
+										'spacery'
+									)
 								)}
 								value={row.slug}
 								onChange={(slug: string) =>
@@ -108,9 +139,13 @@ export function BreakpointRows({
 						<FlexBlock>
 							<UnitControl
 								label={__('Up to', 'spacery')}
-								help={__(
-									'The widest screen this breakpoint covers.',
-									'spacery'
+								help={helpFor(
+									row,
+									'max',
+									__(
+										'The widest screen this breakpoint covers.',
+										'spacery'
+									)
 								)}
 								value={row.max}
 								units={UNITS}

@@ -234,6 +234,27 @@
 			],
 			"%s (editing)": [
 				"%s (σε επεξεργασία)"
+			],
+			"Every breakpoint needs a name.": [
+				"Κάθε σημείο διακοπής χρειάζεται όνομα."
+			],
+			"Lowercase letters, numbers and dashes only.": [
+				"Μόνο πεζά λατινικά γράμματα, αριθμοί και παύλες."
+			],
+			"Needs a number and a unit — px, em or rem.": [
+				"Χρειάζεται αριθμό και μονάδα — px, em ή rem."
+			],
+			"Has to be more than zero.": [
+				"Πρέπει να είναι μεγαλύτερο από το μηδέν."
+			],
+			"%s is already taken.": [
+				"Το %s χρησιμοποιείται ήδη."
+			],
+			"Another breakpoint is already this wide, so which applies would be ambiguous.": [
+				"Ένα άλλο σημείο διακοπής έχει ήδη αυτό το πλάτος, οπότε δεν θα ήταν σαφές ποιο ισχύει."
+			],
+			"%d breakpoints is the maximum.": [
+				"Τα %d σημεία διακοπής είναι το ανώτατο όριο."
 			]
 		}
 	},

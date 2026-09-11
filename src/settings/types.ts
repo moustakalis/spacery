@@ -22,6 +22,21 @@ export interface StoredSettings {
 }
 
 /**
+ * The sanitiser's rules, shipped rather than mirrored (D19).
+ *
+ * Patterns arrive without delimiters and go straight to `RegExp`; the
+ * pixels-per-em is what the server compares widths with, and comparing
+ * anything else makes `888px` and `55.5rem` look like different widths when
+ * the server will refuse the pair.
+ */
+export interface ValidationRules {
+	slugPattern: string;
+	lengthPattern: string;
+	pixelsPerEm: number;
+	maxBreakpoints: number;
+}
+
+/**
  * What the stored options *mean*, from `spacery/v1/breakpoints`.
  *
  * Kept apart from the stored values on purpose: the screen has to be able to
@@ -34,4 +49,5 @@ export interface BreakpointInfo {
 	theme: Breakpoint[] | null;
 	preset: Breakpoint[];
 	maxBreakpoints: number;
+	rules: Omit<ValidationRules, 'maxBreakpoints'>;
 }

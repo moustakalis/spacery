@@ -24,13 +24,28 @@ final class Breakpoint {
 	/**
 	 * Lengths accepted for a boundary.
 	 *
+	 * Stored without PCRE delimiters on purpose: PHP adds them at the point of
+	 * use, and the settings screen receives the pattern as-is and hands it
+	 * straight to `RegExp`. A JavaScript copy with a comment asking someone to
+	 * keep the two in step is what this replaces (D19) -- the screen and the
+	 * sanitiser disagreeing means a save that looks accepted and changes
+	 * nothing.
+	 *
 	 * Mirrors `WP_Theme_JSON::is_valid_viewport_breakpoint_size()` exactly. Core
 	 * restricts these because the value is interpolated into a media query, so
 	 * CSS functions, percentages and negative numbers are all rejected. Spacery
 	 * accepting anything core rejects would let a site define a breakpoint that
 	 * works here and silently fails there.
 	 */
-	private const VALID_LENGTH = '/^(?:\d+|\d*\.\d+)(?:px|em|rem)$/';
+	public const LENGTH_PATTERN = '^(?:\d+|\d*\.\d+)(?:px|em|rem)$';
+
+	/**
+	 * Machine names accepted for a slug.
+	 *
+	 * Held here rather than inline in `create()` so the settings screen can
+	 * validate against the rule itself rather than a copy of it.
+	 */
+	public const SLUG_PATTERN = '^[a-z0-9-]+$';
 
 	/**
 	 * Pixels assumed per `em`/`rem` when comparing boundaries.
@@ -38,7 +53,7 @@ final class Breakpoint {
 	 * Only ever used for ordering. Generated media queries keep the author's
 	 * original units. The value matches core's own assumption.
 	 */
-	private const PIXELS_PER_EM = 16;
+	public const PIXELS_PER_EM = 16;
 
 	/**
 	 * Constructor. Prefer {@see Breakpoint::create()}, which validates.
@@ -70,7 +85,7 @@ final class Breakpoint {
 		$label = trim( $label );
 		$max   = trim( $max );
 
-		if ( 1 !== preg_match( '/^[a-z0-9-]+$/', $slug ) ) {
+		if ( 1 !== preg_match( '/' . self::SLUG_PATTERN . '/', $slug ) ) {
 			return null;
 		}
 
@@ -96,7 +111,7 @@ final class Breakpoint {
 	 * @param string $value Candidate length.
 	 */
 	public static function is_valid_length( string $value ): bool {
-		return 1 === preg_match( self::VALID_LENGTH, trim( $value ) );
+		return 1 === preg_match( '/' . self::LENGTH_PATTERN . '/', trim( $value ) );
 	}
 
 	/**
