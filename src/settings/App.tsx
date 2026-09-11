@@ -15,22 +15,18 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from 'react';
 
 import { band } from './bands';
+import { Footer, Masthead } from './Brand';
 import { BreakpointRows } from './BreakpointRows';
 import { Ruler } from './Ruler';
 import { fetchInfo, fetchSettings, saveSettings, wasAccepted } from './data';
 import { isDirty, toBreakpoints, toRows, type Row } from './rows';
-import { cautions, isValid, validate } from './validate';
-import type {
-	Breakpoint,
-	BreakpointInfo,
-	EffectiveSource,
-	StoredSettings,
-	StoredSource,
-} from './types';
+import { fallbackNotice, sourceName, sourceOptions } from './sources';
+import { cautions, isValid, saveHint, validate } from './validate';
+import type { BreakpointInfo, StoredSettings, StoredSource } from './types';
 
 type Status =
 	| { kind: 'idle' }
@@ -117,14 +113,48 @@ export function App(): React.ReactElement {
 
 	if ('error' === status.kind && null === settings) {
 		return (
-			<Notice status="error" isDismissible={false}>
-				{status.message}
-			</Notice>
+			<Flex direction="column" gap={5}>
+				<FlexItem>
+					<Masthead />
+				</FlexItem>
+				<FlexItem>
+					<Notice status="error" isDismissible={false}>
+						{status.message}
+					</Notice>
+				</FlexItem>
+			</Flex>
 		);
 	}
 
+	/*
+	 * Two REST round-trips, and the screen used to render a bare spinner on an
+	 * empty page while they ran (S6): nothing named the page, and a screen
+	 * reader was told nothing at all, because a spinner alone is decorative.
+	 * The heading is available markup that does not depend on either request,
+	 * so it renders immediately and the wait is announced rather than blank.
+	 */
 	if (null === settings || null === info) {
-		return <Spinner />;
+		return (
+			<Flex direction="column" gap={5}>
+				<FlexItem>
+					<Masthead />
+				</FlexItem>
+				<FlexItem>
+					<div role="status">
+						<Flex justify="flex-start" align="center" gap={2}>
+							<FlexItem>
+								<Spinner />
+							</FlexItem>
+							<FlexItem>
+								<Text variant="muted">
+									{__('Loading your breakpoints…', 'spacery')}
+								</Text>
+							</FlexItem>
+						</Flex>
+					</div>
+				</FlexItem>
+			</Flex>
+		);
 	}
 
 	/*
@@ -134,6 +164,7 @@ export function App(): React.ReactElement {
 	 */
 	const rules = { ...info.rules, maxBreakpoints: info.maxBreakpoints };
 	const problems = validate(rows, rules);
+	const valid = isValid(problems);
 
 	const save = async () => {
 		setStatus({ kind: 'saving' });
@@ -197,7 +228,7 @@ export function App(): React.ReactElement {
 	return (
 		<Flex direction="column" gap={5}>
 			<FlexItem>
-				<Heading level={1}>{__('Spacery', 'spacery')}</Heading>
+				<Masthead />
 				<Text variant="muted">
 					{__(
 						'Spacery adds responsive padding and margin to any block that supports spacing. These are the breakpoints it offers.',
@@ -258,6 +289,7 @@ export function App(): React.ReactElement {
 								problems={problems.rows}
 								cautions={cautions(rows, rules)}
 								max={info.maxBreakpoints}
+								fallback={sourceName(info.effectiveSource)}
 								onChange={(next: Row[]) => setRows(next)}
 							/>
 						</CardBody>
@@ -273,7 +305,7 @@ export function App(): React.ReactElement {
 						</Heading>
 					</CardHeader>
 					<CardBody>
-						<ResolvedSet info={info} />
+						<ResolvedSet info={info} source={source} />
 					</CardBody>
 				</Card>
 			</FlexItem>
@@ -291,11 +323,9 @@ export function App(): React.ReactElement {
 						<CardBody>
 							<Flex justify="space-between" align="center">
 								<FlexItem>
-									{dirty && (
-										<Text variant="muted" size={12}>
-											{__('Unsaved changes.', 'spacery')}
-										</Text>
-									)}
+									<Text variant="muted" size={12}>
+										{saveHint(problems, dirty, valid)}
+									</Text>
 								</FlexItem>
 
 								<FlexItem>
@@ -305,7 +335,7 @@ export function App(): React.ReactElement {
 										isBusy={'saving' === status.kind}
 										disabled={
 											'saving' === status.kind ||
-											!isValid(problems) ||
+											!valid ||
 											!dirty
 										}
 									>
@@ -317,50 +347,12 @@ export function App(): React.ReactElement {
 					</Card>
 				</div>
 			</FlexItem>
+
+			<FlexItem>
+				<Footer />
+			</FlexItem>
 		</Flex>
 	);
-}
-
-/**
- * The radio options, each saying what choosing it would get you.
- *
- * The theme entry names its breakpoints rather than saying "Theme", because
- * whether the theme has any is the fact the choice turns on.
- *
- * @param info What each source contains.
- * @return Options for RadioControl.
- */
-function sourceOptions(
-	info: BreakpointInfo
-): Array<{ label: string; value: string }> {
-	const themeLabel = info.theme
-		? sprintf(
-				/* translators: %s: comma-separated breakpoint names. */
-				__('This theme — %s', 'spacery'),
-				info.theme.map(describeTier).join(', ')
-			)
-		: __('This theme — it declares no breakpoints', 'spacery');
-
-	return [
-		{
-			value: '',
-			label: sprintf(
-				/* translators: %s: the source that will be followed. */
-				__('Decide for me — currently %s', 'spacery'),
-				sourceName(info.defaultSource)
-			),
-		},
-		{ value: 'theme', label: themeLabel },
-		{
-			value: 'spacery',
-			label: sprintf(
-				/* translators: %s: comma-separated breakpoint names. */
-				__("Spacery's own — %s", 'spacery'),
-				info.preset.map(describeTier).join(', ')
-			),
-		},
-		{ value: 'custom', label: __('Breakpoints I define below', 'spacery') },
-	];
 }
 
 /**
@@ -370,11 +362,26 @@ function sourceOptions(
  * bands visible: a tier covers a range, and its lower edge is the next tier's
  * boundary rather than zero.
  *
- * @param root0      Component props.
- * @param root0.info What each source contains.
+ * @param root0        Component props.
+ * @param root0.info   What each source contains.
+ * @param root0.source The stored choice, which is not always what is in effect.
  * @return The resolved set.
  */
-function ResolvedSet({ info }: { info: BreakpointInfo }): React.ReactElement {
+function ResolvedSet({
+	info,
+	source,
+}: {
+	info: BreakpointInfo;
+	source: StoredSource;
+}): React.ReactElement {
+	/*
+	 * A chosen source can be empty — custom before the first row is added, or a
+	 * theme that declares nothing — and the registry then falls through to the
+	 * next one. Printing only the result leaves the author looking at a set
+	 * that contradicts the choice above it, with nothing joining the two (E4).
+	 */
+	const fallback = fallbackNotice(source, info);
+
 	if (0 === info.resolved.length) {
 		return (
 			<Text variant="muted">
@@ -394,6 +401,14 @@ function ResolvedSet({ info }: { info: BreakpointInfo }): React.ReactElement {
 					)}
 				</Text>
 			</FlexItem>
+
+			{null !== fallback && (
+				<FlexItem>
+					<Text variant="muted" size={12}>
+						{fallback}
+					</Text>
+				</FlexItem>
+			)}
 			<FlexItem>
 				<Ruler
 					tiers={info.resolved}
@@ -417,38 +432,6 @@ function ResolvedSet({ info }: { info: BreakpointInfo }): React.ReactElement {
 			))}
 		</Flex>
 	);
-}
-
-/**
- * A readable name for a source.
- *
- * The stored value is a slug, and a settings screen that prints `spacery` at
- * someone is showing them the database rather than an answer. Exhaustive over
- * `EffectiveSource` on purpose: adding a fourth source should fail the
- * typecheck here rather than quietly render its slug.
- *
- * @param source The source in effect.
- * @return A human-readable name.
- */
-function sourceName(source: EffectiveSource): string {
-	switch (source) {
-		case 'theme':
-			return __('your theme', 'spacery');
-		case 'custom':
-			return __('the breakpoints you defined', 'spacery');
-		default:
-			return __("Spacery's own set", 'spacery');
-	}
-}
-
-/**
- * A tier as "Label (782px)".
- *
- * @param tier A breakpoint.
- * @return A short description.
- */
-function describeTier(tier: Breakpoint): string {
-	return `${tier.label} (${tier.max})`;
 }
 
 /**

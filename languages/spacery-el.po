@@ -7,17 +7,17 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-04T11:32:49+00:00\n"
-"PO-Revision-Date: 2026-09-04T11:32:49+00:00\n"
+"POT-Creation-Date: 2026-09-11T06:56:27+00:00\n"
+"PO-Revision-Date: 2026-09-11T06:56:27+00:00\n"
 "Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Domain: spacery\n"
 
 #. Plugin Name of the plugin
 #: spacery.php
-#: includes/Settings/Screen.php:101
-#: includes/Settings/Screen.php:102
-#: src/settings/App.js:140
+#: includes/Settings/Screen.php:115
+#: includes/Settings/Screen.php:116
+#: src/settings/Brand.js:65
 msgid "Spacery"
 msgstr ""
 
@@ -74,8 +74,8 @@ msgid "Spacery requires WordPress %1$s or newer. This site is running WordPress 
 msgstr "Το Spacery απαιτεί WordPress %1$s ή νεότερο. Αυτός ο ιστότοπος εκτελεί WordPress %2$s."
 
 #: includes/Settings/Options.php:59
-#: src/settings/App.js:140
-#: src/settings/App.js:154
+#: src/settings/App.js:150
+#: src/settings/App.js:164
 msgid "Breakpoint source"
 msgstr "Πηγή σημείων διακοπής"
 
@@ -108,11 +108,6 @@ msgstr "Προεπιλογή"
 #: src/blocks/spacer/edit.js:46
 msgid "Applies at every width unless a narrower breakpoint overrides it."
 msgstr "Ισχύει σε κάθε πλάτος, εκτός αν το αντικαταστήσει ένα στενότερο σημείο διακοπής."
-
-#: src/breakpoints/TierSelector.js:56
-#: src/breakpoints/TierSelector.js:58
-msgid "Breakpoint"
-msgstr "Σημείο διακοπής"
 
 #: src/blocks/spacer/edit.js:46
 msgid "Set at"
@@ -148,14 +143,89 @@ msgstr "Ορίστηκε εδώ"
 msgid "Inherited from %s"
 msgstr "Κληρονομείται από %s"
 
+#: src/blocks/spacer/height.js:94
+msgid "No height set"
+msgstr "Δεν έχει οριστεί ύψος"
+
 #: src/blocks/spacer/height.js:96
 msgid "Inherited from Default"
 msgstr "Κληρονομείται από την Προεπιλογή"
+
+#. translators: %s: breakpoint name. Marks a tier that has values set.
+#: src/breakpoints/TierSelector.js:54
+#, js-format
+msgid "%s (has values)"
+msgstr "%s (έχει τιμές)"
+
+#: src/breakpoints/TierSelector.js:56
+#: src/breakpoints/TierSelector.js:58
+msgid "Breakpoint"
+msgstr "Σημείο διακοπής"
+
+#. translators: %s: breakpoint name.
+#: src/breakpoints/TierSelector.js:67
+#, js-format
+msgid "The canvas is still previewing %s."
+msgstr "Ο καμβάς εξακολουθεί να προβάλλει %s."
+
+#: src/breakpoints/TierSelector.js:67
+msgid "Responsive editing is switched off for this site, so the canvas does not follow along."
+msgstr "Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε ο καμβάς δεν ακολουθεί."
+
+#: src/extension/provenance.js:50
+msgid "this block's own spacing"
+msgstr "τα ίδια τα κενά αυτού του μπλοκ"
+
+#: src/extension/provenance.js:68
+msgid "Partly set here"
+msgstr "Ορίστηκε εν μέρει εδώ"
+
+#. translators: 1: a breakpoint name. 2: another breakpoint name.
+#: src/extension/provenance.js:89
+#, js-format
+msgid "Inherited from %1$s and %2$s"
+msgstr "Κληρονομείται από %1$s και %2$s"
+
+#. translators: %d: how many places a box's values come from.
+#: src/extension/provenance.js:98
+#, js-format
+msgid "Inherited from %d different places"
+msgstr "Κληρονομείται από %d διαφορετικά σημεία"
 
 #: src/extension/register.js:77
 #: src/extension/register.js:80
 msgid "Responsive spacing"
 msgstr "Αποκρίσιμα κενά"
+
+#: src/extension/register.js:79
+msgid "Responsive spacing — this block has responsive values"
+msgstr "Αποκρίσιμα κενά — αυτό το μπλοκ έχει αποκρίσιμες τιμές"
+
+#: src/extension/SpacingBox.js:74
+msgid "custom"
+msgstr "προσαρμοσμένο"
+
+#: src/extension/SpacingBox.js:98
+msgid "Unit"
+msgstr "Μονάδα"
+
+#: src/extension/SpacingBox.js:99
+msgid "Unlink sides"
+msgstr "Αποσύνδεση πλευρών"
+
+#: src/extension/SpacingBox.js:100
+msgid "Link sides — one value for all four"
+msgstr "Σύνδεση πλευρών — μία τιμή και για τις τέσσερις"
+
+#. translators: %s: a spacing property, e.g. "Padding".
+#: src/extension/SpacingBox.js:102
+#, js-format
+msgid "Reset %s"
+msgstr "Επαναφορά: %s"
+
+#: src/extension/SpacingBox.js:102
+msgid "Any CSS value, one per side — a length, calc() or a preset. WordPress drops anything it cannot verify."
+msgstr "Οποιαδήποτε τιμή CSS, μία ανά πλευρά — μήκος, calc() ή προεπιλογή. Το WordPress απορρίπτει ό,τι δεν μπορεί να επαληθεύσει."
 
 #: src/extension/SpacingPanel.js:67
 msgid "This site has no breakpoints, so there is nothing to set here yet."
@@ -164,6 +234,10 @@ msgstr "Αυτός ο ιστότοπος δεν έχει σημεία διακο
 #: src/extension/SpacingPanel.js:75
 msgid "This theme has spacing controls switched off for this block."
 msgstr "Αυτό το θέμα έχει απενεργοποιημένα τα χειριστήρια κενών για αυτό το μπλοκ."
+
+#: src/extension/SpacingPanel.js:112
+msgid "Reset all"
+msgstr "Επαναφορά όλων"
 
 #: src/extension/supports.js:99
 msgid "Padding"
@@ -211,61 +285,59 @@ msgstr "Διαχείριση από το Spacery"
 msgid "Leaving %s to WordPress: no Spacery breakpoint covers the same widths."
 msgstr "Το %s παραμένει στο WordPress: κανένα σημείο διακοπής του Spacery δεν καλύπτει τα ίδια πλάτη."
 
-#: src/settings/App.js:140
+#: src/settings/App.js:90
+msgid "Loading your breakpoints…"
+msgstr "Φόρτωση των σημείων διακοπής σας…"
+
+#: src/settings/App.js:150
 msgid "Spacery adds responsive padding and margin to any block that supports spacing. These are the breakpoints it offers."
 msgstr "Το Spacery προσθέτει αποκρίσιμο εσωτερικό και εξωτερικό περιθώριο σε κάθε μπλοκ που υποστηρίζει κενά. Αυτά είναι τα σημεία διακοπής που προσφέρει."
 
-#: src/settings/App.js:154
+#: src/settings/App.js:164
 msgid "One source is used at a time. Spacery never mixes two sets: values from different intentions sitting side by side produce a set nobody designed."
 msgstr "Χρησιμοποιείται μία πηγή κάθε φορά. Το Spacery δεν αναμειγνύει ποτέ δύο σύνολα: τιμές από διαφορετικές προθέσεις, η μία δίπλα στην άλλη, παράγουν ένα σύνολο που δεν σχεδίασε κανείς."
 
-#: src/settings/App.js:154
+#: src/settings/App.js:164
 msgid "Your breakpoints"
 msgstr "Τα σημεία διακοπής σας"
 
-#: src/settings/App.js:154
+#: src/settings/App.js:164
 msgid "In use now"
 msgstr "Σε χρήση τώρα"
 
-#: src/settings/App.js:156
+#: src/settings/App.js:166
 msgid "Save changes"
 msgstr "Αποθήκευση αλλαγών"
 
-#. translators: %s: comma-separated breakpoint names.
-#: src/settings/App.js:171
-#, js-format
-msgid "This theme — %s"
-msgstr "Αυτό το θέμα — %s"
-
-#: src/settings/App.js:172
-msgid "This theme — it declares no breakpoints"
-msgstr "Αυτό το θέμα — δεν δηλώνει σημεία διακοπής"
-
-#. translators: %s: the source that will be followed.
-#: src/settings/App.js:178
-#, js-format
-msgid "Decide for me — currently %s"
-msgstr "Ας αποφασίσει το Spacery — τώρα: %s"
-
-#. translators: %s: comma-separated breakpoint names.
-#: src/settings/App.js:185
-#, js-format
-msgid "Spacery's own — %s"
-msgstr "Του ίδιου του Spacery — %s"
-
-#: src/settings/App.js:187
-msgid "Breakpoints I define below"
-msgstr "Σημεία διακοπής που ορίζω παρακάτω"
-
-#: src/settings/App.js:203
+#: src/settings/App.js:189
 msgid "No breakpoints are active."
 msgstr "Δεν υπάρχουν ενεργά σημεία διακοπής."
 
 #. translators: %s: where the breakpoints come from.
-#: src/settings/App.js:207
+#: src/settings/App.js:193
 #, js-format
 msgid "From: %s"
 msgstr "Από: %s"
+
+#: src/settings/App.js:205
+msgid "Settings saved."
+msgstr "Οι ρυθμίσεις αποθηκεύτηκαν."
+
+#: src/settings/App.js:213
+msgid "Settings saved. What is in use could not be read back — reload the page to see it."
+msgstr "Οι ρυθμίσεις αποθηκεύτηκαν. Δεν ήταν δυνατή η ανάγνωση του τι χρησιμοποιείται — φορτώστε ξανά τη σελίδα για να το δείτε."
+
+#: src/settings/App.js:217
+msgid "Your breakpoint source was saved. Those breakpoints were not: every breakpoint needs a name and a width in px, em or rem, and no two may share a width."
+msgstr "Η πηγή σημείων διακοπής σας αποθηκεύτηκε. Αυτά τα σημεία διακοπής όχι: κάθε σημείο διακοπής χρειάζεται όνομα και πλάτος σε px, em ή rem, και δύο σημεία δεν μπορούν να έχουν το ίδιο πλάτος."
+
+#: src/settings/App.js:218
+msgid "Those breakpoints were not saved, and nothing changed. Every breakpoint needs a name and a width in px, em or rem, and no two may share a width."
+msgstr "Αυτά τα σημεία διακοπής δεν αποθηκεύτηκαν και δεν άλλαξε τίποτα. Κάθε σημείο διακοπής χρειάζεται όνομα και πλάτος σε px, em ή rem, και δύο σημεία δεν μπορούν να έχουν το ίδιο πλάτος."
+
+#: src/settings/App.js:238
+msgid "Something went wrong talking to the site."
+msgstr "Κάτι πήγε στραβά στην επικοινωνία με τον ιστότοπο."
 
 #. translators: %s: a CSS length, e.g. "480px".
 #: src/settings/bands.js:53
@@ -279,73 +351,219 @@ msgstr "έως %s"
 msgid "over %1$s, up to %2$s"
 msgstr "πάνω από %1$s, έως %2$s"
 
-#: src/settings/App.js:223
-msgid "your theme"
-msgstr "το θέμα σας"
+#. translators: %s: the plugin version.
+#: src/settings/Brand.js:71
+#, js-format
+msgid "Version %s"
+msgstr "Έκδοση %s"
 
-#: src/settings/App.js:225
-msgid "the breakpoints you defined"
-msgstr "τα σημεία διακοπής που ορίσατε"
+#. translators: %s: the plugin version.
+#: src/settings/Brand.js:91
+#, js-format
+msgid "Spacery %s"
+msgstr "Spacery %s"
 
-#: src/settings/App.js:227
-msgid "Spacery's own set"
-msgstr "το δικό του σύνολο του Spacery"
+#: src/settings/Brand.js:91
+msgid "Documentation"
+msgstr "Τεκμηρίωση"
 
-#: src/settings/App.js:249
-msgid "Settings saved."
-msgstr "Οι ρυθμίσεις αποθηκεύτηκαν."
+#: src/settings/Brand.js:91
+msgid "Support"
+msgstr "Υποστήριξη"
 
-#: src/settings/App.js:262
-msgid "Those breakpoints were not saved, and nothing changed. Every breakpoint needs a name and a width in px, em or rem, and no two may share a width."
-msgstr "Αυτά τα σημεία διακοπής δεν αποθηκεύτηκαν και δεν άλλαξε τίποτα. Κάθε σημείο διακοπής χρειάζεται όνομα και πλάτος σε px, em ή rem, και δύο σημεία δεν μπορούν να έχουν το ίδιο πλάτος."
-
-#: src/settings/App.js:282
-msgid "Something went wrong talking to the site."
-msgstr "Κάτι πήγε στραβά στην επικοινωνία με τον ιστότοπο."
-
-#: src/settings/BreakpointRows.js:53
+#: src/settings/BreakpointRows.js:54
 msgid "Name"
 msgstr "Όνομα"
 
-#: src/settings/BreakpointRows.js:53
+#: src/settings/BreakpointRows.js:54
 msgid "Shown in the editor, e.g. Laptop."
 msgstr "Εμφανίζεται στον επεξεργαστή, π.χ. Φορητός."
 
-#: src/settings/BreakpointRows.js:59
+#: src/settings/BreakpointRows.js:60
 msgid "Slug"
 msgstr "Σύντομο όνομα"
 
-#: src/settings/BreakpointRows.js:59
+#: src/settings/BreakpointRows.js:60
 msgid "Stored in block attributes. Lowercase letters, numbers and dashes."
 msgstr "Αποθηκεύεται στις ιδιότητες του μπλοκ. Πεζά λατινικά γράμματα, αριθμοί και παύλες."
 
-#: src/settings/BreakpointRows.js:61
+#. translators: %s: the slug the breakpoint was saved under.
+#: src/settings/BreakpointRows.js:62
+#, js-format
+msgid "Spacing already saved under %s will stop applying. To change only what this breakpoint is called, edit its name and leave the slug alone."
+msgstr "Τα κενά που έχουν ήδη αποθηκευτεί με το %s θα πάψουν να ισχύουν. Για να αλλάξετε μόνο το πώς ονομάζεται αυτό το σημείο διακοπής, επεξεργαστείτε το όνομά του και αφήστε το σύντομο όνομα ως έχει."
+
+#: src/settings/BreakpointRows.js:62
 msgid "Up to"
 msgstr "Έως"
 
-#: src/settings/BreakpointRows.js:61
+#: src/settings/BreakpointRows.js:62
 msgid "The widest screen this breakpoint covers."
 msgstr "Η ευρύτερη οθόνη που καλύπτει αυτό το σημείο διακοπής."
 
 #. translators: %s: breakpoint name.
-#: src/settings/BreakpointRows.js:63
+#: src/settings/BreakpointRows.js:64
 #, js-format
 msgid "Remove %s"
 msgstr "Αφαίρεση %s"
 
-#: src/settings/BreakpointRows.js:63
+#: src/settings/BreakpointRows.js:64
 msgid "Remove"
 msgstr "Αφαίρεση"
 
-#: src/settings/BreakpointRows.js:63
+#: src/settings/BreakpointRows.js:64
+msgid "You have not defined any breakpoints yet"
+msgstr "Δεν έχετε ορίσει ακόμη κανένα σημείο διακοπής"
+
+#. translators: %s: the breakpoint set in use meanwhile.
+#: src/settings/BreakpointRows.js:66
+#, js-format
+msgid "Until you add one, Spacery falls back to %s, which is what \"In use now\" below is showing."
+msgstr "Μέχρι να προσθέσετε ένα, το Spacery χρησιμοποιεί %s, που είναι αυτό που δείχνει η ενότητα «Σε χρήση τώρα» παρακάτω."
+
+#: src/settings/BreakpointRows.js:66
 msgid "Add breakpoint"
 msgstr "Προσθήκη σημείου διακοπής"
 
 #. translators: %d: maximum number of breakpoints.
-#: src/settings/BreakpointRows.js:65
+#: src/settings/BreakpointRows.js:68
 #, js-format
 msgid "%d breakpoints is the maximum. Beyond that the editor asks more of an author than it gives back."
 msgstr "Τα %d σημεία διακοπής είναι το ανώτατο όριο. Πέρα από αυτό, ο επεξεργαστής ζητά από τον συντάκτη περισσότερα απ' όσα του δίνει."
+
+#. translators: 1: breakpoint name. 2: a CSS length.
+#: src/settings/Ruler.js:74
+#, js-format
+msgid "%1$s runs to %2$s, past the edge of this ruler."
+msgstr "Το %1$s φτάνει έως %2$s, πέρα από το άκρο αυτού του χάρακα."
+
+#. translators: %s: a CSS length, e.g. "1280px".
+#: src/settings/Ruler.js:77
+#, js-format
+msgid "Above %s no breakpoint applies, so the default does."
+msgstr "Πάνω από %s δεν ισχύει κανένα σημείο διακοπής, οπότε ισχύει η προεπιλογή."
+
+#. translators: 1: comma-separated breakpoint names. 2: how many further breakpoints there are.
+#: src/settings/sources.js:49
+#, js-format
+msgid "%1$s and %2$d more"
+msgid_plural "%1$s and %2$d more"
+msgstr[0] "%1$s και %2$d ακόμη"
+msgstr[1] "%1$s και %2$d ακόμη"
+
+#: src/settings/sources.js:65
+msgid "your theme"
+msgstr "το θέμα σας"
+
+#: src/settings/sources.js:67
+msgid "the breakpoints you defined"
+msgstr "τα σημεία διακοπής που ορίσατε"
+
+#: src/settings/sources.js:69
+msgid "Spacery's own set"
+msgstr "το δικό του σύνολο του Spacery"
+
+#: src/settings/sources.js:84
+msgid "This theme — it declares no breakpoints"
+msgstr "Αυτό το θέμα — δεν δηλώνει σημεία διακοπής"
+
+#. translators: %s: a list of breakpoint names.
+#: src/settings/sources.js:87
+#, js-format
+msgid "This theme — %s"
+msgstr "Αυτό το θέμα — %s"
+
+#. translators: %s: the source that will be followed.
+#: src/settings/sources.js:93
+#, js-format
+msgid "Decide for me — currently %s"
+msgstr "Ας αποφασίσει το Spacery — τώρα: %s"
+
+#. translators: %s: a list of breakpoint names.
+#: src/settings/sources.js:100
+#, js-format
+msgid "Spacery's own — %s"
+msgstr "Του ίδιου του Spacery — %s"
+
+#: src/settings/sources.js:102
+msgid "Breakpoints I define below"
+msgstr "Σημεία διακοπής που ορίζω παρακάτω"
+
+#. translators: %s: the breakpoint set in use instead.
+#: src/settings/sources.js:127
+#, js-format
+msgid "You chose your own breakpoints but have not defined any yet, so %s is in use until you add one."
+msgstr "Επιλέξατε δικά σας σημεία διακοπής αλλά δεν έχετε ορίσει ακόμη κανένα, οπότε χρησιμοποιείται %s μέχρι να προσθέσετε ένα."
+
+#. translators: %s: the breakpoint set in use instead.
+#: src/settings/sources.js:132
+#, js-format
+msgid "You chose your theme's breakpoints but it declares none, so %s is in use until it does."
+msgstr "Επιλέξατε τα σημεία διακοπής του θέματός σας, αλλά αυτό δεν δηλώνει κανένα, οπότε χρησιμοποιείται %s μέχρι να δηλώσει."
+
+#. translators: %s: the breakpoint set in use instead.
+#: src/settings/sources.js:136
+#, js-format
+msgid "The set you chose is empty, so %s is in use."
+msgstr "Το σύνολο που επιλέξατε είναι κενό, οπότε χρησιμοποιείται %s."
+
+#. translators: %d: how many problems are on the screen.
+#: src/settings/validate.js:62
+#, js-format
+msgid "Fix %d problem above to save."
+msgid_plural "Fix %d problems above to save."
+msgstr[0] "Διορθώστε %d πρόβλημα παραπάνω για αποθήκευση."
+msgstr[1] "Διορθώστε %d προβλήματα παραπάνω για αποθήκευση."
+
+#: src/settings/validate.js:65
+msgid "Unsaved changes."
+msgstr "Μη αποθηκευμένες αλλαγές."
+
+#: src/settings/validate.js:66
+msgid "No changes to save."
+msgstr "Δεν υπάρχουν αλλαγές προς αποθήκευση."
+
+#: src/settings/validate.js:89
+msgid "Every breakpoint needs a name."
+msgstr "Κάθε σημείο διακοπής χρειάζεται όνομα."
+
+#: src/settings/validate.js:95
+msgid "Lowercase letters, numbers and dashes only."
+msgstr "Μόνο πεζά λατινικά γράμματα, αριθμοί και παύλες."
+
+#: src/settings/validate.js:101
+msgid "Needs a number and a unit — px, em or rem."
+msgstr "Χρειάζεται αριθμό και μονάδα — px, em ή rem."
+
+#: src/settings/validate.js:107
+msgid "Has to be more than zero."
+msgstr "Πρέπει να είναι μεγαλύτερο από το μηδέν."
+
+#. translators: %s: a breakpoint slug.
+#: src/settings/validate.js:115
+#, js-format
+msgid "%s is already taken."
+msgstr "Το %s χρησιμοποιείται ήδη."
+
+#: src/settings/validate.js:121
+msgid "Another breakpoint is already this wide, so which applies would be ambiguous."
+msgstr "Ένα άλλο σημείο διακοπής έχει ήδη αυτό το πλάτος, οπότε δεν θα ήταν σαφές ποιο ισχύει."
+
+#. translators: %d: maximum number of breakpoints.
+#: src/settings/validate.js:132
+#, js-format
+msgid "%d breakpoints is the maximum."
+msgstr "Τα %d σημεία διακοπής είναι το ανώτατο όριο."
+
+#. translators: %s: a narrower CSS length, e.g. "1920px".
+#: src/settings/validate.js:161
+#, js-format
+msgid "Wider than any common screen. Did you mean %s?"
+msgstr "Πιο πλατύ από κάθε συνηθισμένη οθόνη. Μήπως εννοούσατε %s;"
+
+#: src/settings/validate.js:162
+msgid "Wider than any common screen, so the ruler stops short of it."
+msgstr "Πιο πλατύ από κάθε συνηθισμένη οθόνη, γι' αυτό ο χάρακας σταματά πριν από αυτό."
 
 #: src/blocks/spacer/block.json
 msgctxt "block title"
@@ -381,149 +599,3 @@ msgstr "απόσταση"
 msgctxt "block keyword"
 msgid "breakpoint"
 msgstr "σημείο διακοπής"
-
-#. translators: %s: breakpoint name.
-#: src/breakpoints/TierSelector.js:67
-#, js-format
-msgid "The canvas is still previewing %s."
-msgstr "Ο καμβάς εξακολουθεί να προβάλλει %s."
-
-#: src/breakpoints/TierSelector.js:67
-msgid "Responsive editing is switched off for this site, so the canvas does not follow along."
-msgstr "Η αποκρίσιμη επεξεργασία είναι απενεργοποιημένη σε αυτόν τον ιστότοπο, οπότε ο καμβάς δεν ακολουθεί."
-
-#: src/extension/SpacingBox.js:98
-msgid "Unit"
-msgstr "Μονάδα"
-
-#: src/extension/SpacingBox.js:99
-msgid "Unlink sides"
-msgstr "Αποσύνδεση πλευρών"
-
-#: src/extension/SpacingBox.js:100
-msgid "Link sides — one value for all four"
-msgstr "Σύνδεση πλευρών — μία τιμή και για τις τέσσερις"
-
-#. translators: %s: a spacing property, e.g. "Padding".
-#: src/extension/SpacingBox.js:102
-#, js-format
-msgid "Reset %s"
-msgstr "Επαναφορά: %s"
-
-#: src/extension/SpacingPanel.js:112
-msgid "Reset all"
-msgstr "Επαναφορά όλων"
-
-#: src/extension/SpacingBox.js:74
-msgid "custom"
-msgstr "προσαρμοσμένο"
-
-#: src/extension/SpacingBox.js:102
-msgid "Any CSS value, one per side — a length, calc() or a preset. WordPress drops anything it cannot verify."
-msgstr "Οποιαδήποτε τιμή CSS, μία ανά πλευρά — μήκος, calc() ή προεπιλογή. Το WordPress απορρίπτει ό,τι δεν μπορεί να επαληθεύσει."
-
-#. translators: %s: the slug the breakpoint was saved under.
-#: src/settings/BreakpointRows.js:61
-#, js-format
-msgid "Spacing already saved under %s will stop applying. To change only what this breakpoint is called, edit its name and leave the slug alone."
-msgstr "Τα κενά που έχουν ήδη αποθηκευτεί με το %s θα πάψουν να ισχύουν. Για να αλλάξετε μόνο το πώς ονομάζεται αυτό το σημείο διακοπής, επεξεργαστείτε το όνομά του και αφήστε το σύντομο όνομα ως έχει."
-
-#: src/blocks/spacer/height.js:94
-msgid "No height set"
-msgstr "Δεν έχει οριστεί ύψος"
-
-#: src/settings/App.js:257
-msgid "Settings saved. What is in use could not be read back — reload the page to see it."
-msgstr "Οι ρυθμίσεις αποθηκεύτηκαν. Δεν ήταν δυνατή η ανάγνωση του τι χρησιμοποιείται — φορτώστε ξανά τη σελίδα για να το δείτε."
-
-#: src/settings/App.js:261
-msgid "Your breakpoint source was saved. Those breakpoints were not: every breakpoint needs a name and a width in px, em or rem, and no two may share a width."
-msgstr "Η πηγή σημείων διακοπής σας αποθηκεύτηκε. Αυτά τα σημεία διακοπής όχι: κάθε σημείο διακοπής χρειάζεται όνομα και πλάτος σε px, em ή rem, και δύο σημεία δεν μπορούν να έχουν το ίδιο πλάτος."
-
-#. translators: %s: breakpoint name. Marks a tier that has values set.
-#: src/breakpoints/TierSelector.js:54
-#, js-format
-msgid "%s (has values)"
-msgstr "%s (έχει τιμές)"
-
-#: src/extension/provenance.js:50
-msgid "this block's own spacing"
-msgstr "τα ίδια τα κενά αυτού του μπλοκ"
-
-#: src/extension/provenance.js:68
-msgid "Partly set here"
-msgstr "Ορίστηκε εν μέρει εδώ"
-
-#. translators: 1: a breakpoint name. 2: another breakpoint name.
-#: src/extension/provenance.js:89
-#, js-format
-msgid "Inherited from %1$s and %2$s"
-msgstr "Κληρονομείται από %1$s και %2$s"
-
-#. translators: %d: how many places a box's values come from.
-#: src/extension/provenance.js:98
-#, js-format
-msgid "Inherited from %d different places"
-msgstr "Κληρονομείται από %d διαφορετικά σημεία"
-
-#: src/extension/register.js:79
-msgid "Responsive spacing — this block has responsive values"
-msgstr "Αποκρίσιμα κενά — αυτό το μπλοκ έχει αποκρίσιμες τιμές"
-
-#: src/settings/validate.js:52
-msgid "Every breakpoint needs a name."
-msgstr "Κάθε σημείο διακοπής χρειάζεται όνομα."
-
-#: src/settings/validate.js:58
-msgid "Lowercase letters, numbers and dashes only."
-msgstr "Μόνο πεζά λατινικά γράμματα, αριθμοί και παύλες."
-
-#: src/settings/validate.js:64
-msgid "Needs a number and a unit — px, em or rem."
-msgstr "Χρειάζεται αριθμό και μονάδα — px, em ή rem."
-
-#: src/settings/validate.js:70
-msgid "Has to be more than zero."
-msgstr "Πρέπει να είναι μεγαλύτερο από το μηδέν."
-
-#. translators: %s: a breakpoint slug.
-#: src/settings/validate.js:78
-#, js-format
-msgid "%s is already taken."
-msgstr "Το %s χρησιμοποιείται ήδη."
-
-#: src/settings/validate.js:84
-msgid "Another breakpoint is already this wide, so which applies would be ambiguous."
-msgstr "Ένα άλλο σημείο διακοπής έχει ήδη αυτό το πλάτος, οπότε δεν θα ήταν σαφές ποιο ισχύει."
-
-#. translators: %d: maximum number of breakpoints.
-#: src/settings/validate.js:95
-#, js-format
-msgid "%d breakpoints is the maximum."
-msgstr "Τα %d σημεία διακοπής είναι το ανώτατο όριο."
-
-#. translators: 1: breakpoint name. 2: a CSS length.
-#: src/settings/Ruler.js:74
-#, js-format
-msgid "%1$s runs to %2$s, past the edge of this ruler."
-msgstr "Το %1$s φτάνει έως %2$s, πέρα από το άκρο αυτού του χάρακα."
-
-#. translators: %s: a CSS length, e.g. "1280px".
-#: src/settings/Ruler.js:77
-#, js-format
-msgid "Above %s no breakpoint applies, so the default does."
-msgstr "Πάνω από %s δεν ισχύει κανένα σημείο διακοπής, οπότε ισχύει η προεπιλογή."
-
-#. translators: %s: a narrower CSS length, e.g. "1920px".
-#: src/settings/validate.js:124
-#, js-format
-msgid "Wider than any common screen. Did you mean %s?"
-msgstr "Πιο πλατύ από κάθε συνηθισμένη οθόνη. Μήπως εννοούσατε %s;"
-
-#: src/settings/validate.js:125
-msgid "Wider than any common screen, so the ruler stops short of it."
-msgstr "Πιο πλατύ από κάθε συνηθισμένη οθόνη, γι' αυτό ο χάρακας σταματά πριν από αυτό."
-
-#: src/settings/App.js:154
-msgid "Unsaved changes."
-msgstr "Μη αποθηκευμένες αλλαγές."

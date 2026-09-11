@@ -188,4 +188,60 @@ test.describe('settings screen', () => {
 			app.getByText('were not saved, and nothing changed')
 		).toBeVisible();
 	});
+
+	/**
+	 * E4. Choosing "breakpoints I define below" and adding none is a legitimate
+	 * state -- an empty set is valid, and the registry falls through to the next
+	 * source -- but the screen used to report the result without connecting it
+	 * to the choice, so the author read `From: Spacery's own set` directly
+	 * beneath a radio saying they had chosen something else.
+	 */
+	test('explains what is running while the custom set is empty', async ({
+		admin,
+		page,
+	}) => {
+		await admin.visitAdminPage('admin.php', 'page=spacery');
+
+		const app = page.locator(appRoot);
+
+		await app.locator(sourceRadio('custom')).check();
+
+		// Before saving: the empty state names what is in effect meanwhile.
+		await expect(
+			app.getByText('You have not defined any breakpoints yet')
+		).toBeVisible();
+
+		await page.getByRole('button', { name: 'Save changes' }).click();
+		await expect(app.getByText('Settings saved.')).toBeVisible();
+
+		// After: the resolved set says why it is not the set that was chosen.
+		await expect(
+			app.getByText(
+				'You chose your own breakpoints but have not defined any yet'
+			)
+		).toBeVisible();
+	});
+
+	/**
+	 * E7, and the loading state it shares a component with (S6). The mark is
+	 * `aria-hidden`, so it is addressed by the viewBox its geometry is drawn on
+	 * -- twice per screen, header and footer, and nowhere else.
+	 */
+	test('signs the page at the top and the bottom, and nowhere else', async ({
+		admin,
+		page,
+	}) => {
+		await admin.visitAdminPage('admin.php', 'page=spacery');
+
+		const app = page.locator(appRoot);
+
+		await expect(
+			app.getByRole('heading', { name: 'Spacery', level: 1 })
+		).toBeVisible();
+		await expect(app.locator('svg[viewBox="0 0 77 77"]')).toHaveCount(2);
+		await expect(app.getByText(/^Version \d/)).toBeVisible();
+		await expect(
+			app.getByRole('link', { name: 'Documentation' })
+		).toBeVisible();
+	});
 });

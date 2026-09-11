@@ -19,6 +19,18 @@ export function __(text: string): string {
 }
 
 /**
+ * English's plural rule, which is what an untranslated site applies.
+ *
+ * @param single The singular source string.
+ * @param plural The plural source string.
+ * @param number The count deciding which form applies.
+ * @return The form English would use.
+ */
+export function _n(single: string, plural: string, number: number): string {
+	return 1 === number ? single : plural;
+}
+
+/**
  * Minimal `sprintf`, covering the `%s`, `%d` and positional forms Spacery uses.
  *
  * @param format The format string.

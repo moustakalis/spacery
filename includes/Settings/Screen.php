@@ -33,6 +33,20 @@ final class Screen {
 	/** Script handle. Public so {@see Screen::HANDLE} can be set translations. */
 	public const HANDLE = 'spacery-settings';
 
+	/** The global the screen's own data is published under. */
+	public const DATA_GLOBAL = 'spacerySettingsScreen';
+
+	/**
+	 * Where the footer sends someone who wants to read more, or ask.
+	 *
+	 * The repository rather than the directory listing, because the listing
+	 * does not exist until the plugin has been reviewed and the support forum
+	 * only exists alongside it. Both of these are live now, which is the whole
+	 * requirement for a link the author can click today.
+	 */
+	private const DOCS_URL    = 'https://github.com/moustakalis/spacery#readme';
+	private const SUPPORT_URL = 'https://github.com/moustakalis/spacery/issues';
+
 	/**
 	 * The menu icon: Spacery's own mark, not a dashicon.
 	 *
@@ -123,6 +137,22 @@ final class Screen {
 	}
 
 	/**
+	 * What the screen itself needs, as opposed to what it configures.
+	 *
+	 * The version it signs itself with, and where to send someone for help.
+	 * Public so it can be asserted without booting an admin screen.
+	 *
+	 * @return array<string, string>
+	 */
+	public static function data(): array {
+		return array(
+			'version'    => \Spacery\VERSION,
+			'docsUrl'    => self::DOCS_URL,
+			'supportUrl' => self::SUPPORT_URL,
+		);
+	}
+
+	/**
 	 * The container the app mounts into.
 	 *
 	 * `wrap` so WordPress positions admin notices correctly; everything inside
@@ -167,6 +197,23 @@ final class Screen {
 			is_array( $dependencies ) ? $dependencies : array(),
 			is_string( $version ) ? $version : \Spacery\VERSION,
 			array( 'in_footer' => true )
+		);
+
+		/*
+		 * `before` the bundle, so the global exists by the time the module
+		 * runs -- the same arrangement the editor settings use, for the same
+		 * reason. Nothing the screen does depends on this arriving; the
+		 * accessor in `screen.ts` falls back to empty strings and the header
+		 * tag and footer simply do not render.
+		 */
+		wp_add_inline_script(
+			self::HANDLE,
+			sprintf(
+				'window.%s = %s;',
+				self::DATA_GLOBAL,
+				(string) wp_json_encode( self::data() )
+			),
+			'before'
 		);
 
 		\Spacery\I18n::set_script_translations( self::HANDLE );

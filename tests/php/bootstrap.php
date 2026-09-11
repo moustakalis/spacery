@@ -15,6 +15,21 @@ declare( strict_types=1 );
 
 define( 'ABSPATH', __DIR__ . '/' );
 
+/*
+ * `Spacery\VERSION` without loading `spacery.php`, which would bootstrap the
+ * whole plugin against stubs that exist for three functions. Read out of the
+ * file rather than repeated here: a second copy of the version is a second
+ * thing to bump, and this one would be the copy nobody remembers.
+ */
+preg_match(
+	"/^const VERSION = '([^']+)';/m",
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- reading a file in this repository from a bootstrap that has no WordPress.
+	(string) file_get_contents( dirname( __DIR__, 2 ) . '/spacery.php' ),
+	$spacery_version
+);
+
+define( 'Spacery\VERSION', $spacery_version[1] ?? '0.0.0' );
+
 /**
  * Resets all stub state. Call from setUp().
  */

@@ -6,7 +6,12 @@ import { describe, expect, it } from 'vitest';
 
 import { blankRow, toRows } from '../../src/settings/rows';
 import type { ValidationRules } from '../../src/settings/types';
-import { isValid, validate } from '../../src/settings/validate';
+import {
+	countProblems,
+	isValid,
+	saveHint,
+	validate,
+} from '../../src/settings/validate';
 
 /** As the server ships them. */
 const RULES: ValidationRules = {
@@ -109,5 +114,54 @@ describe('validate', () => {
 		expect(validate(rows, RULES).set).toStrictEqual([
 			'12 breakpoints is the maximum.',
 		]);
+	});
+});
+
+/**
+ * The sentence beside the Save button, which exists because a disabled control
+ * with nothing next to it is a question the author cannot answer: is the screen
+ * broken, is the work already saved, or is something above it wrong?
+ */
+describe('saveHint', () => {
+	const clean = { rows: {}, set: [] };
+	const broken = (count: number) => ({
+		rows: Object.fromEntries(
+			Array.from({ length: count }, (_unused, index) => [
+				`row-${index}`,
+				{ field: 'label' as const, message: 'x' },
+			])
+		),
+		set: [],
+	});
+
+	it('counts the problems ahead of the changes', () => {
+		expect(saveHint(broken(3), true, false)).toBe(
+			'Fix 3 problems above to save.'
+		);
+	});
+
+	it('counts one problem in the singular', () => {
+		expect(saveHint(broken(1), true, false)).toBe(
+			'Fix 1 problem above to save.'
+		);
+	});
+
+	it('says what the button is waiting for', () => {
+		expect(saveHint(clean, true, true)).toBe('Unsaved changes.');
+	});
+
+	it('says why a valid, unchanged screen cannot save', () => {
+		expect(saveHint(clean, false, true)).toBe('No changes to save.');
+	});
+});
+
+describe('countProblems', () => {
+	it('counts row and set-wide problems together', () => {
+		expect(
+			countProblems({
+				rows: { a: { field: 'label', message: 'x' } },
+				set: ['too many'],
+			})
+		).toBe(2);
 	});
 });

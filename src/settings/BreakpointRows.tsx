@@ -30,6 +30,8 @@ interface BreakpointRowsProps {
 	/** Advisory cautions, which do not block a save. */
 	cautions: Record<string, RowProblem>;
 	max: number;
+	/** What runs while this list is empty, named so the empty state can say. */
+	fallback: string;
 	onChange: (rows: Row[]) => void;
 }
 
@@ -47,6 +49,7 @@ interface BreakpointRowsProps {
  * @param root0.problems One problem per row that has one.
  * @param root0.cautions Advisory cautions, which do not block a save.
  * @param root0.max      Most breakpoints the server will accept.
+ * @param root0.fallback What runs while the list is empty.
  * @param root0.onChange Called with the next rows.
  * @return The repeater.
  */
@@ -55,6 +58,7 @@ export function BreakpointRows({
 	problems,
 	cautions,
 	max,
+	fallback,
 	onChange,
 }: BreakpointRowsProps): React.ReactElement {
 	/**
@@ -183,6 +187,33 @@ export function BreakpointRows({
 					</Flex>
 				</FlexItem>
 			))}
+
+			{0 === rows.length && (
+				<FlexItem>
+					{/*
+					 * An empty state names the consequence of the emptiness,
+					 * not the emptiness. A lone Add button leaves the author to
+					 * guess what the site is doing about spacing meanwhile —
+					 * and the answer is that something else is in effect.
+					 */}
+					<Text weight={600}>
+						{__(
+							'You have not defined any breakpoints yet',
+							'spacery'
+						)}
+					</Text>
+					<Text variant="muted" size={12}>
+						{sprintf(
+							/* translators: %s: the breakpoint set in use meanwhile. */
+							__(
+								'Until you add one, Spacery falls back to %s, which is what "In use now" below is showing.',
+								'spacery'
+							),
+							fallback
+						)}
+					</Text>
+				</FlexItem>
+			)}
 
 			<FlexItem>
 				<Button

@@ -18,7 +18,7 @@
  * against the same table of cases the PHP suite uses.
  */
 
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { CEILING_PX, didYouMean, toPixels } from './bands';
 import type { Row } from './rows';
@@ -50,6 +50,58 @@ export interface Problems {
  */
 export function isValid(problems: Problems): boolean {
 	return 0 === problems.set.length && 0 === Object.keys(problems.rows).length;
+}
+
+/**
+ * How many problems there are, for the sentence beside the disabled Save.
+ *
+ * Rows and set-wide problems counted together, because the author is not being
+ * asked where they are — only how many are left.
+ *
+ * @param problems From validate().
+ * @return The count.
+ */
+export function countProblems(problems: Problems): number {
+	return problems.set.length + Object.keys(problems.rows).length;
+}
+
+/**
+ * Why the Save button is in the state it is in.
+ *
+ * A disabled control with nothing beside it is a question the author cannot
+ * answer: whether the screen is broken, whether the work is already saved, or
+ * whether something above is wrong. An invalid set outranks a dirty one —
+ * knowing there are three problems to fix is more use than being told there are
+ * changes that cannot go anywhere.
+ *
+ * @param problems From validate().
+ * @param dirty    Whether the screen holds anything the server does not.
+ * @param valid    Whether the server would accept what it holds.
+ * @return One sentence.
+ */
+export function saveHint(
+	problems: Problems,
+	dirty: boolean,
+	valid: boolean
+): string {
+	if (!valid) {
+		const count = countProblems(problems);
+
+		return sprintf(
+			/* translators: %d: how many problems are on the screen. */
+			_n(
+				'Fix %d problem above to save.',
+				'Fix %d problems above to save.',
+				count,
+				'spacery'
+			),
+			count
+		);
+	}
+
+	return dirty
+		? __('Unsaved changes.', 'spacery')
+		: __('No changes to save.', 'spacery');
 }
 
 /**

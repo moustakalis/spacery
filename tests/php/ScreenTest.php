@@ -71,6 +71,30 @@ final class ScreenTest extends TestCase {
 	}
 
 	/**
+	 * The screen signs itself with the version it is actually running (E7).
+	 *
+	 * Read from the plugin file by the bootstrap, so this cannot pass against a
+	 * version that only the test believes in.
+	 */
+	public function test_data_carries_the_running_version(): void {
+		$this->assertSame( \Spacery\VERSION, Screen::data()['version'] );
+	}
+
+	/**
+	 * The footer renders a link per URL and nothing at all for an empty one, so
+	 * a typo here is a missing link rather than a broken one -- which is the
+	 * kind of defect nobody notices. Assert they are absolute and secure.
+	 */
+	public function test_data_carries_reachable_links(): void {
+		$data = Screen::data();
+
+		foreach ( array( 'docsUrl', 'supportUrl' ) as $key ) {
+			$this->assertStringStartsWith( 'https://', $data[ $key ], $key );
+			$this->assertNotFalse( filter_var( $data[ $key ], FILTER_VALIDATE_URL ), $key );
+		}
+	}
+
+	/**
 	 * Decodes the data URI back to markup.
 	 *
 	 * @return string
