@@ -185,8 +185,16 @@ test.describe('settings screen', () => {
 			page.getByRole('button', { name: 'Save changes' })
 		).toBeDisabled();
 
-		// Completing the row is what makes it sendable.
-		await page.getByLabel('Up to').fill('900px');
+		/*
+		 * Completing the row is what makes it sendable. Digits only: `Up to` is
+		 * a `UnitControl`, which is an `input[type=number]` beside a unit
+		 * select, and Playwright refuses to type letters into a number input.
+		 * The control appends the selected unit itself -- px, the first entry
+		 * in the row's `UNITS` -- so this stores `900px`, and the assertion
+		 * below is what proves it: an unfinished value would leave Save
+		 * disabled.
+		 */
+		await page.getByLabel('Up to').fill('900');
 		await page.getByLabel('Up to').press('Tab');
 
 		await expect(
