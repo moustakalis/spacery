@@ -23,6 +23,21 @@ python3 bin/check-release.py     # whenever a file is added, renamed or removed
 E2E (`pnpm run test:e2e`) needs `wp-env` up. It is slow, and CI runs it, but it
 is worth running locally before touching anything the inspector renders.
 
+**`lint:js` is the one that catches what `tsc` does not** — an unused import, a
+`@param` name that does not match the parameter it documents. Two of those
+reached `main` because the job had not been run since the commit that
+introduced them. If `wp-scripts lint-js` will not start (a `node_modules`
+installed for another platform cannot load the import resolver's native
+binding), run ESLint directly against the repo's own flat config:
+
+```bash
+node node_modules/.pnpm/eslint@*/node_modules/eslint/bin/eslint.js \
+  "src/**/*.ts" "src/**/*.tsx" "tests/**/*.ts"
+```
+
+Every rule then runs except `import/*`, which reports one resolve error per
+file. Ignore those; read everything else.
+
 ## The POT goes stale when code *moves*, not when strings change
 
 This is the single most frequent CI failure in this repository, and the rule

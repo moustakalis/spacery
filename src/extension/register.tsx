@@ -98,7 +98,7 @@ const DOT = (
  * the wrapper below returns early for everything else, and a hook after an
  * early return is a hook that sometimes does not run.
  *
- * @param root0 The block's edit props.
+ * @param props The block's edit props.
  * @return The inspector fill.
  */
 function SpaceryPanel(props: BlockEditProps): React.ReactElement {

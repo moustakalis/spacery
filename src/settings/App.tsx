@@ -15,7 +15,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from 'react';
 
 import { band } from './bands';
