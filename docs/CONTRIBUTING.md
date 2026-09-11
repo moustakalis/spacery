@@ -149,6 +149,15 @@ is fine and the test asserting the identical thing was not.
 So give it a `return`: a small method that answers the question, called from the
 assertion. `BreakpointPatternsTest::matches()` is the example.
 
+## A test helper cannot be named after a PHPUnit assertion
+
+`PHPUnit\Framework\Assert` declares its constraint factories -- `matches()`,
+`equalTo()`, `isTrue()`, `callback()`, `stringContains()` and the rest -- as
+**final**. A helper in a `TestCase` subclass that happens to share one of those
+names is a fatal error at load time, so the whole suite exits 255 without
+running a single test. Give helpers names that read as this repo's own:
+`pattern_matches()`, `given_option()`, `decoded()`.
+
 ## `base64_encode` needs a reason, not a wider ruleset
 
 WordPress-Extra warns on it under `DiscouragedPHPFunctions.obfuscation`, and

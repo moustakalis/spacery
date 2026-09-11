@@ -62,13 +62,16 @@ final class BreakpointPatternsTest extends TestCase {
 
 		$this->assertSame(
 			$expected,
-			$this->matches( Breakpoint::LENGTH_PATTERN, $value ),
+			$this->pattern_matches( Breakpoint::LENGTH_PATTERN, $value ),
 			'The shipped pattern disagreed about ' . $value
 		);
 	}
 
 	/**
 	 * Applies a shipped pattern the way PHP applies it.
+	 *
+	 * Not `matches()`: `PHPUnit\Framework\Assert::matches()` is final, and a
+	 * subclass that redeclares it is a fatal error before a single test runs.
 	 *
 	 * A method rather than the expression it replaces, and the reason is a
 	 * sniff rather than a preference: WPCS reads `1 === preg_match( … )` inside
@@ -81,7 +84,7 @@ final class BreakpointPatternsTest extends TestCase {
 	 * @param string $value   The value to test it against.
 	 * @return bool Whether the pattern matches.
 	 */
-	private function matches( string $pattern, string $value ): bool {
+	private function pattern_matches( string $pattern, string $value ): bool {
 		return 1 === preg_match( '/' . $pattern . '/', $value );
 	}
 
@@ -115,7 +118,7 @@ final class BreakpointPatternsTest extends TestCase {
 
 		$this->assertSame(
 			$expected,
-			$this->matches( Breakpoint::SLUG_PATTERN, $slug ),
+			$this->pattern_matches( Breakpoint::SLUG_PATTERN, $slug ),
 			'The shipped pattern disagreed about ' . $slug
 		);
 	}

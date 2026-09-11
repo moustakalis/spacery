@@ -141,51 +141,62 @@ test.describe('settings screen', () => {
 	});
 
 	/**
-	 * The server refuses an invalid set whole and hands back the previous one,
-	 * so the screen has to notice that nothing changed rather than report a
-	 * success it cannot verify.
+	 * What E0 and E1 did to the test that used to be here.
 	 *
-	 * It also has to say *which* half was refused. The two options are
-	 * sanitised independently, so switching the source while a row is
-	 * half-typed stores the source and refuses the rows -- and this test used
-	 * to assert the screen said "nothing changed" in exactly that case, which
-	 * was the bug (S4) rather than the behaviour. Both branches are covered
-	 * below, in the order that reaches them without depending on another test.
+	 * It submitted a breakpoint with no width and asserted the screen reported
+	 * the server's refusal -- "your source was saved, those breakpoints were
+	 * not", which is S4's fix. That path can no longer be reached by a person:
+	 * the screen now validates against the server's own shipped rules and
+	 * disables Save while anything is wrong, so the set never leaves the
+	 * browser. The old test sat clicking a disabled button until Playwright
+	 * timed out.
 	 *
-	 * The invalid set here is a breakpoint with no width, which is what someone
-	 * gets by adding a row and saving before filling it in. An earlier version
-	 * of this test typed `80%` into the width instead and could not: the control
-	 * is a `UnitControl` over a number input with px, em and rem, so a bad unit
-	 * is unreachable through the screen. Worth knowing — it means the only
-	 * invalid sets a person can actually submit are missing fields and colliding
-	 * widths, not malformed lengths.
+	 * The refusal notices stay in the code, because the server is still the
+	 * authority and the screen must not report a success it cannot verify. They
+	 * are simply unreachable from the interface now, which is the point of E0
+	 * and E1 -- and this test asserts *that* instead, on the same row the old
+	 * one used: a name with no width, which is what someone gets by adding a
+	 * row and saving before filling it in.
 	 */
-	test('says so when the server refuses a set', async ({ admin, page }) => {
+	test('refuses a set the server would refuse, without sending it', async ({
+		admin,
+		page,
+	}) => {
 		await admin.visitAdminPage('admin.php', 'page=spacery');
 
 		const app = page.locator(appRoot);
 
-		// The source changes here, so half of this save succeeds.
 		await app.locator(sourceRadio('custom')).check();
 		await page.getByRole('button', { name: 'Add breakpoint' }).click();
 		await page.getByLabel('Name').fill('Broken');
-		await page.getByRole('button', { name: 'Save changes' }).click();
-
-		await expect(
-			app.getByText('Your breakpoint source was saved')
-		).toBeVisible();
 
 		/*
-		 * The refused rows were replaced by what the server holds, so the row
-		 * has to be rebuilt -- and the source is now stored as `custom`, so
-		 * this second attempt changes nothing that succeeds.
+		 * The message belongs to the field that caused it, and the save bar
+		 * says why the button is disabled rather than leaving the author to
+		 * guess -- design system §5.2 and §5.3.
 		 */
-		await page.getByRole('button', { name: 'Add breakpoint' }).click();
-		await page.getByLabel('Name').fill('Broken');
-		await page.getByRole('button', { name: 'Save changes' }).click();
+		await expect(
+			app.getByText('Needs a number and a unit — px, em or rem.')
+		).toBeVisible();
+		await expect(
+			app.getByText('Fix 1 problem above to save.')
+		).toBeVisible();
+		await expect(
+			page.getByRole('button', { name: 'Save changes' })
+		).toBeDisabled();
+
+		// Completing the row is what makes it sendable.
+		await page.getByLabel('Up to').fill('900px');
+		await page.getByLabel('Up to').press('Tab');
 
 		await expect(
-			app.getByText('were not saved, and nothing changed')
+			page.getByRole('button', { name: 'Save changes' })
+		).toBeEnabled();
+
+		await page.getByRole('button', { name: 'Save changes' }).click();
+		await expect(app.getByText('Settings saved.')).toBeVisible();
+		await expect(
+			app.getByText('From: the breakpoints you defined')
 		).toBeVisible();
 	});
 
