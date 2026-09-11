@@ -94,6 +94,13 @@ declared stable here when it is experimental in 7.1, which resolves to
 docblock there gives the anchored grep for checking a name against
 `wp-includes/js/dist/components.js`.
 
+Being an external, `@wordpress/components` is not a dependency and is not in
+`node_modules` — so "check it against the package" means reading a WordPress
+install or the Gutenberg source, not `node_modules`. When neither is to hand,
+the answer is to use plain markup rather than to guess a declaration: the
+settings footer's two links are ordinary `<a>` elements for exactly that reason,
+where `ExternalLink` would have meant declaring a component nobody could verify.
+
 ## A failing E2E test may be defending a bug
 
 `settings.spec.ts` asserted that a refused save reported "nothing changed" — in
