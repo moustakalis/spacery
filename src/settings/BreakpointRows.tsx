@@ -27,6 +27,8 @@ interface BreakpointRowsProps {
 	rows: Row[];
 	/** One problem per row that has one, keyed by the row's client id. */
 	problems: Record<string, RowProblem>;
+	/** Advisory cautions, which do not block a save. */
+	cautions: Record<string, RowProblem>;
 	max: number;
 	onChange: (rows: Row[]) => void;
 }
@@ -43,6 +45,7 @@ interface BreakpointRowsProps {
  * @param root0          Component props.
  * @param root0.rows     Current rows.
  * @param root0.problems One problem per row that has one.
+ * @param root0.cautions Advisory cautions, which do not block a save.
  * @param root0.max      Most breakpoints the server will accept.
  * @param root0.onChange Called with the next rows.
  * @return The repeater.
@@ -50,6 +53,7 @@ interface BreakpointRowsProps {
 export function BreakpointRows({
 	rows,
 	problems,
+	cautions,
 	max,
 	onChange,
 }: BreakpointRowsProps): React.ReactElement {
@@ -67,9 +71,10 @@ export function BreakpointRows({
 	 * @return The help text.
 	 */
 	const helpFor = (row: Row, field: Field, guidance: string): string => {
-		const problem = problems[row.id];
+		// A refusal outranks a caution: one stops the save, the other advises.
+		const note = problems[row.id] ?? cautions[row.id];
 
-		return problem && problem.field === field ? problem.message : guidance;
+		return note && note.field === field ? note.message : guidance;
 	};
 	const update = (index: number, patch: Partial<Row>) => {
 		onChange(

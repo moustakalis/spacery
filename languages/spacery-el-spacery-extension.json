@@ -102,6 +102,15 @@
 			"No height set": [
 				"Δεν έχει οριστεί ύψος"
 			],
+			"Default": [
+				"Προεπιλογή"
+			],
+			"up to %s": [
+				"έως %s"
+			],
+			"over %1$s, up to %2$s": [
+				"πάνω από %1$s, έως %2$s"
+			],
 			"Spacery": [
 				""
 			],
@@ -143,12 +152,6 @@
 			],
 			"From: %s": [
 				"Από: %s"
-			],
-			"up to %s": [
-				"έως %s"
-			],
-			"over %1$s, up to %2$s": [
-				"πάνω από %1$s, έως %2$s"
 			],
 			"your theme": [
 				"το θέμα σας"
@@ -205,6 +208,12 @@
 			"Inherited from %d different places": [
 				"Κληρονομείται από %d διαφορετικά σημεία"
 			],
+			"%1$s runs to %2$s, past the edge of this ruler.": [
+				"Το %1$s φτάνει έως %2$s, πέρα από το άκρο αυτού του χάρακα."
+			],
+			"Above %s no breakpoint applies, so the default does.": [
+				"Πάνω από %s δεν ισχύει κανένα σημείο διακοπής, οπότε ισχύει η προεπιλογή."
+			],
 			"%1$s · ≤%2$s": [
 				"%1$s · ≤%2$s"
 			],
@@ -219,9 +228,6 @@
 			],
 			"Height": [
 				"Ύψος"
-			],
-			"Default": [
-				"Προεπιλογή"
 			],
 			"Applies at every width unless a narrower breakpoint overrides it.": [
 				"Ισχύει σε κάθε πλάτος, εκτός αν το αντικαταστήσει ένα στενότερο σημείο διακοπής."
@@ -255,6 +261,12 @@
 			],
 			"%d breakpoints is the maximum.": [
 				"Τα %d σημεία διακοπής είναι το ανώτατο όριο."
+			],
+			"Wider than any common screen. Did you mean %s?": [
+				"Πιο πλατύ από κάθε συνηθισμένη οθόνη. Μήπως εννοούσατε %s;"
+			],
+			"Wider than any common screen, so the ruler stops short of it.": [
+				"Πιο πλατύ από κάθε συνηθισμένη οθόνη, γι' αυτό ο χάρακας σταματά πριν από αυτό."
 			]
 		}
 	},

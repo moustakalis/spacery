@@ -20,6 +20,7 @@
 
 import { __, sprintf } from '@wordpress/i18n';
 
+import { CEILING_PX, didYouMean, toPixels } from './bands';
 import type { Row } from './rows';
 import type { ValidationRules } from './types';
 
@@ -49,25 +50,6 @@ export interface Problems {
  */
 export function isValid(problems: Problems): boolean {
 	return 0 === problems.set.length && 0 === Object.keys(problems.rows).length;
-}
-
-/**
- * A width in pixels, for comparison only.
- *
- * The trap this exists for: widths are compared by the server in **pixels**,
- * not as strings, so `888px` and `55.5rem` are the same width and a set holding
- * both is refused. A screen comparing the typed text would show a valid form
- * and then a save that did nothing.
- *
- * @param value       A validated length.
- * @param pixelsPerEm From the server's own constant.
- * @return The width in pixels, or NaN.
- */
-function toPixels(value: string, pixelsPerEm: number): number {
-	const length = value.trim();
-	const number = parseFloat(length);
-
-	return length.endsWith('em') ? number * pixelsPerEm : number;
 }
 
 /**
@@ -154,4 +136,51 @@ export function validate(rows: Row[], rules: ValidationRules): Problems {
 	}
 
 	return problems;
+}
+
+/**
+ * Cautions: legal, saveable, and probably not what the author meant.
+ *
+ * Kept apart from `validate()` on purpose. The server enforces no upper bound
+ * on a width and is right not to — there is no principled maximum — so a tier
+ * at `11920px` saves cleanly and applies. It is also, almost always, `1920px`
+ * with a finger on the wrong key, and nothing on this screen said so: the
+ * `Covers` column read "over 1300px, up to 11920px" as if that were deliberate.
+ *
+ * @param rows  The rows being edited.
+ * @param rules The server's rules.
+ * @return One caution per row that earns one.
+ */
+export function cautions(
+	rows: Row[],
+	rules: ValidationRules
+): Record<string, RowProblem> {
+	const found: Record<string, RowProblem> = {};
+
+	for (const row of rows) {
+		if (CEILING_PX >= toPixels(row.max, rules.pixelsPerEm)) {
+			continue;
+		}
+
+		const suggestion = didYouMean(row.max, rules.pixelsPerEm);
+
+		found[row.id] = {
+			field: 'max',
+			message: suggestion
+				? sprintf(
+						/* translators: %s: a narrower CSS length, e.g. "1920px". */
+						__(
+							'Wider than any common screen. Did you mean %s?',
+							'spacery'
+						),
+						suggestion
+					)
+				: __(
+						'Wider than any common screen, so the ruler stops short of it.',
+						'spacery'
+					),
+		};
+	}
+
+	return found;
 }

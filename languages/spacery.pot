@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-11T06:05:01+00:00\n"
+"POT-Creation-Date: 2026-09-11T06:18:16+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: spacery\n"
@@ -102,6 +102,7 @@ msgid "Height"
 msgstr ""
 
 #: src/blocks/spacer/edit.js:46
+#: src/settings/bands.js:86
 msgid "Default"
 msgstr ""
 
@@ -341,130 +342,152 @@ msgstr ""
 msgid "From: %s"
 msgstr ""
 
-#. translators: %s: a CSS length, e.g. "480px".
+#: src/settings/App.js:200
+msgid "your theme"
+msgstr ""
+
 #: src/settings/App.js:202
+msgid "the breakpoints you defined"
+msgstr ""
+
+#: src/settings/App.js:204
+msgid "Spacery's own set"
+msgstr ""
+
+#: src/settings/App.js:226
+msgid "Settings saved."
+msgstr ""
+
+#: src/settings/App.js:234
+msgid "Settings saved. What is in use could not be read back — reload the page to see it."
+msgstr ""
+
+#: src/settings/App.js:238
+msgid "Your breakpoint source was saved. Those breakpoints were not: every breakpoint needs a name and a width in px, em or rem, and no two may share a width."
+msgstr ""
+
+#: src/settings/App.js:239
+msgid "Those breakpoints were not saved, and nothing changed. Every breakpoint needs a name and a width in px, em or rem, and no two may share a width."
+msgstr ""
+
+#: src/settings/App.js:259
+msgid "Something went wrong talking to the site."
+msgstr ""
+
+#. translators: %s: a CSS length, e.g. "480px".
+#: src/settings/bands.js:53
 #, js-format
 msgid "up to %s"
 msgstr ""
 
 #. translators: 1: a CSS length. 2: a wider CSS length.
-#: src/settings/App.js:206
+#: src/settings/bands.js:57
 #, js-format
 msgid "over %1$s, up to %2$s"
 msgstr ""
 
-#: src/settings/App.js:222
-msgid "your theme"
-msgstr ""
-
-#: src/settings/App.js:224
-msgid "the breakpoints you defined"
-msgstr ""
-
-#: src/settings/App.js:226
-msgid "Spacery's own set"
-msgstr ""
-
-#: src/settings/App.js:248
-msgid "Settings saved."
-msgstr ""
-
-#: src/settings/App.js:256
-msgid "Settings saved. What is in use could not be read back — reload the page to see it."
-msgstr ""
-
-#: src/settings/App.js:260
-msgid "Your breakpoint source was saved. Those breakpoints were not: every breakpoint needs a name and a width in px, em or rem, and no two may share a width."
-msgstr ""
-
-#: src/settings/App.js:261
-msgid "Those breakpoints were not saved, and nothing changed. Every breakpoint needs a name and a width in px, em or rem, and no two may share a width."
-msgstr ""
-
-#: src/settings/App.js:281
-msgid "Something went wrong talking to the site."
-msgstr ""
-
-#: src/settings/BreakpointRows.js:51
+#: src/settings/BreakpointRows.js:53
 msgid "Name"
 msgstr ""
 
-#: src/settings/BreakpointRows.js:51
+#: src/settings/BreakpointRows.js:53
 msgid "Shown in the editor, e.g. Laptop."
 msgstr ""
 
-#: src/settings/BreakpointRows.js:57
+#: src/settings/BreakpointRows.js:59
 msgid "Slug"
 msgstr ""
 
-#: src/settings/BreakpointRows.js:57
+#: src/settings/BreakpointRows.js:59
 msgid "Stored in block attributes. Lowercase letters, numbers and dashes."
 msgstr ""
 
 #. translators: %s: the slug the breakpoint was saved under.
-#: src/settings/BreakpointRows.js:59
+#: src/settings/BreakpointRows.js:61
 #, js-format
 msgid "Spacing already saved under %s will stop applying. To change only what this breakpoint is called, edit its name and leave the slug alone."
 msgstr ""
 
-#: src/settings/BreakpointRows.js:59
+#: src/settings/BreakpointRows.js:61
 msgid "Up to"
 msgstr ""
 
-#: src/settings/BreakpointRows.js:59
+#: src/settings/BreakpointRows.js:61
 msgid "The widest screen this breakpoint covers."
 msgstr ""
 
 #. translators: %s: breakpoint name.
-#: src/settings/BreakpointRows.js:61
+#: src/settings/BreakpointRows.js:63
 #, js-format
 msgid "Remove %s"
 msgstr ""
 
-#: src/settings/BreakpointRows.js:61
+#: src/settings/BreakpointRows.js:63
 msgid "Remove"
 msgstr ""
 
-#: src/settings/BreakpointRows.js:61
+#: src/settings/BreakpointRows.js:63
 msgid "Add breakpoint"
 msgstr ""
 
 #. translators: %d: maximum number of breakpoints.
-#: src/settings/BreakpointRows.js:63
+#: src/settings/BreakpointRows.js:65
 #, js-format
 msgid "%d breakpoints is the maximum. Beyond that the editor asks more of an author than it gives back."
 msgstr ""
 
-#: src/settings/validate.js:68
+#. translators: 1: breakpoint name. 2: a CSS length.
+#: src/settings/Ruler.js:74
+#, js-format
+msgid "%1$s runs to %2$s, past the edge of this ruler."
+msgstr ""
+
+#. translators: %s: a CSS length, e.g. "1280px".
+#: src/settings/Ruler.js:77
+#, js-format
+msgid "Above %s no breakpoint applies, so the default does."
+msgstr ""
+
+#: src/settings/validate.js:52
 msgid "Every breakpoint needs a name."
 msgstr ""
 
-#: src/settings/validate.js:74
+#: src/settings/validate.js:58
 msgid "Lowercase letters, numbers and dashes only."
 msgstr ""
 
-#: src/settings/validate.js:80
+#: src/settings/validate.js:64
 msgid "Needs a number and a unit — px, em or rem."
 msgstr ""
 
-#: src/settings/validate.js:86
+#: src/settings/validate.js:70
 msgid "Has to be more than zero."
 msgstr ""
 
 #. translators: %s: a breakpoint slug.
-#: src/settings/validate.js:94
+#: src/settings/validate.js:78
 #, js-format
 msgid "%s is already taken."
 msgstr ""
 
-#: src/settings/validate.js:100
+#: src/settings/validate.js:84
 msgid "Another breakpoint is already this wide, so which applies would be ambiguous."
 msgstr ""
 
 #. translators: %d: maximum number of breakpoints.
-#: src/settings/validate.js:111
+#: src/settings/validate.js:95
 #, js-format
 msgid "%d breakpoints is the maximum."
+msgstr ""
+
+#. translators: %s: a narrower CSS length, e.g. "1920px".
+#: src/settings/validate.js:124
+#, js-format
+msgid "Wider than any common screen. Did you mean %s?"
+msgstr ""
+
+#: src/settings/validate.js:125
+msgid "Wider than any common screen, so the ruler stops short of it."
 msgstr ""
 
 #: src/blocks/spacer/block.json

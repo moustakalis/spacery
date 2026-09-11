@@ -18,10 +18,12 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from 'react';
 
+import { band } from './bands';
 import { BreakpointRows } from './BreakpointRows';
+import { Ruler } from './Ruler';
 import { fetchInfo, fetchSettings, saveSettings, wasAccepted } from './data';
 import { toBreakpoints, toRows, type Row } from './rows';
-import { isValid, validate } from './validate';
+import { cautions, isValid, validate } from './validate';
 import type {
 	Breakpoint,
 	BreakpointInfo,
@@ -104,10 +106,8 @@ export function App(): React.ReactElement {
 	 * an invalid set whole: a rule caught only at save time reads as "nothing
 	 * changed" when the author has been typing for a minute.
 	 */
-	const problems = validate(rows, {
-		...info.rules,
-		maxBreakpoints: info.maxBreakpoints,
-	});
+	const rules = { ...info.rules, maxBreakpoints: info.maxBreakpoints };
+	const problems = validate(rows, rules);
 
 	const save = async () => {
 		setStatus({ kind: 'saving' });
@@ -230,6 +230,7 @@ export function App(): React.ReactElement {
 							<BreakpointRows
 								rows={rows}
 								problems={problems.rows}
+								cautions={cautions(rows, rules)}
 								max={info.maxBreakpoints}
 								onChange={(next: Row[]) => setRows(next)}
 							/>
@@ -338,6 +339,13 @@ function ResolvedSet({ info }: { info: BreakpointInfo }): React.ReactElement {
 					)}
 				</Text>
 			</FlexItem>
+			<FlexItem>
+				<Ruler
+					tiers={info.resolved}
+					pixelsPerEm={info.rules.pixelsPerEm}
+				/>
+			</FlexItem>
+
 			{info.resolved.map((tier, index) => (
 				<FlexItem key={tier.slug}>
 					<Flex justify="space-between">
@@ -353,36 +361,6 @@ function ResolvedSet({ info }: { info: BreakpointInfo }): React.ReactElement {
 				</FlexItem>
 			))}
 		</Flex>
-	);
-}
-
-/**
- * The range a tier covers, in the same shape the generated CSS uses.
- *
- * Mirrors `BreakpointSet::media_queries()`. It is a description for humans, not
- * the CSS itself — the server remains the only thing that generates a query.
- *
- * @param tiers The resolved set, widest first.
- * @param index Which tier to describe.
- * @return A human-readable range.
- */
-function band(tiers: Breakpoint[], index: number): string {
-	const tier = tiers[index]!;
-	const narrower = tiers[index + 1];
-
-	if (!narrower) {
-		return sprintf(
-			/* translators: %s: a CSS length, e.g. "480px". */
-			__('up to %s', 'spacery'),
-			tier.max
-		);
-	}
-
-	return sprintf(
-		/* translators: 1: a CSS length. 2: a wider CSS length. */
-		__('over %1$s, up to %2$s', 'spacery'),
-		narrower.max,
-		tier.max
 	);
 }
 
