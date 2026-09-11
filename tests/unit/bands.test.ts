@@ -5,10 +5,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { band, didYouMean, ruler } from '../../src/settings/bands';
-import type { Breakpoint } from '../../src/settings/types';
-import { cautions } from '../../src/settings/validate';
 import { toRows } from '../../src/settings/rows';
-import type { ValidationRules } from '../../src/settings/types';
+import type { Breakpoint, ValidationRules } from '../../src/settings/types';
+import { cautions } from '../../src/settings/validate';
 
 const PRESET: Breakpoint[] = [
 	{ slug: 'desktop', label: 'Desktop', max: '1280px' },

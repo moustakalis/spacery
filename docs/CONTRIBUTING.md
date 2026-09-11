@@ -35,8 +35,15 @@ node node_modules/.pnpm/eslint@*/node_modules/eslint/bin/eslint.js \
   "src/**/*.ts" "src/**/*.tsx" "tests/**/*.ts"
 ```
 
-Every rule then runs except `import/*`, which reports one resolve error per
-file. Ignore those; read everything else.
+Every rule then runs except the ones that need the resolver, which report one
+error per file. **Filter that noise by its message, never by its rule name.**
+The resolve error is reported *as* `import/no-duplicates`, so dropping lines by
+rule hides real violations of the same rule — which is exactly how a duplicate
+import reached CI:
+
+```bash
+… | grep -v 'Resolve error'
+```
 
 ## The POT goes stale when code *moves*, not when strings change
 
@@ -126,6 +133,21 @@ response was to correct the assertion, not the code.
 So when a behavioural fix breaks a test: read what the test claims before
 assuming the code regressed. Then make the test assert the new claim, and cover
 the branch that made the old one look right.
+
+## Never put a comparison inside an argument list
+
+```php
+$this->assertSame( $expected, 1 === preg_match( $pattern, $value ), $message );
+```
+
+PHPCS reads that as `WordPress.PHP.YodaConditions.NotYoda`, even though the
+literal is already on the left. The statement it scans back through starts at
+`$this`, and a variable before the operator is the whole test. The same
+comparison in a `return` passes — which is why `Breakpoint::is_valid_length()`
+is fine and the test asserting the identical thing was not.
+
+So give it a `return`: a small method that answers the question, called from the
+assertion. `BreakpointPatternsTest::matches()` is the example.
 
 ## `base64_encode` needs a reason, not a wider ruleset
 

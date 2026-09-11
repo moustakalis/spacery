@@ -33,17 +33,17 @@ final class BreakpointPatternsTest extends TestCase {
 	 */
 	public static function lengths(): array {
 		return array(
-			'pixels'         => array( '782px', true ),
-			'rem'            => array( '55.5rem', true ),
-			'em'             => array( '48em', true ),
-			'leading dot'    => array( '.5rem', true ),
-			'zero is valid'  => array( '0px', true ),
-			'no unit'        => array( '782', false ),
-			'percent'        => array( '80%', false ),
-			'negative'       => array( '-10px', false ),
-			'calc'           => array( 'calc(100% - 2rem)', false ),
-			'unitless zero'  => array( '0', false ),
-			'trailing junk'  => array( '782px;', false ),
+			'pixels'        => array( '782px', true ),
+			'rem'           => array( '55.5rem', true ),
+			'em'            => array( '48em', true ),
+			'leading dot'   => array( '.5rem', true ),
+			'zero is valid' => array( '0px', true ),
+			'no unit'       => array( '782', false ),
+			'percent'       => array( '80%', false ),
+			'negative'      => array( '-10px', false ),
+			'calc'          => array( 'calc(100% - 2rem)', false ),
+			'unitless zero' => array( '0', false ),
+			'trailing junk' => array( '782px;', false ),
 		);
 	}
 
@@ -62,9 +62,27 @@ final class BreakpointPatternsTest extends TestCase {
 
 		$this->assertSame(
 			$expected,
-			1 === preg_match( '/' . Breakpoint::LENGTH_PATTERN . '/', $value ),
+			$this->matches( Breakpoint::LENGTH_PATTERN, $value ),
 			'The shipped pattern disagreed about ' . $value
 		);
+	}
+
+	/**
+	 * Applies a shipped pattern the way PHP applies it.
+	 *
+	 * A method rather than the expression it replaces, and the reason is a
+	 * sniff rather than a preference: WPCS reads `1 === preg_match( … )` inside
+	 * an argument list as a non-Yoda condition, because the statement it scans
+	 * back to starts at `$this`. In a `return` the literal is the first thing
+	 * it sees -- which is how `Breakpoint::is_valid_length()` gets away with
+	 * exactly the same comparison.
+	 *
+	 * @param string $pattern A pattern from Breakpoint, stored without delimiters.
+	 * @param string $value   The value to test it against.
+	 * @return bool Whether the pattern matches.
+	 */
+	private function matches( string $pattern, string $value ): bool {
+		return 1 === preg_match( '/' . $pattern . '/', $value );
 	}
 
 	/**
@@ -97,7 +115,7 @@ final class BreakpointPatternsTest extends TestCase {
 
 		$this->assertSame(
 			$expected,
-			1 === preg_match( '/' . Breakpoint::SLUG_PATTERN . '/', $slug ),
+			$this->matches( Breakpoint::SLUG_PATTERN, $slug ),
 			'The shipped pattern disagreed about ' . $slug
 		);
 	}
