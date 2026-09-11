@@ -87,6 +87,16 @@ test.describe('settings screen', () => {
 		const preset = app.locator(sourceRadio('spacery'));
 
 		await expect(preset).toBeVisible();
+
+		/*
+		 * Nothing has changed yet, so there is nothing to save. The screen used
+		 * to offer the button regardless, which said the same thing whether or
+		 * not the author had touched anything (S8).
+		 */
+		await expect(
+			page.getByRole('button', { name: 'Save changes' })
+		).toBeDisabled();
+
 		await preset.check();
 		await page.getByRole('button', { name: 'Save changes' }).click();
 

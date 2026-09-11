@@ -10,6 +10,7 @@
 
 import apiFetch from '@wordpress/api-fetch';
 
+import { sameBreakpoints } from './rows';
 import type { Breakpoint, BreakpointInfo, StoredSettings } from './types';
 
 /** Core's settings endpoint. */
@@ -79,24 +80,14 @@ export async function saveSettings(
 /**
  * Whether the server stored the breakpoints it was sent.
  *
- * Compared by content rather than by order, because the server stores a
- * canonical widest-first ordering and reordering is not a rejection.
+ * The return value is the point: the sanitiser refuses an invalid set whole and
+ * hands back the previous one, so the only honest way to know a save worked is
+ * to read what came back.
  *
  * @param sent   What the screen submitted.
  * @param stored What came back.
  * @return True when every submitted breakpoint survived.
  */
 export function wasAccepted(sent: Breakpoint[], stored: Breakpoint[]): boolean {
-	if (sent.length !== stored.length) {
-		return false;
-	}
-
-	return sent.every((row) =>
-		stored.some(
-			(other) =>
-				other.slug === row.slug &&
-				other.label === row.label &&
-				other.max === row.max
-		)
-	);
+	return sameBreakpoints(sent, stored);
 }

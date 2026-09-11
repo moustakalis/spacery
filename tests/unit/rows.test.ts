@@ -6,13 +6,16 @@ import { describe, expect, it } from 'vitest';
 
 import {
 	blankRow,
+	isDirty,
 	isStored,
+	sameBreakpoints,
 	slugFrom,
 	slugHasMoved,
 	toBreakpoints,
 	toRows,
 	toSlug,
 } from '../../src/settings/rows';
+import type { StoredSettings } from '../../src/settings/types';
 
 describe('toRows', () => {
 	it('gives every row an id of its own', () => {
@@ -107,5 +110,83 @@ describe('toSlug', () => {
 	it('matches what the server accepts', () => {
 		expect(toSlug('Wide  Desktop!')).toBe('wide-desktop');
 		expect(toSlug('  ')).toBe('');
+	});
+});
+
+describe('sameBreakpoints', () => {
+	const laptop = { slug: 'laptop', label: 'Laptop', max: '1024px' };
+	const mobile = { slug: 'mobile', label: 'Mobile', max: '480px' };
+
+	it('ignores order, because the server stores its own', () => {
+		expect(sameBreakpoints([laptop, mobile], [mobile, laptop])).toBe(true);
+	});
+
+	it('notices a changed value', () => {
+		expect(sameBreakpoints([laptop], [{ ...laptop, max: '1000px' }])).toBe(
+			false
+		);
+	});
+
+	it('notices a different count', () => {
+		expect(sameBreakpoints([laptop], [laptop, mobile])).toBe(false);
+	});
+});
+
+describe('isDirty', () => {
+	const stored: StoredSettings = {
+		spacery_breakpoint_source: 'custom',
+		spacery_custom_breakpoints: [
+			{ slug: 'laptop', label: 'Laptop', max: '1024px' },
+		],
+	};
+
+	it('is clean when the screen matches what the server holds', () => {
+		expect(
+			isDirty(toRows(stored.spacery_custom_breakpoints), 'custom', stored)
+		).toBe(false);
+	});
+
+	it('is dirty when the source changes', () => {
+		expect(
+			isDirty(toRows(stored.spacery_custom_breakpoints), 'theme', stored)
+		).toBe(true);
+	});
+
+	it('is dirty when a value changes', () => {
+		const rows = toRows(stored.spacery_custom_breakpoints);
+
+		expect(
+			isDirty([{ ...rows[0]!, max: '1000px' }], 'custom', stored)
+		).toBe(true);
+	});
+
+	it('is dirty when a row is added', () => {
+		const rows = toRows(stored.spacery_custom_breakpoints);
+
+		expect(
+			isDirty(
+				[
+					...rows,
+					{ ...blankRow(), slug: 'm', label: 'M', max: '480px' },
+				],
+				'custom',
+				stored
+			)
+		).toBe(true);
+	});
+
+	/** Reordering changes nothing a save would store. */
+	it('is clean when rows are only reordered', () => {
+		const both: StoredSettings = {
+			...stored,
+			spacery_custom_breakpoints: [
+				{ slug: 'laptop', label: 'Laptop', max: '1024px' },
+				{ slug: 'mobile', label: 'Mobile', max: '480px' },
+			],
+		};
+
+		const reversed = toRows([...both.spacery_custom_breakpoints].reverse());
+
+		expect(isDirty(reversed, 'custom', both)).toBe(false);
 	});
 });

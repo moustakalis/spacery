@@ -177,6 +177,9 @@
 			"Your breakpoint source was saved. Those breakpoints were not: every breakpoint needs a name and a width in px, em or rem, and no two may share a width.": [
 				"Η πηγή σημείων διακοπής σας αποθηκεύτηκε. Αυτά τα σημεία διακοπής όχι: κάθε σημείο διακοπής χρειάζεται όνομα και πλάτος σε px, em ή rem, και δύο σημεία δεν μπορούν να έχουν το ίδιο πλάτος."
 			],
+			"Unsaved changes.": [
+				"Μη αποθηκευμένες αλλαγές."
+			],
 			"WordPress already sets %d value here for narrower screens.": [
 				"Το WordPress ορίζει ήδη %d τιμή εδώ για στενότερες οθόνες.",
 				"Το WordPress ορίζει ήδη %d τιμές εδώ για στενότερες οθόνες."

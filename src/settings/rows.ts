@@ -23,7 +23,7 @@
  * before saving, so the stored shape is unchanged.
  */
 
-import type { Breakpoint } from './types';
+import type { Breakpoint, StoredSettings, StoredSource } from './types';
 
 /**
  * A breakpoint plus the editing state the screen needs and the server does not.
@@ -145,4 +145,59 @@ export function toSlug(label: string): string {
 		.toLowerCase()
 		.replace(/[^a-z0-9]+/g, '-')
 		.replace(/^-+|-+$/g, '');
+}
+
+/**
+ * Whether two sets hold the same breakpoints.
+ *
+ * By content, never by order: the server stores a canonical widest-first
+ * ordering, so a set that comes back reordered is the same set. Two callers
+ * need this — "did the server accept what we sent" and "is there anything to
+ * save" — and they must not be able to answer it differently.
+ *
+ * @param a One set.
+ * @param b Another.
+ * @return True when every breakpoint in `a` has a twin in `b`.
+ */
+export function sameBreakpoints(a: Breakpoint[], b: Breakpoint[]): boolean {
+	if (a.length !== b.length) {
+		return false;
+	}
+
+	return a.every((one) =>
+		b.some(
+			(other) =>
+				other.slug === one.slug &&
+				other.label === one.label &&
+				other.max === one.max
+		)
+	);
+}
+
+/**
+ * Whether the screen holds anything the server does not.
+ *
+ * The screen had no idea: `Save changes` looked identical whether or not
+ * anything had changed, and navigating away discarded a half-built set in
+ * silence. On a page whose main task is typing several rows, that is a real
+ * loss, and the author gets no signal it is about to happen.
+ *
+ * @param rows   The rows being edited.
+ * @param source The source chosen on screen.
+ * @param stored What the server last returned.
+ * @return True when saving would change something.
+ */
+export function isDirty(
+	rows: Row[],
+	source: StoredSource,
+	stored: StoredSettings
+): boolean {
+	if (source !== stored.spacery_breakpoint_source) {
+		return true;
+	}
+
+	return !sameBreakpoints(
+		toBreakpoints(rows),
+		stored.spacery_custom_breakpoints
+	);
 }

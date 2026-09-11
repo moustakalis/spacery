@@ -22,7 +22,7 @@ import { band } from './bands';
 import { BreakpointRows } from './BreakpointRows';
 import { Ruler } from './Ruler';
 import { fetchInfo, fetchSettings, saveSettings, wasAccepted } from './data';
-import { toBreakpoints, toRows, type Row } from './rows';
+import { isDirty, toBreakpoints, toRows, type Row } from './rows';
 import { cautions, isValid, validate } from './validate';
 import type {
 	Breakpoint,
@@ -88,6 +88,32 @@ export function App(): React.ReactElement {
 			cancelled = true;
 		};
 	}, []);
+
+	/*
+	 * Held above the guards below, because the effect that depends on it must
+	 * run on every render. `settings` is the last thing the server returned, so
+	 * this is "does the screen hold anything the server does not".
+	 */
+	const dirty = null !== settings && isDirty(rows, source, settings);
+
+	/*
+	 * The browser's own warning, which is the only one that can interrupt a
+	 * navigation. Its wording belongs to the browser; all a page can do is ask.
+	 */
+	useEffect(() => {
+		if (!dirty) {
+			return;
+		}
+
+		const warn = (event: BeforeUnloadEvent): void => {
+			event.preventDefault();
+			event.returnValue = '';
+		};
+
+		window.addEventListener('beforeunload', warn);
+
+		return () => window.removeEventListener('beforeunload', warn);
+	}, [dirty]);
 
 	if ('error' === status.kind && null === settings) {
 		return (
@@ -253,14 +279,43 @@ export function App(): React.ReactElement {
 			</FlexItem>
 
 			<FlexItem>
-				<Button
-					variant="primary"
-					onClick={save}
-					isBusy={'saving' === status.kind}
-					disabled={'saving' === status.kind || !isValid(problems)}
-				>
-					{__('Save changes', 'spacery')}
-				</Button>
+				{/*
+				 * Sticky, because the rows it saves can run past the fold: a
+				 * save button below twelve breakpoints is a scroll away from
+				 * the work it commits. The Card is what makes it opaque —
+				 * inventing a background colour here would be inventing one
+				 * WordPress already owns.
+				 */}
+				<div style={{ position: 'sticky', bottom: 0 }}>
+					<Card>
+						<CardBody>
+							<Flex justify="space-between" align="center">
+								<FlexItem>
+									{dirty && (
+										<Text variant="muted" size={12}>
+											{__('Unsaved changes.', 'spacery')}
+										</Text>
+									)}
+								</FlexItem>
+
+								<FlexItem>
+									<Button
+										variant="primary"
+										onClick={save}
+										isBusy={'saving' === status.kind}
+										disabled={
+											'saving' === status.kind ||
+											!isValid(problems) ||
+											!dirty
+										}
+									>
+										{__('Save changes', 'spacery')}
+									</Button>
+								</FlexItem>
+							</Flex>
+						</CardBody>
+					</Card>
+				</div>
 			</FlexItem>
 		</Flex>
 	);
