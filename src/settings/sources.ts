@@ -136,28 +136,49 @@ export function sourceOptions(
 }
 
 /**
- * Why the set in use is not the set that was chosen.
+ * Why the set in use is not the set that was asked for.
  *
- * The screen used to print `From: Spacery's own set` under a chosen source of
- * `custom` and leave it there: the author is looking at a choice they made and
- * a result that contradicts it, with nothing connecting the two. A source can
- * be chosen and still be empty — custom with no rows yet, theme on a theme that
- * declares none — and in both cases the honest answer names the choice, the
- * reason it is not in effect, and what is running instead.
+ * The screen used to print `From: the breakpoints you defined` above Spacery's
+ * own tiers: a source can be followed and still be empty — custom with no rows
+ * yet, a theme that declares breakpoints Spacery cannot read — and the server
+ * falls through to its preset without saying so. The honest answer names what
+ * was asked for, why it is not in effect, and what is running instead.
  *
- * @param source The stored choice.
+ * Compared against `resolvedSource`, never `effectiveSource`: the second is the
+ * source being followed, which is the very thing that can be empty.
+ *
+ * @param source The stored choice, or the empty string for "decide for me".
  * @param info   What each source contains.
- * @return A sentence, or null when the choice is what is in effect.
+ * @return A sentence, or null when what was asked for is what is in effect.
  */
 export function fallbackNotice(
 	source: StoredSource,
 	info: BreakpointInfo
 ): string | null {
-	if ('' === source || source === info.effectiveSource) {
+	// "Decide for me" asks for the default, so that is what went unanswered.
+	const asked = '' === source ? info.defaultSource : source;
+
+	if (asked === info.resolvedSource) {
 		return null;
 	}
 
-	const inUse = sourceName(info.effectiveSource);
+	const inUse = sourceName(info.resolvedSource);
+
+	/*
+	 * Nobody chose this one, so it cannot be put to the author as their choice.
+	 * The only way to reach it is a theme that declares breakpoints and then
+	 * yields none Spacery can read, which is worth saying plainly.
+	 */
+	if ('' === source) {
+		return sprintf(
+			/* translators: %s: the breakpoint set in use instead. */
+			__(
+				'Your theme declares breakpoints Spacery could not read, so %s is in use.',
+				'spacery'
+			),
+			inUse
+		);
+	}
 
 	if ('custom' === source) {
 		return sprintf(
@@ -174,7 +195,7 @@ export function fallbackNotice(
 		return sprintf(
 			/* translators: %s: the breakpoint set in use instead. */
 			__(
-				"You chose your theme's breakpoints but it declares none, so %s is in use until it does.",
+				"You chose your theme's breakpoints, but it declares none Spacery can use, so %s is in use.",
 				'spacery'
 			),
 			inUse

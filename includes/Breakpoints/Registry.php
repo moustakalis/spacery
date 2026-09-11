@@ -120,6 +120,18 @@ final class Registry {
 	private ?BreakpointSet $resolved = null;
 
 	/**
+	 * Which source produced the resolved set, once resolution has run.
+	 *
+	 * Not the same question as {@see Registry::source()}, which answers what
+	 * was *asked for*. A chosen source can be empty -- custom with no option
+	 * stored, a theme that declares breakpoints Spacery cannot read -- and
+	 * resolution then falls through to the preset. Anything reporting the
+	 * chosen source as the origin of the set would be describing a set that is
+	 * not on the page.
+	 */
+	private string $resolved_from = '';
+
+	/**
 	 * Merged theme.json settings for this request.
 	 *
 	 * @var array<mixed>|null
@@ -152,8 +164,9 @@ final class Registry {
 	 * which core caches itself.
 	 */
 	public function flush(): void {
-		$this->resolved = null;
-		$this->settings = null;
+		$this->resolved      = null;
+		$this->settings      = null;
+		$this->resolved_from = '';
 	}
 
 	/**
@@ -173,6 +186,12 @@ final class Registry {
 			self::SOURCE_SPACERY => null,
 			default              => $this->from_theme(),
 		};
+
+		/*
+		 * Recorded before the fallback, because the fallback is the answer: a
+		 * source that produced nothing is not the source of what is in use.
+		 */
+		$this->resolved_from = $set instanceof BreakpointSet ? $this->source() : self::SOURCE_SPACERY;
 
 		if ( ! $set instanceof BreakpointSet ) {
 			$set = $this->preset();
@@ -211,6 +230,19 @@ final class Registry {
 		}
 
 		return $this->default_source();
+	}
+
+	/**
+	 * Which source the set in use actually came from.
+	 *
+	 * Attribution is recorded before the `spacery_breakpoints` filter runs: a
+	 * filter can replace the set entirely, and no honest answer exists for
+	 * where a set somebody else supplied came from.
+	 */
+	public function resolved_source(): string {
+		$this->resolve();
+
+		return $this->resolved_from;
 	}
 
 	/**

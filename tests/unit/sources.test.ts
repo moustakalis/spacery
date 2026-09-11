@@ -20,6 +20,7 @@ const set = (count: number): Breakpoint[] =>
 
 const info = (over: Partial<BreakpointInfo> = {}): BreakpointInfo => ({
 	effectiveSource: 'spacery',
+	resolvedSource: 'spacery',
 	defaultSource: 'spacery',
 	resolved: set(3),
 	theme: null,
@@ -115,36 +116,74 @@ describe('sourceOptions', () => {
 });
 
 describe('fallbackNotice', () => {
-	it('says nothing when nothing has been chosen', () => {
-		expect(fallbackNotice('', info())).toBeNull();
-	});
-
 	it('says nothing when the choice is what is in effect', () => {
 		expect(
-			fallbackNotice('custom', info({ effectiveSource: 'custom' }))
+			fallbackNotice(
+				'custom',
+				info({ effectiveSource: 'custom', resolvedSource: 'custom' })
+			)
 		).toBeNull();
 	});
 
+	it('says nothing when nothing was chosen and the default answered', () => {
+		expect(fallbackNotice('', info())).toBeNull();
+	});
+
 	/**
-	 * E4. Choosing "breakpoints I define below" and adding none used to print
-	 * `From: Spacery's own set` under it and stop there — a result that
-	 * contradicts the choice directly above it, with nothing joining the two.
+	 * E4, and the reason it did not work the first time. `effectiveSource` is
+	 * the source being *followed*, so under a custom choice it reads `custom`
+	 * whether or not any breakpoints are stored — comparing against it can
+	 * never detect the fallback. `resolvedSource` is where the set on the page
+	 * actually came from, which is the question being asked.
 	 */
 	it('explains a custom source with no rows in it', () => {
-		expect(fallbackNotice('custom', info())).toBe(
+		expect(
+			fallbackNotice(
+				'custom',
+				info({ effectiveSource: 'custom', resolvedSource: 'spacery' })
+			)
+		).toBe(
 			"You chose your own breakpoints but have not defined any yet, so Spacery's own set is in use until you add one."
 		);
 	});
 
-	it('explains a theme that declares nothing', () => {
-		expect(fallbackNotice('theme', info())).toBe(
-			"You chose your theme's breakpoints but it declares none, so Spacery's own set is in use until it does."
+	it('explains a theme that declares nothing usable', () => {
+		expect(
+			fallbackNotice(
+				'theme',
+				info({ effectiveSource: 'theme', resolvedSource: 'spacery' })
+			)
+		).toBe(
+			"You chose your theme's breakpoints, but it declares none Spacery can use, so Spacery's own set is in use."
+		);
+	});
+
+	/**
+	 * "Decide for me" cannot be put back to the author as their choice. The
+	 * only way to reach this state is a theme that declares breakpoints and
+	 * then yields none Spacery can read.
+	 */
+	it('does not blame the author for a default it followed', () => {
+		expect(
+			fallbackNotice(
+				'',
+				info({
+					defaultSource: 'theme',
+					effectiveSource: 'theme',
+					resolvedSource: 'spacery',
+				})
+			)
+		).toBe(
+			"Your theme declares breakpoints Spacery could not read, so Spacery's own set is in use."
 		);
 	});
 
 	it('still names what is in use for a case nobody has thought of', () => {
 		expect(
-			fallbackNotice('spacery', info({ effectiveSource: 'theme' }))
+			fallbackNotice(
+				'spacery',
+				info({ effectiveSource: 'spacery', resolvedSource: 'theme' })
+			)
 		).toBe('The set you chose is empty, so your theme is in use.');
 	});
 });

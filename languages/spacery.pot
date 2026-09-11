@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-11T06:56:27+00:00\n"
+"POT-Creation-Date: 2026-09-11T07:10:43+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: spacery\n"
@@ -491,19 +491,25 @@ msgid "Breakpoints I define below"
 msgstr ""
 
 #. translators: %s: the breakpoint set in use instead.
-#: src/settings/sources.js:127
+#: src/settings/sources.js:136
+#, js-format
+msgid "Your theme declares breakpoints Spacery could not read, so %s is in use."
+msgstr ""
+
+#. translators: %s: the breakpoint set in use instead.
+#: src/settings/sources.js:141
 #, js-format
 msgid "You chose your own breakpoints but have not defined any yet, so %s is in use until you add one."
 msgstr ""
 
 #. translators: %s: the breakpoint set in use instead.
-#: src/settings/sources.js:132
+#: src/settings/sources.js:146
 #, js-format
-msgid "You chose your theme's breakpoints but it declares none, so %s is in use until it does."
+msgid "You chose your theme's breakpoints, but it declares none Spacery can use, so %s is in use."
 msgstr ""
 
 #. translators: %s: the breakpoint set in use instead.
-#: src/settings/sources.js:136
+#: src/settings/sources.js:150
 #, js-format
 msgid "The set you chose is empty, so %s is in use."
 msgstr ""

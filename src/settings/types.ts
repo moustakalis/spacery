@@ -44,6 +44,15 @@ export interface ValidationRules {
  */
 export interface BreakpointInfo {
 	effectiveSource: EffectiveSource;
+	/**
+	 * Where the set in `resolved` actually came from.
+	 *
+	 * Not a synonym for `effectiveSource`. A followed source can be empty —
+	 * `custom` with no rows stored, a theme that declares breakpoints Spacery
+	 * cannot read — and the server falls through to its preset. The two differ
+	 * exactly when the screen owes the author an explanation.
+	 */
+	resolvedSource: EffectiveSource;
 	defaultSource: EffectiveSource;
 	resolved: Breakpoint[];
 	theme: Breakpoint[] | null;

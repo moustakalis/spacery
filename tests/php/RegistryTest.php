@@ -209,6 +209,67 @@ final class RegistryTest extends TestCase {
 		);
 	}
 
+	// -- Attribution: which source the set actually came from --------------
+
+	/**
+	 * `source()` answers what is being followed; `resolved_source()` answers
+	 * where the set in use came from. They part company exactly when a followed
+	 * source is empty, which is the state the settings screen has to explain
+	 * rather than report as though the author's choice had taken effect.
+	 */
+	public function test_resolved_source_is_the_chosen_one_when_it_produced_the_set(): void {
+		$this->given_option( Registry::OPTION_SOURCE, Registry::SOURCE_CUSTOM );
+		$this->given_option( Registry::OPTION_CUSTOM, array( 'tiny' => '400px' ) );
+
+		$this->assertSame( Registry::SOURCE_CUSTOM, ( new Registry() )->resolved_source() );
+	}
+
+	public function test_resolved_source_is_spacery_when_the_custom_option_is_empty(): void {
+		$this->given_option( Registry::OPTION_SOURCE, Registry::SOURCE_CUSTOM );
+
+		$registry = new Registry();
+
+		$this->assertSame( Registry::SOURCE_CUSTOM, $registry->source() );
+		$this->assertSame( Registry::SOURCE_SPACERY, $registry->resolved_source() );
+	}
+
+	public function test_resolved_source_is_spacery_when_the_theme_declares_nothing_usable(): void {
+		$this->given_theme_settings(
+			array( 'viewport' => array( 'mobile' => 'calc(100vw)' ) )
+		);
+		$this->given_option( Registry::OPTION_SOURCE, Registry::SOURCE_THEME );
+
+		$registry = new Registry();
+
+		$this->assertSame( Registry::SOURCE_THEME, $registry->source() );
+		$this->assertSame( Registry::SOURCE_SPACERY, $registry->resolved_source() );
+	}
+
+	public function test_resolved_source_is_the_theme_when_the_theme_answered(): void {
+		$this->given_theme_settings(
+			array( 'viewport' => array( 'mobile' => '480px' ) )
+		);
+
+		$this->assertSame( Registry::SOURCE_THEME, ( new Registry() )->resolved_source() );
+	}
+
+	/**
+	 * Attribution is recorded before the filter, so a replaced set does not
+	 * claim an origin nobody can vouch for.
+	 */
+	public function test_resolved_source_survives_a_flush(): void {
+		$this->given_option( Registry::OPTION_SOURCE, Registry::SOURCE_CUSTOM );
+
+		$registry = new Registry();
+
+		$this->assertSame( Registry::SOURCE_SPACERY, $registry->resolved_source() );
+
+		$this->given_option( Registry::OPTION_CUSTOM, array( 'tiny' => '400px' ) );
+		$registry->flush();
+
+		$this->assertSame( Registry::SOURCE_CUSTOM, $registry->resolved_source() );
+	}
+
 	public function test_unknown_stored_source_is_treated_as_unset(): void {
 		$this->given_option( Registry::OPTION_SOURCE, 'nonsense' );
 

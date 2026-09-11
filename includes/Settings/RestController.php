@@ -84,12 +84,19 @@ final class RestController {
 				/*
 				 * Deliberately not the stored option — the screen already has
 				 * that from `/wp/v2/settings`. This is what the stored value
-				 * *means*: `effectiveSource` is what the registry actually uses,
+				 * *means*: `effectiveSource` is the source being followed,
 				 * `defaultSource` what it would fall back to. The screen needs
 				 * both to show "Theme (in use)" without implying someone chose
 				 * it when they merely never chose anything.
+				 *
+				 * `resolvedSource` is a third question and not a synonym for
+				 * the first: a followed source can be empty, and the set on the
+				 * page is then the preset. Reporting the followed source as the
+				 * origin of the set is how the screen came to print "From: the
+				 * breakpoints you defined" above Spacery's own tiers.
 				 */
 				'effectiveSource' => $this->registry->source(),
+				'resolvedSource'  => $this->registry->resolved_source(),
 				'defaultSource'   => $this->registry->default_source(),
 				'resolved'        => $this->registry->resolve()->to_array(),
 				'theme'           => $theme instanceof BreakpointSet ? $theme->to_array() : null,

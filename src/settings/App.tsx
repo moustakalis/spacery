@@ -289,7 +289,7 @@ export function App(): React.ReactElement {
 								problems={problems.rows}
 								cautions={cautions(rows, rules)}
 								max={info.maxBreakpoints}
-								fallback={sourceName(info.effectiveSource)}
+								fallback={sourceName(info.resolvedSource)}
 								onChange={(next: Row[]) => setRows(next)}
 							/>
 						</CardBody>
@@ -397,7 +397,7 @@ function ResolvedSet({
 					{sprintf(
 						/* translators: %s: where the breakpoints come from. */
 						__('From: %s', 'spacery'),
-						sourceName(info.effectiveSource)
+						sourceName(info.resolvedSource)
 					)}
 				</Text>
 			</FlexItem>
