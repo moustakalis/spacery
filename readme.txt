@@ -33,11 +33,12 @@ Spacery fills both gaps.
 Spacery uses one set of breakpoints at a time, and you pick which:
 
 * **Your theme.** Its `settings.custom.spacery.breakpoints`, or the `settings.viewport`
-  values WordPress 7.1 already uses. This is the default whenever your theme defines
-  either, so Spacery and WordPress agree out of the box.
+  values WordPress 7.1 understands. This is the default whenever your theme declares
+  either, so Spacery follows the breakpoints your theme already uses.
 * **Spacery's own.** Four tiers — Desktop, Laptop, Tablet and Mobile — over the default
   that applies everywhere. Tablet and Mobile use WordPress's own values, so choosing this
-  adds tiers without moving the ones you already had.
+  adds tiers without moving the ones you already had. This is what you get on a site whose
+  theme declares no breakpoints, which is most of them.
 * **Your own.** Any set you like, up to twelve tiers, defined on the Spacery screen in the admin menu.
 
 The sets are never blended: values from two different intentions sitting side by side

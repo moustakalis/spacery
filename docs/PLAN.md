@@ -209,11 +209,21 @@ its naming from Tailwind; v2 takes neither. Themes remain free to name their tie
 anything they like through `settings.custom.spacery.breakpoints`.
 
 **Default when the option is unset:** `theme` if the theme declares either
-`settings.custom.spacery.breakpoints` or `settings.viewport`; `spacery` otherwise. Out of
-the box a site therefore agrees with core, which is the safe default given the cascade
-collision in §3.3a — and switching to Spacery's richer set becomes a deliberate act with a
-visible trade-off, rather than something that silently happens because a theme author set
-a core setting for core's benefit.
+`settings.custom.spacery.breakpoints` or `settings.viewport`; `spacery` otherwise. A theme
+that has an opinion is followed, which is the safe default given the cascade collision in
+§3.3a — and switching to Spacery's richer set becomes a deliberate act with a visible
+trade-off, rather than something that silently happens because a theme author set a core
+setting for core's benefit.
+
+**Corrected in the manual pass:** this section used to say "out of the box a site
+therefore agrees with core", which assumed core publishes `settings.viewport`. It does
+not. The key is a *valid* setting in 7.1 — `WP_Theme_JSON::VALID_SETTINGS` carries `mobile`
+and `tablet` — but it is absent from `wp-includes/theme.json`, `get_core_data()`,
+`get_merged_data()` and `wp_get_global_settings()`, probed on a 7.1 install with Twenty
+Twenty-Five. So on an ordinary site *nothing* declares a viewport, the default source is
+`spacery`, and the agreement with core comes from `Registry::CORE_DEFAULT_VIEWPORT` — two
+numbers written down rather than read, which is also what every takeover offer is measured
+against.
 
 **Reading the `theme` set from `settings.viewport`.** There is no derivation. Core's
 values are already `max-width` boundaries in Spacery's own model, so they are read

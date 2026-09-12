@@ -89,9 +89,17 @@ A theme can hand Spacery a set directly:
 }
 ```
 
-Without that, Spacery reads WordPress's own `settings.viewport` (`mobile` and
-`tablet`). Either one makes the theme the default source, so a site agrees with
-core out of the box and adopting Spacery's wider tiers stays a deliberate act.
+Without that, Spacery reads `settings.viewport` (`mobile` and `tablet`), which
+is a valid theme.json setting a theme may declare. Either one makes the theme
+the default source, so adopting Spacery's wider tiers stays a deliberate act.
+
+**Note that core declares neither.** `settings.viewport` is absent from
+`wp-includes/theme.json` in WordPress 7.1, so on a site whose theme declares
+nothing — Twenty Twenty-Five included — there is no theme set to follow and the
+default source is Spacery's own preset. Its `tablet` and `mobile` are core's
+editor preview widths, so the boundaries still line up; they are written down in
+`Registry::CORE_DEFAULT_VIEWPORT` rather than read, because nothing publishes
+them in a form a plugin can read.
 
 ## Options
 

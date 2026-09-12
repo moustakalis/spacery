@@ -119,14 +119,45 @@ though this pass does not.
       declares none either, so the theme source has nothing to find and
       `defaultSource` is `spacery`. To see the theme source carry a set, one has
       to be declared — which is the child-theme step below.
-- [ ] Switch to `spacery`. The bands widen to Desktop / Laptop / Tablet / Mobile
-      and the front end changes with them.
-- [ ] Define a custom set. Try: two rows with the same width; a row with no
+- [x] Switch to `spacery`. The bands widen to Desktop / Laptop / Tablet / Mobile
+      — 0–480, 480–782, 782–1024, 1024–1280, and the hatched uncovered region
+      above 1280px with its callout. `From:` and the ruler both update on save
+      without a reload. (The *front end* half of this needs a block carrying
+      Spacery values; §4.)
+- [x] Define a custom set. Try: two rows with the same width; a row with no
       width; a single row; ten rows. The invalid ones must be refused **whole**,
-      with the previous set still in force — not partially applied.
-- [ ] Add `settings.custom.spacery.breakpoints` to a child theme's `theme.json`
+      with the previous set still in force — not partially applied. All refused
+      on the screen, before anything is sent:
+
+      - **Two rows at one width.** The later row tints red, its field and message
+        turn `#d63638`/`#b32d2e`, `Covers` reads "Nothing — no screens left",
+        Save is disabled and the bar says "Fix 1 problem above to save."
+      - **A row with no width.** `--incomplete` in amber, "Needs a number and a
+        unit — px, em or rem.", and `Covers` stays empty — the message on the
+        field is already saying it.
+      - **An empty set.** Not an error: the empty state explains that Spacery's
+        own set is in use until a breakpoint is added, and the notice under *In
+        use now* says the same thing in the other direction.
+      - **Twelve rows.** Valid, saved, and the ruler draws all twelve with every
+        label and every axis tick — `labelsFit` is all-or-nothing and said yes,
+        because the names are short. A thirteenth **cannot be reached from the
+        screen**: `Add breakpoint` disables at the maximum, with "12 breakpoints
+        is the maximum. Beyond that the editor asks more of an author than it
+        gives back." on the line beside it. The set-level error from
+        `validate()` is therefore unreachable here, like the server-refusal path
+        in `settings.spec.ts` — the server is still the thing that enforces it.
+
+      Also confirmed here: the **hybrid slug**. Before a save the slug field is
+      empty with the derived slug as its placeholder (`tier-12`); after the save
+      it holds that slug as a real value. A placeholder over a stored slug would
+      have been a lie about what is in the block attributes.
+- [x] Add `settings.custom.spacery.breakpoints` to a child theme's `theme.json`
       (see `FILTERS.md`) and confirm it becomes the default source without
-      touching the options.
+      touching the options. A three-line child of Twenty Twenty-Five declaring
+      `wall: 1800px`, `desk: 1200px`, `pocket: 520px` was enough: with the
+      source option unset the screen read "Decide for me — currently your
+      theme", the theme radio listed all three with their widths, and `From:`
+      said "your theme". Labels are title-cased from the slugs.
 - [x] Add a `spacery_breakpoints` filter in a mu-plugin. It must win over every
       source *and* the screen must say so, rather than showing the option's value
       as though it were in effect. **It did not, and this is what the checkbox
