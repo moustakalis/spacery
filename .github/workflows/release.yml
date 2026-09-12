@@ -39,6 +39,15 @@ jobs:
             exit 1
           fi
 
+          # And a release has a date. The changelog entry is written long before
+          # the tag -- the review queue alone is three weeks -- so the date in it
+          # is a guess until the day it ships, and `Unreleased` is the honest
+          # placeholder. This is what stops that placeholder reaching a release.
+          if ! grep -qE "^## \[${tag//./\\.}\] - [0-9]{4}-[0-9]{2}-[0-9]{2}$" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no dated entry for $tag. Set the date in the heading, commit, then re-tag."
+            exit 1
+          fi
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 

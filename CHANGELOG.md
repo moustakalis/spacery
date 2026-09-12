@@ -5,7 +5,11 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2026-09-03
+A version is dated on the day it is tagged, not the day it was written. Nothing here has
+shipped yet: 1.0.0 is waiting on a WordPress.org review that begins when the zip is
+submitted, and `release.yml` refuses a tag whose entry is still undated.
+
+## [1.0.0] - Unreleased
 
 ### Added
 
@@ -33,6 +37,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A settings screen on its own top-level admin menu for choosing where breakpoints come from, and
   for defining your own. Both options are registered with WordPress, so the REST API and
   WP-CLI get the same validation.
+- The screen checks a set against the server's own rules as you type rather than after
+  saving, says which set is in use and why when that is not the one you chose, draws it to
+  scale, and warns before a navigation that would discard unsaved rows.
 - Translations: a POT generated from source, a Greek translation, and script translations
   for every bundle. `bin/make-pot.sh` and `bin/make-translations.sh` regenerate them.
 - Developer documentation for the filter API in `docs/FILTERS.md`.
