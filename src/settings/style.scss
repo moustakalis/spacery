@@ -80,13 +80,31 @@ $caution-text: #8a6616;
 
 /*
  * A field in trouble. `TextControl` renders the input itself and `UnitControl`
- * draws its border on a sibling backdrop, so both are named.
+ * draws its border on a sibling backdrop, so both are named -- but they are not
+ * reached the same way, and the difference was found in wp-admin rather than
+ * reasoned about, because `@wordpress/components` is a script external and its
+ * stylesheet is not in `node_modules` to read.
+ *
+ * `.components-text-control__input` comes from the components' own Sass and a
+ * descendant selector beats it. The backdrop does not: `InputControl` is an
+ * emotion component, and emotion emits its class **three times over**
+ * (`.css-HASH.css-HASH.css-HASH`, one generated hash) precisely so that theme
+ * and plugin CSS cannot move it. That is specificity 0,3,0 against this rule's
+ * 0,2,0, so without `!important` the backdrop keeps its resting grey and a
+ * conflicting width never turns red. Measured: `getComputedStyle(backdrop).borderColor`
+ * reported `#8d8d8d` while the help text beside it was already `#b32d2e`.
+ *
+ * The focus ring is left to win over both. A field the author is typing in
+ * should look focused; the message underneath is still there.
  */
 .spacery-field {
 	&--conflict {
-		.components-text-control__input,
-		.components-input-control__backdrop {
+		.components-text-control__input {
 			border-color: $error-border;
+		}
+
+		.components-input-control__backdrop {
+			border-color: $error-border !important;
 		}
 
 		.components-base-control__help {
@@ -96,9 +114,12 @@ $caution-text: #8a6616;
 
 	&--incomplete,
 	&--caution {
-		.components-text-control__input,
-		.components-input-control__backdrop {
+		.components-text-control__input {
 			border-color: $caution-border;
+		}
+
+		.components-input-control__backdrop {
+			border-color: $caution-border !important;
 		}
 
 		.components-base-control__help {

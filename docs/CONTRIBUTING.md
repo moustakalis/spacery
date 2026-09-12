@@ -37,12 +37,30 @@ node node_modules/.pnpm/eslint@*/node_modules/eslint/bin/eslint.js \
 
 Every rule then runs except the ones that need the resolver, which report one
 error per file. **Filter that noise by its message, never by its rule name.**
-The resolve error is reported *as* `import/no-duplicates`, so dropping lines by
+The resolve error is reported _as_ `import/no-duplicates`, so dropping lines by
 rule hides real violations of the same rule — which is exactly how a duplicate
 import reached CI:
 
 ```bash
 … | grep -v 'Resolve error'
+```
+
+That filter is not quite enough on its own: the resolver reports a **multi-line
+stack**, so a line-based grep leaves most of it behind and the trailing count
+(`✖ 61 problems`) still includes every one of them. Use the JSON formatter and
+drop whole messages instead — then the count is the truth:
+
+```bash
+node node_modules/.pnpm/eslint@*/node_modules/eslint/bin/eslint.js -f json \
+  "src/**/*.ts" "src/**/*.tsx" "tests/**/*.ts" > /tmp/eslint.json
+python3 -c "
+import json
+for f in json.load(open('/tmp/eslint.json')):
+    for m in f['messages']:
+        if 'resolver' in m['message'] or 'Resolve error' in m['message']:
+            continue
+        print(f['filePath'], m['line'], m['ruleId'], m['message'])
+"
 ```
 
 ## The E2E suite can run somewhere other than `wp-env`
@@ -62,7 +80,7 @@ leaves draft posts behind, overwrites Spacery's two options, and
 the wrong place leaves deactivated. It deletes no content, but do not point it
 at a site you would mind explaining.
 
-## The POT goes stale when code *moves*, not when strings change
+## The POT goes stale when code _moves_, not when strings change
 
 This is the single most frequent CI failure in this repository, and the rule
 most people assume is narrower than it is.
@@ -71,7 +89,7 @@ most people assume is narrower than it is.
 `#: includes/Settings/Screen.php:101`. CI regenerates the POT and diffs it
 against the committed one byte for byte, ignoring only `POT-Creation-Date`. So
 inserting a comment above a `__()` call, extracting a helper, or adding a
-docblock in a file that contains *any* translatable string is enough to fail the
+docblock in a file that contains _any_ translatable string is enough to fail the
 build, with no string added, removed or altered.
 
 **Regenerate whenever `includes/`, `spacery.php` or anything under `src/`
@@ -86,8 +104,8 @@ per-handle `.json`, so it only matters when a translation changed.
 `git add languages` swept in a stray `spacery-el-spacery-spacer-editor-script
 2.json` that had been sitting there untracked since an earlier session — the
 shape macOS gives a duplicate file. Plugin Check then failed the entire
-distributable with *"File and folder names must not contain spaces or special
-characters"*, which names the rule and not the file, on a build whose diff
+distributable with _"File and folder names must not contain spaces or special
+characters"_, which names the rule and not the file, on a build whose diff
 showed nothing wrong.
 
 `git add <dir>` stages whatever happens to be in that directory, including
@@ -140,10 +158,32 @@ the answer is to use plain markup rather than to guess a declaration: the
 settings footer's two links are ordinary `<a>` elements for exactly that reason,
 where `ExternalLink` would have meant declaring a component nobody could verify.
 
+## Overriding a `@wordpress/components` control's border needs `!important`
+
+Not as a shortcut -- as the only thing that reaches it. Two controls, two
+different answers, and the difference is invisible from the source:
+
+| Control                            | The element with the border           | Beaten by                     |
+| ---------------------------------- | ------------------------------------- | ----------------------------- |
+| `TextControl`                      | `.components-text-control__input`     | a descendant selector (0,2,0) |
+| `UnitControl` / any `InputControl` | `.components-input-control__backdrop` | nothing below 0,3,0           |
+
+`InputControl` is an emotion component, and emotion emits its class **three
+times over** (`.css-HASH.css-HASH.css-HASH`) so that theme and plugin CSS cannot
+move it. `src/settings/style.scss` needs `border-color: … !important` on the
+backdrop for that reason, and says so.
+
+**This class of bug cannot be found by any test in this repo.** A colour that
+only CSS produces is not in the DOM, not in `tsc`, and not in an E2E assertion
+about text -- the E2E suite was asserting the right words beside a field that
+was still grey. Load `wp-admin`, provoke the state, and read
+`getComputedStyle(el).borderColor`. The same check found an earlier commit whose
+message described nine edits that an aborted script never wrote.
+
 ## A failing E2E test may be defending a bug
 
 `settings.spec.ts` asserted that a refused save reported "nothing changed" — in
-a scenario where the source *had* changed and been stored. That was S4, written
+a scenario where the source _had_ changed and been stored. That was S4, written
 down as an expectation. Fixing the behaviour broke the test, and the right
 response was to correct the assertion, not the code.
 

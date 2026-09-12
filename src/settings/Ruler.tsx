@@ -6,9 +6,11 @@
  * tiers crowd the narrow end and leave everything above the widest one to the
  * default, or that one of them is an order of magnitude wider than the rest.
  *
- * So the bar is `aria-hidden` and the caption carries anything it says that the
- * column does not. A picture that has to be described in full to be usable is
- * not earning its space.
+ * So the bar is one `role="img"` with an `aria-label` built by `described()`,
+ * which says in a sentence what the drawing says in proportions; the axis
+ * beneath it is `aria-hidden`, because a tick is a mark on that picture and not
+ * a fact of its own. A picture that has to be described in full to be usable is
+ * not earning its space -- but it still owes a screen reader the sentence.
  *
  * Built to `docs/design/admin-screen.png`, which is the drawing §5.1 of the
  * design system is the companion to. The first version of this component was
