@@ -15,6 +15,15 @@ export type StoredSource = '' | 'theme' | 'spacery' | 'custom';
 /** A resolved source. Never empty — the registry always lands on one. */
 export type EffectiveSource = Exclude<StoredSource, ''>;
 
+/**
+ * Where the set on the page came from.
+ *
+ * A superset of `EffectiveSource`, because `spacery_breakpoints` can replace
+ * the set and a filter is not a source anybody can choose or store. Kept as its
+ * own type so that nothing can assign one of these to a radio button.
+ */
+export type ResolvedSource = EffectiveSource | 'filter';
+
 /** The two options, exactly as `/wp/v2/settings` returns them. */
 export interface StoredSettings {
 	spacery_breakpoint_source: StoredSource;
@@ -52,7 +61,7 @@ export interface BreakpointInfo {
 	 * cannot read — and the server falls through to its preset. The two differ
 	 * exactly when the screen owes the author an explanation.
 	 */
-	resolvedSource: EffectiveSource;
+	resolvedSource: ResolvedSource;
 	defaultSource: EffectiveSource;
 	resolved: Breakpoint[];
 	theme: Breakpoint[] | null;

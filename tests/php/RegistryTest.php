@@ -253,10 +253,6 @@ final class RegistryTest extends TestCase {
 		$this->assertSame( Registry::SOURCE_THEME, ( new Registry() )->resolved_source() );
 	}
 
-	/**
-	 * Attribution is recorded before the filter, so a replaced set does not
-	 * claim an origin nobody can vouch for.
-	 */
 	public function test_resolved_source_survives_a_flush(): void {
 		$this->given_option( Registry::OPTION_SOURCE, Registry::SOURCE_CUSTOM );
 
@@ -305,6 +301,59 @@ final class RegistryTest extends TestCase {
 		( new Registry() )->resolve();
 
 		$this->assertSame( Registry::SOURCE_SPACERY, $seen );
+	}
+
+	/**
+	 * Found in the manual pass, not by a test. A `spacery_breakpoints` filter
+	 * in a mu-plugin replaced the set, the screen drew the filter's bands, and
+	 * above them it still said "From: the breakpoints you defined" -- the
+	 * author's own rows credited with a set they had never seen. Attribution
+	 * used to stop before the filter on the grounds that no honest answer
+	 * existed for a set somebody else supplied; "a filter on this site" is one.
+	 */
+	public function test_resolved_source_is_the_filter_when_the_filter_replaced_the_set(): void {
+		$this->given_option( Registry::OPTION_SOURCE, Registry::SOURCE_CUSTOM );
+		$this->given_option( Registry::OPTION_CUSTOM, array( 'tiny' => '400px' ) );
+
+		add_filter(
+			'spacery_breakpoints',
+			static fn() => BreakpointSet::from_array( array( 'only' => '900px' ) )
+		);
+
+		$registry = new Registry();
+
+		$this->assertSame( array( 'only' ), $registry->resolve()->slugs() );
+		$this->assertSame( Registry::SOURCE_FILTER, $registry->resolved_source() );
+	}
+
+	/**
+	 * The other half, and the reason identity is the wrong test: almost every
+	 * real filter looks at `$source` and hands `$set` straight back. Crediting
+	 * it for a set it did not change would trade one wrong answer for another.
+	 */
+	public function test_a_filter_that_changes_nothing_is_not_the_source(): void {
+		$this->given_option( Registry::OPTION_SOURCE, Registry::SOURCE_CUSTOM );
+		$this->given_option( Registry::OPTION_CUSTOM, array( 'tiny' => '400px' ) );
+
+		add_filter( 'spacery_breakpoints', static fn( $set ) => $set );
+
+		$this->assertSame( Registry::SOURCE_CUSTOM, ( new Registry() )->resolved_source() );
+	}
+
+	/**
+	 * And a filter that rebuilds an equal set is indistinguishable from one
+	 * that returned it untouched, which is why the comparison is by value.
+	 */
+	public function test_a_filter_returning_an_equal_set_is_not_the_source(): void {
+		$this->given_option( Registry::OPTION_SOURCE, Registry::SOURCE_CUSTOM );
+		$this->given_option( Registry::OPTION_CUSTOM, array( 'tiny' => '400px' ) );
+
+		add_filter(
+			'spacery_breakpoints',
+			static fn() => BreakpointSet::from_array( array( 'tiny' => '400px' ) )
+		);
+
+		$this->assertSame( Registry::SOURCE_CUSTOM, ( new Registry() )->resolved_source() );
 	}
 
 	public function test_filter_returning_garbage_is_ignored(): void {

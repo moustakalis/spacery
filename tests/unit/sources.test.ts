@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	fallbackNotice,
 	listTiers,
+	sourceName,
 	sourceOptions,
 } from '../../src/settings/sources';
 import type { Breakpoint, BreakpointInfo } from '../../src/settings/types';
@@ -185,5 +186,55 @@ describe('fallbackNotice', () => {
 				info({ effectiveSource: 'spacery', resolvedSource: 'theme' })
 			)
 		).toBe('The set you chose is empty, so your theme is in use.');
+	});
+
+	/**
+	 * Found by running the manual pass with a `spacery_breakpoints` filter in a
+	 * mu-plugin. The filter's bands were drawn under "From: the breakpoints you
+	 * defined" — the same lie E4 was about, reached the other way round. Every
+	 * sentence above would be wrong here: nothing the author chose was empty,
+	 * and nothing fell through.
+	 */
+	it('names a filter as an override, not as a fallback', () => {
+		expect(
+			fallbackNotice(
+				'custom',
+				info({ effectiveSource: 'custom', resolvedSource: 'filter' })
+			)
+		).toBe(
+			'A spacery_breakpoints filter on this site replaces the set, so the breakpoints above are stored but not in use.'
+		);
+	});
+
+	/** And from "decide for me", where there is no choice to describe either. */
+	it('names a filter even when nothing was chosen', () => {
+		expect(
+			fallbackNotice(
+				'',
+				info({ effectiveSource: 'spacery', resolvedSource: 'filter' })
+			)
+		).toBe(
+			'A spacery_breakpoints filter on this site replaces the set, so the breakpoints above are stored but not in use.'
+		);
+	});
+});
+
+describe('sourceName', () => {
+	it('names every source it can be handed', () => {
+		expect(sourceName('theme')).toBe('your theme');
+		expect(sourceName('custom')).toBe('the breakpoints you defined');
+		expect(sourceName('spacery')).toBe("Spacery's own set");
+		expect(sourceName('filter')).toBe('a filter on this site');
+	});
+
+	/**
+	 * The reason the `never` assignment is there. With a `default:` clause a
+	 * new source rendered as whatever the default returned — so `filter` would
+	 * have read "Spacery's own set", which is a wrong answer rather than an
+	 * obviously missing one.
+	 */
+	it('does not fall back to another source for an unknown one', () => {
+		// @ts-expect-error -- not a ResolvedSource; that is the point.
+		expect(sourceName('something-else')).not.toBe("Spacery's own set");
 	});
 });

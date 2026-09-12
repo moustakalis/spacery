@@ -107,8 +107,18 @@ though this pass does not.
 
 **Spacery** in the admin menu, below Appearance.
 
-- [ ] With **Twenty Twenty-Five** active, "Decide for me" reports the theme, and
-      the bands shown match core's `settings.viewport`.
+- [x] With **Twenty Twenty-Five** active, "Decide for me" reports **Spacery's
+      own set**, and the theme radio reads "it declares no breakpoints". That is
+      correct, and the checkbox this replaced ("the bands shown match core's
+      `settings.viewport`") described something that cannot happen: `viewport`
+      is a valid theme.json setting in 7.1 —
+      `WP_Theme_JSON::VALID_SETTINGS['viewport']` is `mobile` and `tablet` —
+      but **core declares none**. It is absent from `wp-includes/theme.json`,
+      from `get_core_data()`, from `get_merged_data()` and therefore from
+      `wp_get_global_settings()`; probed on this install. Twenty Twenty-Five
+      declares none either, so the theme source has nothing to find and
+      `defaultSource` is `spacery`. To see the theme source carry a set, one has
+      to be declared — which is the child-theme step below.
 - [ ] Switch to `spacery`. The bands widen to Desktop / Laptop / Tablet / Mobile
       and the front end changes with them.
 - [ ] Define a custom set. Try: two rows with the same width; a row with no
@@ -117,21 +127,35 @@ though this pass does not.
 - [ ] Add `settings.custom.spacery.breakpoints` to a child theme's `theme.json`
       (see `FILTERS.md`) and confirm it becomes the default source without
       touching the options.
-- [ ] Add a `spacery_breakpoints` filter in a mu-plugin. It must win over every
+- [x] Add a `spacery_breakpoints` filter in a mu-plugin. It must win over every
       source *and* the screen must say so, rather than showing the option's value
-      as though it were in effect.
-- [ ] Check the REST route agrees with the screen. Visiting
+      as though it were in effect. **It did not, and this is what the checkbox
+      was for.** The filter won and the ruler drew its bands — and above them
+      the screen still said "From: the breakpoints you defined", crediting the
+      author's own stored rows with a set they had never seen. Attribution
+      stopped before the filter by design, on the argument that no honest answer
+      existed for a set somebody else supplied.
+
+      Fixed: `Registry::SOURCE_FILTER`, recorded after the filter and only when
+      it actually changed the set (by value, since most filters hand `$set`
+      straight back). The screen now reads "From: a filter on this site" over a
+      notice saying the rows above are stored but not in use. Covered by three
+      PHPUnit cases and two unit tests.
+- [x] Check the REST route agrees with the screen. Visiting
       `/wp-json/spacery/v1/breakpoints` in the browser returns 401 — the route
       requires `manage_options`, and a plain page load carries no REST nonce — so
-      ask from inside the editor instead. Open any post in the block editor and
-      run this in the browser console:
+      ask from a screen that has one. **The settings screen itself is the
+      cheapest place**: it already depends on `wp-api-fetch`, so its console
+      needs no editor and no post. Run:
 
       ```js
       wp.apiFetch( { path: '/spacery/v1/breakpoints' } ).then( console.log );
       ```
 
-      `effectiveSource`, `resolved` and `maxBreakpoints` should match what the
-      settings screen is showing.
+      `effectiveSource`, `resolvedSource`, `defaultSource`, `resolved` and
+      `maxBreakpoints` should match what the screen is showing. They did:
+      `custom` / `custom` / `spacery`, the four authored tiers, and `12` against
+      the screen's "4 of 12".
 
 ## 2. Editor, responsive editing on (D12)
 

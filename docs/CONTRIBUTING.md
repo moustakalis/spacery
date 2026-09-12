@@ -158,6 +158,18 @@ the answer is to use plain markup rather than to guess a declaration: the
 settings footer's two links are ordinary `<a>` elements for exactly that reason,
 where `ExternalLink` would have meant declaring a component nobody could verify.
 
+## `lint:css` is not a gate, and never was
+
+The script exists (`pnpm run lint:css` → `wp-scripts lint-style`) but **no
+workflow runs it**, and `src/settings/style.scss` fails it the moment it is run:
+the wp-scripts default config wants a blank line before every nested rule,
+including the first one inside a block, which is not how anything else in this
+repo is written. Four of the five complaints predate the file's own error
+states. Don't reformat the stylesheet to satisfy a linter nothing enforces —
+but do keep comments wrapped at 80 and read the output for anything real.
+`declaration-no-important` is not in that config, which is worth knowing given
+the section below.
+
 ## Overriding a `@wordpress/components` control's border needs `!important`
 
 Not as a shortcut -- as the only thing that reaches it. Two controls, two

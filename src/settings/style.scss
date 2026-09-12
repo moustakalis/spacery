@@ -91,8 +91,8 @@ $caution-text: #8a6616;
  * (`.css-HASH.css-HASH.css-HASH`, one generated hash) precisely so that theme
  * and plugin CSS cannot move it. That is specificity 0,3,0 against this rule's
  * 0,2,0, so without `!important` the backdrop keeps its resting grey and a
- * conflicting width never turns red. Measured: `getComputedStyle(backdrop).borderColor`
- * reported `#8d8d8d` while the help text beside it was already `#b32d2e`.
+ * conflicting width never turns red. Measured: the backdrop's computed
+ * `borderColor` was `#8d8d8d` while the help text beside it was `#b32d2e`.
  *
  * The focus ring is left to win over both. A field the author is typing in
  * should look focused; the message underneath is still there.

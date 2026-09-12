@@ -11,7 +11,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import type {
 	Breakpoint,
 	BreakpointInfo,
-	EffectiveSource,
+	ResolvedSource,
 	StoredSource,
 } from './types';
 
@@ -73,21 +73,32 @@ export function listTiers(
  * A readable name for a source.
  *
  * The stored value is a slug, and a settings screen that prints `spacery` at
- * someone is showing them the database rather than an answer. Exhaustive over
- * `EffectiveSource` on purpose: adding a fourth source should fail the
- * typecheck here rather than quietly render its slug.
+ * someone is showing them the database rather than an answer.
  *
- * @param source The source in effect.
+ * **Exhaustive for real, now.** The docblock here used to claim that adding a
+ * source would fail the typecheck, while the body ended in `default:` — so
+ * when `filter` arrived it would have rendered as "Spacery's own set", which is
+ * worse than rendering the slug. The `never` assignment below is what the
+ * comment was describing.
+ *
+ * @param source Where the set came from.
  * @return A human-readable name.
  */
-export function sourceName(source: EffectiveSource): string {
+export function sourceName(source: ResolvedSource): string {
 	switch (source) {
 		case 'theme':
 			return __('your theme', 'spacery');
 		case 'custom':
 			return __('the breakpoints you defined', 'spacery');
-		default:
+		case 'spacery':
 			return __("Spacery's own set", 'spacery');
+		case 'filter':
+			return __('a filter on this site', 'spacery');
+		default: {
+			const unreachable: never = source;
+
+			return unreachable;
+		}
 	}
 }
 
@@ -147,6 +158,13 @@ export function sourceOptions(
  * Compared against `resolvedSource`, never `effectiveSource`: the second is the
  * source being followed, which is the very thing that can be empty.
  *
+ * Two reasons the two can differ, and they need different sentences. A source
+ * that produced nothing is a *fallback*, and the author is told what they asked
+ * for and what they got instead. A `spacery_breakpoints` filter is an
+ * *override*: every source worked, and then code on the site replaced the
+ * result. Saying "the set you chose is empty" about that would be false in both
+ * halves.
+ *
  * @param source The stored choice, or the empty string for "decide for me".
  * @param info   What each source contains.
  * @return A sentence, or null when what was asked for is what is in effect.
@@ -160,6 +178,20 @@ export function fallbackNotice(
 
 	if (asked === info.resolvedSource) {
 		return null;
+	}
+
+	/*
+	 * A filter is not a fallback, and the sentences below would all be wrong
+	 * about it: nothing the author chose was empty, and nothing fell through.
+	 * Code on the site replaced the set after every source had had its say, so
+	 * the rows above are stored and simply not what is running -- which is the
+	 * one thing the author cannot work out from this screen on their own.
+	 */
+	if ('filter' === info.resolvedSource) {
+		return __(
+			'A spacery_breakpoints filter on this site replaces the set, so the breakpoints above are stored but not in use.',
+			'spacery'
+		);
 	}
 
 	const inUse = sourceName(info.resolvedSource);

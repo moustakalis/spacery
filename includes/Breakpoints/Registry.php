@@ -27,6 +27,17 @@ final class Registry {
 	public const SOURCE_SPACERY = 'spacery';
 	public const SOURCE_CUSTOM  = 'custom';
 
+	/**
+	 * A set that `spacery_breakpoints` replaced.
+	 *
+	 * Only ever an *answer*: it cannot be stored and nobody can choose it, so
+	 * it appears in `resolved_source()` and nowhere else. Without it the screen
+	 * draws a filter's bands under "From: the breakpoints you defined", which
+	 * is the same lie E4 was about -- the author reads their own rows as being
+	 * in force while code on the site has replaced them.
+	 */
+	public const SOURCE_FILTER = 'filter';
+
 	public const OPTION_SOURCE = 'spacery_breakpoint_source';
 	public const OPTION_CUSTOM = 'spacery_custom_breakpoints';
 
@@ -34,8 +45,9 @@ final class Registry {
 	 * Spacery's own tiers.
 	 *
 	 * Anchored on WordPress rather than on a CSS framework: `tablet` and
-	 * `mobile` are core's own values from `settings.viewport`, so moving a site
-	 * from the theme source to this one adds tiers without shifting the
+	 * `mobile` are core's own viewport widths (see `CORE_DEFAULT_VIEWPORT`,
+	 * which explains why they are written down rather than read), so moving a
+	 * site from the theme source to this one adds tiers without shifting the
 	 * boundaries it already had. Names describe devices rather than borrowing
 	 * ascending abbreviations such as Tailwind's `lg`, which mean the opposite
 	 * of what they would here.
@@ -50,12 +62,23 @@ final class Registry {
 	);
 
 	/**
-	 * Core's own `settings.viewport` defaults, for when theme.json yields none.
+	 * Core's own viewport widths, for when theme.json yields none.
 	 *
-	 * WordPress 7.1 ships these in its own theme.json, so `theme_viewport()`
-	 * normally finds them and this is never reached. It exists because the
-	 * takeover flow needs to say "core's tablet is 782px" with certainty, and
-	 * an absent answer there would silently turn every takeover offer off.
+	 * **This is the normal path, not the fallback.** `viewport` is a valid
+	 * theme.json setting in 7.1 -- `WP_Theme_JSON::VALID_SETTINGS` carries
+	 * `array( 'mobile' => null, 'tablet' => null )` -- but core does not
+	 * *declare* one: `settings.viewport` is absent from `wp-includes/theme.json`,
+	 * from `get_core_data()`, from `get_merged_data()` and therefore from
+	 * `wp_get_global_settings()`. Checked on a 7.1 install with Twenty
+	 * Twenty-Five, which declares none either. So `theme_viewport()` returns
+	 * nothing on an ordinary site and every takeover offer is measured against
+	 * these two numbers.
+	 *
+	 * They are core's editor preview widths, and nothing publishes them in a
+	 * form this plugin can read. Should a future release start shipping
+	 * `settings.viewport`, `theme_viewport()` picks it up and this constant goes
+	 * back to being what it was written as. Until then it is load-bearing: an
+	 * absent answer here would silently turn every takeover offer off.
 	 *
 	 * @var array<string, string>
 	 */
@@ -213,6 +236,17 @@ final class Registry {
 
 		$this->resolved = $filtered instanceof BreakpointSet ? $filtered : $set;
 
+		/*
+		 * Compared by value, not by identity. Most filters look at `$source`
+		 * and return `$set` untouched, and a filter that changed nothing did
+		 * not produce the set -- attributing it to the filter would trade one
+		 * wrong answer for another. A filter that returns an equal set built
+		 * from scratch is indistinguishable from that, and rightly so.
+		 */
+		if ( $this->resolved->to_array() !== $set->to_array() ) {
+			$this->resolved_from = self::SOURCE_FILTER;
+		}
+
 		return $this->resolved;
 	}
 
@@ -235,9 +269,20 @@ final class Registry {
 	/**
 	 * Which source the set in use actually came from.
 	 *
-	 * Attribution is recorded before the `spacery_breakpoints` filter runs: a
-	 * filter can replace the set entirely, and no honest answer exists for
-	 * where a set somebody else supplied came from.
+	 * One of `SOURCE_THEME`, `SOURCE_SPACERY`, `SOURCE_CUSTOM` or
+	 * `SOURCE_FILTER` -- never the empty string, and not a synonym for
+	 * `source()`, which answers what is being *followed*.
+	 *
+	 * Recorded in two places, because there are two ways for the answer to
+	 * differ from the question. Before the preset fallback, since a source that
+	 * yielded nothing did not produce what is on the page. And again after
+	 * `spacery_breakpoints`, when the filter actually changed the set: this
+	 * used to be left alone on the grounds that no honest answer existed for a
+	 * set somebody else supplied, which was wrong twice over -- "a filter on
+	 * this site" is an honest answer, and the alternative was reporting the
+	 * author's own rows as the origin of bands they had never seen.
+	 *
+	 * @return string The attribution.
 	 */
 	public function resolved_source(): string {
 		$this->resolve();
