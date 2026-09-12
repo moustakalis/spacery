@@ -365,7 +365,10 @@ export function coverage(
 
 	for (const row of rows) {
 		found[row.id] = nothing.has(row.id)
-			? { text: __('Nothing', 'spacery'), covers: false }
+			? {
+					text: __('Nothing — no screens left', 'spacery'),
+					covers: false,
+				}
 			: { text: '', covers: true };
 	}
 

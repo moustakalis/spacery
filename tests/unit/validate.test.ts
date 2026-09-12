@@ -47,7 +47,8 @@ describe('validate', () => {
 
 		expect(problemFor(rows, 0)).toStrictEqual({
 			field: 'label',
-			message: 'Every breakpoint needs a name.',
+			severity: 'incomplete',
+			message: 'Needs a name — this is what authors pick in the editor.',
 		});
 	});
 
@@ -72,11 +73,17 @@ describe('validate', () => {
 
 		expect(problemFor(rows, 0)).toStrictEqual({
 			field: 'max',
+			severity: 'incomplete',
 			message: 'Has to be more than zero.',
 		});
 	});
 
-	it('refuses a repeated slug, naming it', () => {
+	/**
+	 * §5.2: a problem "names the other row involved. Never a generic rule
+	 * recital." The author does not need to be told slugs are unique; they
+	 * need to be told which row already has this one.
+	 */
+	it('refuses a repeated slug, naming the row that has it', () => {
 		const rows = rowsOf(
 			['laptop', 'Laptop', '1024px'],
 			['laptop', 'Also laptop', '900px']
@@ -84,8 +91,40 @@ describe('validate', () => {
 
 		expect(problemFor(rows, 1)).toStrictEqual({
 			field: 'slug',
-			message: 'laptop is already taken.',
+			severity: 'conflict',
+			message:
+				'Already used by Laptop. Slugs are stored in block attributes, so two rows cannot share one.',
 		});
+	});
+
+	it('refuses a repeated width, naming the row that has it', () => {
+		const rows = rowsOf(
+			['laptop', 'Laptop', '888px'],
+			['tablet', 'Tablet', '888px']
+		);
+
+		expect(problemFor(rows, 1)).toStrictEqual({
+			field: 'max',
+			severity: 'conflict',
+			message:
+				'Same width as Laptop. Two breakpoints at one width would cover the same screens.',
+		});
+	});
+
+	/**
+	 * Two treatments, and which one a row gets is the difference between "you
+	 * have not finished this" and "these two rows disagree" -- only the second
+	 * tints the row, because only the second is about a pair.
+	 */
+	it('separates an unfinished field from a conflict', () => {
+		const rows = rowsOf(
+			['laptop', 'Laptop', '1024px'],
+			['tablet', '', '900px'],
+			['laptop', 'Also laptop', '700px']
+		);
+
+		expect(problemFor(rows, 1)?.severity).toBe('incomplete');
+		expect(problemFor(rows, 2)?.severity).toBe('conflict');
 	});
 
 	/**
@@ -128,7 +167,11 @@ describe('saveHint', () => {
 		rows: Object.fromEntries(
 			Array.from({ length: count }, (_unused, index) => [
 				`row-${index}`,
-				{ field: 'label' as const, message: 'x' },
+				{
+					field: 'label' as const,
+					severity: 'incomplete' as const,
+					message: 'x',
+				},
 			])
 		),
 		set: [],
@@ -177,7 +220,13 @@ describe('countProblems', () => {
 	it('counts row and set-wide problems together', () => {
 		expect(
 			countProblems({
-				rows: { a: { field: 'label', message: 'x' } },
+				rows: {
+					a: {
+						field: 'label',
+						severity: 'incomplete' as const,
+						message: 'x',
+					},
+				},
 				set: ['too many'],
 			})
 		).toBe(2);

@@ -392,8 +392,26 @@ export function App(): React.ReactElement {
 								<FlexItem>
 									<Flex align="center" gap={3}>
 										<FlexItem>
+											{/*
+											 * Three appearances for three
+											 * states (§5.3), from the
+											 * components' own variants rather
+											 * than a hand-set colour: solid
+											 * while there is something to
+											 * save, solid-but-disabled while
+											 * something above is wrong, and
+											 * outlined when there is simply
+											 * nothing to do -- which stops a
+											 * faded primary from looking like
+											 * the action of the page when it
+											 * is not.
+											 */}
 											<Button
-												variant="primary"
+												variant={
+													dirty
+														? 'primary'
+														: 'secondary'
+												}
 												onClick={save}
 												isBusy={
 													'saving' === status.kind

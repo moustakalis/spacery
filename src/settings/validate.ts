@@ -27,9 +27,22 @@ import type { ValidationRules } from './types';
 /** Which field a problem belongs to, so the message lands beside its cause. */
 export type Field = 'label' | 'slug' | 'max';
 
+/**
+ * How bad a problem is, which decides how it is drawn.
+ *
+ * Two treatments, three meanings (`docs/design/settings-screen.png` §C). A
+ * **conflict** is a row fighting another row: red field, red message, and the
+ * row itself tinted, because the pair is the problem and the author has to see
+ * which rows are in it. **Incomplete** is a field the author has not finished
+ * and **caution** is a value that is legal and probably a typo; both are amber
+ * and neither tints the row, because nothing is wrong with the rest of it.
+ */
+export type Severity = 'conflict' | 'incomplete' | 'caution';
+
 /** One row's problem. */
 export interface RowProblem {
 	field: Field;
+	severity: Severity;
 	message: string;
 }
 
@@ -139,8 +152,15 @@ export function validate(rows: Row[], rules: ValidationRules): Problems {
 	const slug = new RegExp(rules.slugPattern);
 	const length = new RegExp(rules.lengthPattern);
 
-	const seenSlugs = new Set<string>();
-	const seenWidths = new Set<number>();
+	/*
+	 * Keyed by slug and by width, holding the *name* of the row that got there
+	 * first, because §5.2 asks a problem to name the other row involved rather
+	 * than recite the rule. "Already used by Laptop" is something the author
+	 * can act on; "slugs must be unique" is something they have to go and
+	 * check.
+	 */
+	const seenSlugs = new Map<string, string>();
+	const seenWidths = new Map<number, string>();
 
 	for (const row of rows) {
 		const width = toPixels(row.max, rules.pixelsPerEm);
@@ -148,11 +168,16 @@ export function validate(rows: Row[], rules: ValidationRules): Problems {
 		if ('' === row.label.trim()) {
 			problems.rows[row.id] = {
 				field: 'label',
-				message: __('Every breakpoint needs a name.', 'spacery'),
+				severity: 'incomplete',
+				message: __(
+					'Needs a name — this is what authors pick in the editor.',
+					'spacery'
+				),
 			};
 		} else if (!slug.test(row.slug.trim())) {
 			problems.rows[row.id] = {
 				field: 'slug',
+				severity: 'incomplete',
 				message: __(
 					'Lowercase letters, numbers and dashes only.',
 					'spacery'
@@ -161,6 +186,7 @@ export function validate(rows: Row[], rules: ValidationRules): Problems {
 		} else if (!length.test(row.max.trim())) {
 			problems.rows[row.id] = {
 				field: 'max',
+				severity: 'incomplete',
 				message: __(
 					'Needs a number and a unit — px, em or rem.',
 					'spacery'
@@ -169,30 +195,40 @@ export function validate(rows: Row[], rules: ValidationRules): Problems {
 		} else if (0 >= width) {
 			problems.rows[row.id] = {
 				field: 'max',
+				severity: 'incomplete',
 				message: __('Has to be more than zero.', 'spacery'),
 			};
 		} else if (seenSlugs.has(row.slug.trim())) {
 			problems.rows[row.id] = {
 				field: 'slug',
+				severity: 'conflict',
 				message: sprintf(
-					/* translators: %s: a breakpoint slug. */
-					__('%s is already taken.', 'spacery'),
-					row.slug.trim()
+					/* translators: %s: the name of the breakpoint already using this slug. */
+					__(
+						'Already used by %s. Slugs are stored in block attributes, so two rows cannot share one.',
+						'spacery'
+					),
+					seenSlugs.get(row.slug.trim()) ?? ''
 				),
 			};
 		} else if (seenWidths.has(width)) {
 			problems.rows[row.id] = {
 				field: 'max',
-				message: __(
-					'Another breakpoint is already this wide, so which applies would be ambiguous.',
-					'spacery'
+				severity: 'conflict',
+				message: sprintf(
+					/* translators: %s: the name of the breakpoint at this width. */
+					__(
+						'Same width as %s. Two breakpoints at one width would cover the same screens.',
+						'spacery'
+					),
+					seenWidths.get(width) ?? ''
 				),
 			};
 		}
 
 		if (undefined === problems.rows[row.id]) {
-			seenSlugs.add(row.slug.trim());
-			seenWidths.add(width);
+			seenSlugs.set(row.slug.trim(), row.label.trim());
+			seenWidths.set(width, row.label.trim());
 		}
 	}
 
@@ -237,6 +273,7 @@ export function cautions(
 
 		found[row.id] = {
 			field: 'max',
+			severity: 'caution',
 			message: suggestion
 				? sprintf(
 						/* translators: %s: a narrower CSS length, e.g. "1920px". */

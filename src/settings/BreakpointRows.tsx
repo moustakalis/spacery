@@ -261,18 +261,16 @@ export function BreakpointRows({
 							 * on the screen that says so in the row itself.
 							 */}
 							<div
-								style={{
-									paddingTop: '8px',
-									fontSize: '13px',
-									color: covers?.covers
-										? '#646464'
-										: '#b32d2e',
-								}}
+								className={`spacery-table__covers${
+									false === covers?.covers
+										? ' spacery-table__covers--nothing'
+										: ''
+								}`}
 							>
 								{covers?.text}
 							</div>
 
-							<div style={{ paddingTop: '4px' }}>
+							<div className="spacery-table__remove">
 								<Button
 									icon={CLOSE}
 									size="small"

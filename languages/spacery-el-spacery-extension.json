@@ -129,8 +129,8 @@
 			"no tier": [
 				"κανένα σημείο"
 			],
-			"Nothing": [
-				"Τίποτα"
+			"Nothing — no screens left": [
+				"Τίποτα — δεν μένει καμία οθόνη"
 			],
 			"%1$s and %2$d more": [
 				"%1$s και %2$d ακόμη",
@@ -307,8 +307,8 @@
 			"No changes to save.": [
 				"Δεν υπάρχουν αλλαγές προς αποθήκευση."
 			],
-			"Every breakpoint needs a name.": [
-				"Κάθε σημείο διακοπής χρειάζεται όνομα."
+			"Needs a name — this is what authors pick in the editor.": [
+				"Χρειάζεται όνομα — αυτό επιλέγουν οι συντάκτες στον επεξεργαστή."
 			],
 			"Lowercase letters, numbers and dashes only.": [
 				"Μόνο πεζά λατινικά γράμματα, αριθμοί και παύλες."
@@ -319,11 +319,11 @@
 			"Has to be more than zero.": [
 				"Πρέπει να είναι μεγαλύτερο από το μηδέν."
 			],
-			"%s is already taken.": [
-				"Το %s χρησιμοποιείται ήδη."
+			"Already used by %s. Slugs are stored in block attributes, so two rows cannot share one.": [
+				"Χρησιμοποιείται ήδη από το %s. Τα slug αποθηκεύονται στα χαρακτηριστικά των μπλοκ, οπότε δύο γραμμές δεν μπορούν να μοιράζονται ένα."
 			],
-			"Another breakpoint is already this wide, so which applies would be ambiguous.": [
-				"Ένα άλλο σημείο διακοπής έχει ήδη αυτό το πλάτος, οπότε δεν θα ήταν σαφές ποιο ισχύει."
+			"Same width as %s. Two breakpoints at one width would cover the same screens.": [
+				"Ίδιο πλάτος με το %s. Δύο σημεία διακοπής στο ίδιο πλάτος θα κάλυπταν τις ίδιες οθόνες."
 			],
 			"%d breakpoints is the maximum.": [
 				"Τα %d σημεία διακοπής είναι το ανώτατο όριο."

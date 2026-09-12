@@ -162,6 +162,7 @@ describe('cautions', () => {
 
 		expect(cautions(rows, RULES)[rows[0]!.id]).toStrictEqual({
 			field: 'max',
+			severity: 'caution',
 			message: 'Wider than any common screen. Did you mean 1920px?',
 		});
 	});
@@ -272,7 +273,7 @@ describe('coverage', () => {
 
 		expect(found[rows[0]!.id]?.covers).toBe(true);
 		expect(found[rows[1]!.id]).toStrictEqual({
-			text: 'Nothing',
+			text: 'Nothing — no screens left',
 			covers: false,
 		});
 	});

@@ -7,8 +7,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-12T10:29:30+00:00\n"
-"PO-Revision-Date: 2026-09-12T10:29:30+00:00\n"
+"POT-Creation-Date: 2026-09-12T10:37:57+00:00\n"
+"PO-Revision-Date: 2026-09-12T10:37:57+00:00\n"
 "Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Domain: spacery\n"
@@ -316,35 +316,35 @@ msgstr "Σε χρήση τώρα"
 msgid "From: %s"
 msgstr "Από: %s"
 
-#: src/settings/App.js:185
+#: src/settings/App.js:187
 msgid "Save changes"
 msgstr "Αποθήκευση αλλαγών"
 
-#: src/settings/App.js:185
+#: src/settings/App.js:187
 msgid "Discard"
 msgstr "Απόρριψη"
 
-#: src/settings/App.js:211
+#: src/settings/App.js:213
 msgid "No breakpoints are active."
 msgstr "Δεν υπάρχουν ενεργά σημεία διακοπής."
 
-#: src/settings/App.js:230
+#: src/settings/App.js:232
 msgid "Settings saved."
 msgstr "Οι ρυθμίσεις αποθηκεύτηκαν."
 
-#: src/settings/App.js:238
+#: src/settings/App.js:240
 msgid "Settings saved. What is in use could not be read back — reload the page to see it."
 msgstr "Οι ρυθμίσεις αποθηκεύτηκαν. Δεν ήταν δυνατή η ανάγνωση του τι χρησιμοποιείται — φορτώστε ξανά τη σελίδα για να το δείτε."
 
-#: src/settings/App.js:242
+#: src/settings/App.js:244
 msgid "Your breakpoint source was saved. Those breakpoints were not: every breakpoint needs a name and a width in px, em or rem, and no two may share a width."
 msgstr "Η πηγή σημείων διακοπής σας αποθηκεύτηκε. Αυτά τα σημεία διακοπής όχι: κάθε σημείο διακοπής χρειάζεται όνομα και πλάτος σε px, em ή rem, και δύο σημεία δεν μπορούν να έχουν το ίδιο πλάτος."
 
-#: src/settings/App.js:243
+#: src/settings/App.js:245
 msgid "Those breakpoints were not saved, and nothing changed. Every breakpoint needs a name and a width in px, em or rem, and no two may share a width."
 msgstr "Αυτά τα σημεία διακοπής δεν αποθηκεύτηκαν και δεν άλλαξε τίποτα. Κάθε σημείο διακοπής χρειάζεται όνομα και πλάτος σε px, em ή rem, και δύο σημεία δεν μπορούν να έχουν το ίδιο πλάτος."
 
-#: src/settings/App.js:263
+#: src/settings/App.js:265
 msgid "Something went wrong talking to the site."
 msgstr "Κάτι πήγε στραβά στην επικοινωνία με τον ιστότοπο."
 
@@ -371,9 +371,9 @@ msgstr "%1$s – %2$s"
 msgid "no tier"
 msgstr "κανένα σημείο"
 
-#: src/settings/bands.js:255
-msgid "Nothing"
-msgstr "Τίποτα"
+#: src/settings/bands.js:256
+msgid "Nothing — no screens left"
+msgstr "Τίποτα — δεν μένει καμία οθόνη"
 
 #. translators: %s: the plugin version.
 #: src/settings/Brand.js:89
@@ -415,36 +415,36 @@ msgid "Spacing already saved under %s will stop applying. To change only what th
 msgstr "Τα κενά που έχουν ήδη αποθηκευτεί με το %s θα πάψουν να ισχύουν. Για να αλλάξετε μόνο το πώς ονομάζεται αυτό το σημείο διακοπής, επεξεργαστείτε το όνομά του και αφήστε το σύντομο όνομα ως έχει."
 
 #. translators: %s: breakpoint name.
-#: src/settings/BreakpointRows.js:128
+#: src/settings/BreakpointRows.js:124
 #, js-format
 msgid "Remove %s"
 msgstr "Αφαίρεση %s"
 
-#: src/settings/BreakpointRows.js:129
+#: src/settings/BreakpointRows.js:125
 msgid "Add breakpoint"
 msgstr "Προσθήκη σημείου διακοπής"
 
 #. translators: %d: maximum number of breakpoints.
-#: src/settings/BreakpointRows.js:132
+#: src/settings/BreakpointRows.js:128
 #, js-format
 msgid "%d breakpoints is the maximum. Beyond that the editor asks more of an author than it gives back."
 msgstr "Τα %d σημεία διακοπής είναι το ανώτατο όριο. Πέρα από αυτό, ο επεξεργαστής ζητά από τον συντάκτη περισσότερα απ' όσα του δίνει."
 
-#: src/settings/BreakpointRows.js:133
+#: src/settings/BreakpointRows.js:129
 msgid "Name is shown in the editor. Slug is stored in block attributes and follows the name until you change it."
 msgstr "Το όνομα εμφανίζεται στον επεξεργαστή. Το slug αποθηκεύεται στα χαρακτηριστικά των μπλοκ και ακολουθεί το όνομα μέχρι να το αλλάξετε."
 
-#: src/settings/BreakpointRows.js:148
+#: src/settings/BreakpointRows.js:144
 msgid "You have not defined any breakpoints yet"
 msgstr "Δεν έχετε ορίσει ακόμη κανένα σημείο διακοπής"
 
 #. translators: %s: the breakpoint set in use meanwhile.
-#: src/settings/BreakpointRows.js:150
+#: src/settings/BreakpointRows.js:146
 #, js-format
 msgid "Until you add one, Spacery falls back to %s, which is what \"In use now\" below is showing."
 msgstr "Μέχρι να προσθέσετε ένα, το Spacery χρησιμοποιεί %s, που είναι αυτό που δείχνει η ενότητα «Σε χρήση τώρα» παρακάτω."
 
-#: src/settings/BreakpointRows.js:150
+#: src/settings/BreakpointRows.js:146
 msgid "Add your first breakpoint"
 msgstr "Προσθέστε το πρώτο σας σημείο διακοπής"
 
@@ -566,45 +566,47 @@ msgstr "Μη αποθηκευμένη αλλαγή στην πηγή σημεί�
 msgid "No changes to save."
 msgstr "Δεν υπάρχουν αλλαγές προς αποθήκευση."
 
-#: src/settings/validate.js:99
-msgid "Every breakpoint needs a name."
-msgstr "Κάθε σημείο διακοπής χρειάζεται όνομα."
+#: src/settings/validate.js:107
+msgid "Needs a name — this is what authors pick in the editor."
+msgstr "Χρειάζεται όνομα — αυτό επιλέγουν οι συντάκτες στον επεξεργαστή."
 
-#: src/settings/validate.js:105
+#: src/settings/validate.js:114
 msgid "Lowercase letters, numbers and dashes only."
 msgstr "Μόνο πεζά λατινικά γράμματα, αριθμοί και παύλες."
 
-#: src/settings/validate.js:111
+#: src/settings/validate.js:121
 msgid "Needs a number and a unit — px, em or rem."
 msgstr "Χρειάζεται αριθμό και μονάδα — px, em ή rem."
 
-#: src/settings/validate.js:117
+#: src/settings/validate.js:128
 msgid "Has to be more than zero."
 msgstr "Πρέπει να είναι μεγαλύτερο από το μηδέν."
 
-#. translators: %s: a breakpoint slug.
-#: src/settings/validate.js:125
+#. translators: %s: the name of the breakpoint already using this slug.
+#: src/settings/validate.js:137
 #, js-format
-msgid "%s is already taken."
-msgstr "Το %s χρησιμοποιείται ήδη."
+msgid "Already used by %s. Slugs are stored in block attributes, so two rows cannot share one."
+msgstr "Χρησιμοποιείται ήδη από το %s. Τα slug αποθηκεύονται στα χαρακτηριστικά των μπλοκ, οπότε δύο γραμμές δεν μπορούν να μοιράζονται ένα."
 
-#: src/settings/validate.js:131
-msgid "Another breakpoint is already this wide, so which applies would be ambiguous."
-msgstr "Ένα άλλο σημείο διακοπής έχει ήδη αυτό το πλάτος, οπότε δεν θα ήταν σαφές ποιο ισχύει."
+#. translators: %s: the name of the breakpoint at this width.
+#: src/settings/validate.js:146
+#, js-format
+msgid "Same width as %s. Two breakpoints at one width would cover the same screens."
+msgstr "Ίδιο πλάτος με το %s. Δύο σημεία διακοπής στο ίδιο πλάτος θα κάλυπταν τις ίδιες οθόνες."
 
 #. translators: %d: maximum number of breakpoints.
-#: src/settings/validate.js:142
+#: src/settings/validate.js:157
 #, js-format
 msgid "%d breakpoints is the maximum."
 msgstr "Τα %d σημεία διακοπής είναι το ανώτατο όριο."
 
 #. translators: %s: a narrower CSS length, e.g. "1920px".
-#: src/settings/validate.js:171
+#: src/settings/validate.js:187
 #, js-format
 msgid "Wider than any common screen. Did you mean %s?"
 msgstr "Πιο πλατύ από κάθε συνηθισμένη οθόνη. Μήπως εννοούσατε %s;"
 
-#: src/settings/validate.js:172
+#: src/settings/validate.js:188
 msgid "Wider than any common screen, so the ruler stops short of it."
 msgstr "Πιο πλατύ από κάθε συνηθισμένη οθόνη, γι' αυτό ο χάρακας σταματά πριν από αυτό."
 

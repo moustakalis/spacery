@@ -243,6 +243,27 @@ test.describe('settings screen', () => {
 		await expect(
 			app.getByText('Name is shown in the editor.', { exact: false })
 		).toHaveCount(1);
+
+		/*
+		 * And the other severity. A second row at the same width is not an
+		 * unfinished field, it is two rows disagreeing -- so the message names
+		 * the other row rather than reciting the rule (§5.2), and the `Covers`
+		 * cell says what the conflict costs this row.
+		 */
+		await page.getByRole('button', { name: 'Add breakpoint' }).click();
+		await page.getByLabel('Name').last().fill('Copy');
+		await page.getByLabel('Up to').last().fill('900');
+
+		await expect(
+			app.getByText('Same width as Broken.', { exact: false })
+		).toBeVisible();
+		await expect(app.getByText('Nothing — no screens left')).toBeVisible();
+		await expect(
+			app.getByText('Fix 1 problem above to save.')
+		).toBeVisible();
+		await expect(
+			page.getByRole('button', { name: 'Save changes' })
+		).toBeDisabled();
 	});
 
 	/**

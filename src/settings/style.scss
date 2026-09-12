@@ -1,0 +1,108 @@
+/**
+ * The settings screen's own states.
+ *
+ * This is the plugin's first admin stylesheet, and it exists because two things
+ * `docs/design/settings-screen.png` §C asks for cannot be reached from a React
+ * prop: a tinted row, and the border of an input that belongs to
+ * `@wordpress/components`. Everything else on this screen is still drawn with
+ * the components' own styles, which is the rule §4 sets — "not restyled".
+ *
+ * The status colours come in threes (design system §2): border, text, row tint.
+ * Status text is never set in the border colour; `#d63638` at 12px fails
+ * contrast where `#b32d2e` passes.
+ *
+ * The table's grid lives here too, because the header and the rows have to
+ * share one column definition and two copies of it in inline styles is one
+ * copy too many.
+ */
+
+$columns: minmax(0, 1.3fr) minmax(0, 1.3fr) 130px minmax(0, 1fr) 36px;
+
+$error-border: #d63638;
+$error-text: #b32d2e;
+$error-tint: #fcf0f1;
+
+$caution-border: #dba617;
+$caution-text: #8a6616;
+
+.spacery-table {
+	&__head,
+	&__row {
+		display: grid;
+		grid-template-columns: $columns;
+		gap: 12px;
+		padding: 12px 8px;
+	}
+
+	&__head {
+		align-items: center;
+		padding-top: 8px;
+		padding-bottom: 8px;
+		border-bottom: 1px solid #e5e5e5;
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: #545454;
+	}
+
+	&__row {
+		align-items: flex-start;
+		border-bottom: 1px solid #f0f0f0;
+	}
+
+	/*
+	 * Only a conflict tints the row (§5.2). An unfinished field marks itself
+	 * and leaves the rest of the row alone, because the rest of the row is
+	 * fine; a conflict is two rows disagreeing, and the tint is what makes the
+	 * pair visible.
+	 */
+	&__row--conflict {
+		background: $error-tint;
+	}
+
+	&__covers {
+		padding-top: 8px;
+		font-size: 13px;
+		color: #646464;
+	}
+
+	&__covers--nothing {
+		color: $error-text;
+	}
+
+	&__remove {
+		display: flex;
+		justify-content: flex-end;
+		padding-top: 4px;
+	}
+}
+
+/*
+ * A field in trouble. `TextControl` renders the input itself and `UnitControl`
+ * draws its border on a sibling backdrop, so both are named.
+ */
+.spacery-field {
+	&--conflict {
+		.components-text-control__input,
+		.components-input-control__backdrop {
+			border-color: $error-border;
+		}
+
+		.components-base-control__help {
+			color: $error-text;
+		}
+	}
+
+	&--incomplete,
+	&--caution {
+		.components-text-control__input,
+		.components-input-control__backdrop {
+			border-color: $caution-border;
+		}
+
+		.components-base-control__help {
+			color: $caution-text;
+		}
+	}
+}

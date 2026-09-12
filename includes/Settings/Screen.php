@@ -220,5 +220,30 @@ final class Screen {
 
 		// The app is built from @wordpress/components, which ships its own CSS.
 		wp_enqueue_style( 'wp-components' );
+
+		/*
+		 * The screen's own states: a tinted row and a coloured field border,
+		 * neither of which can be reached from a React prop because the border
+		 * belongs to a component's own markup. Emitted by `wp-scripts` from
+		 * `src/settings/style.scss`, following the same naming as the spacer
+		 * block's `style-index.css`.
+		 *
+		 * Guarded, because `build/` is gitignored and a tree that has only
+		 * ever been committed from has no stylesheet: the screen then renders
+		 * without its status colours rather than with a 404 in the console.
+		 */
+		$stylesheet = $directory . '/build/style-settings.css';
+
+		if ( is_readable( $stylesheet ) ) {
+			wp_enqueue_style(
+				self::HANDLE,
+				plugins_url( 'build/style-settings.css', \Spacery\PLUGIN_FILE ),
+				array( 'wp-components' ),
+				is_string( $version ) ? $version : \Spacery\VERSION
+			);
+
+			// `wp-scripts` emits `style-settings-rtl.css` beside it.
+			wp_style_add_data( self::HANDLE, 'rtl', 'replace' );
+		}
 	}
 }
