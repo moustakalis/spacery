@@ -17,16 +17,28 @@ name has to stay `spacery`; both of those derive from it.
 
 Three preconditions, each of which fails in a way that looks like a plugin bug:
 
-1. **`build/` must exist.** It is gitignored, and CI builds it in its own
-   checkout, so a working tree that has only ever been committed from does not
-   have one. Without it the PHP half runs — blocks register, breakpoints
-   resolve, front-end CSS is emitted — while the inspector panel and the
-   settings screen silently do nothing, because `Editor\Extension` and
-   `Settings\Screen` enqueue `build/extension.js` and `build/settings.js`.
+1. **`build/` must exist, and must be newer than `src/`.** It is gitignored, and
+   CI builds it in its own checkout, so a working tree that has only ever been
+   committed from does not have one. Without it the PHP half runs — blocks
+   register, breakpoints resolve, front-end CSS is emitted — while the inspector
+   panel and the settings screen silently do nothing, because `Editor\Extension`
+   and `Settings\Screen` enqueue `build/extension.js` and `build/settings.js`.
 
    ```bash
    pnpm install     # once
    pnpm run build   # or: pnpm run start, to watch while you poke at it
+   ```
+
+   **A stale `build/` is the worse failure, because the precondition above reads
+   as satisfied.** The screens load, behave like the day they were built, and
+   every difference from this document looks like a finding. The first attempt at
+   this pass was nearly run against a `build/settings.js` from 3 September with
+   twenty-six newer source files behind it — the whole of Groups A to F and E0 to
+   E7 missing, including every string and control this document asks you to look
+   at. Check before starting, and rebuild if it says anything at all:
+
+   ```bash
+   find src -newer build/settings.js -name '*.ts*'
    ```
 
 2. **PHP 8.2+ and WordPress 7.1+** on that host. Below either,
