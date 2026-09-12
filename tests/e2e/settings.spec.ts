@@ -193,7 +193,21 @@ test.describe('settings screen', () => {
 		await page
 			.getByRole('button', { name: 'Add your first breakpoint' })
 			.click();
-		await page.getByLabel('Name').fill('Broken');
+
+		/*
+		 * By role, not by label, for every field in this test. `getByLabel`
+		 * matches accessible names as substrings, and the ruler is one
+		 * `role="img"` whose name is a sentence per band -- "Desktop, over
+		 * 1024px, up to 1280px." So `getByLabel('Up to')` resolves to the field
+		 * *and* the drawing and fails strict mode, and `getByLabel('Up
+		 * to').last()` is worse: it silently resolves to the drawing, because
+		 * the ruler is below the table in the DOM. Any label text that could
+		 * appear inside `described()` needs a role to disambiguate it.
+		 */
+		const name = page.getByRole('textbox', { name: 'Name' });
+		const upTo = page.getByRole('spinbutton', { name: 'Up to' });
+
+		await name.fill('Broken');
 
 		/*
 		 * The message belongs to the field that caused it, and the save bar
@@ -218,9 +232,10 @@ test.describe('settings screen', () => {
 		 * in the row's `UNITS` -- so this stores `900px`, and the assertion
 		 * below is what proves it: an unfinished value would leave Save
 		 * disabled.
+		 *
 		 */
-		await page.getByLabel('Up to').fill('900');
-		await page.getByLabel('Up to').press('Tab');
+		await upTo.fill('900');
+		await upTo.press('Tab');
 
 		await expect(
 			page.getByRole('button', { name: 'Save changes' })
@@ -251,8 +266,8 @@ test.describe('settings screen', () => {
 		 * cell says what the conflict costs this row.
 		 */
 		await page.getByRole('button', { name: 'Add breakpoint' }).click();
-		await page.getByLabel('Name').last().fill('Copy');
-		await page.getByLabel('Up to').last().fill('900');
+		await name.last().fill('Copy');
+		await upTo.last().fill('900');
 
 		await expect(
 			app.getByText('Same width as Broken.', { exact: false })
@@ -303,6 +318,13 @@ test.describe('settings screen', () => {
 	 * E7, and the loading state it shares a component with (S6). The mark is
 	 * `aria-hidden`, so it is addressed by the viewBox its geometry is drawn on
 	 * -- twice per screen, header and footer, and nowhere else.
+	 *
+	 * The version is asserted in both placements and in neither's old wording.
+	 * This test used to look for `/^Version \d/`, which the redesign removed:
+	 * the masthead tag is the number alone, as the drawing has it, and the
+	 * footer signs itself `Spacery <version>`. A test failing after a
+	 * deliberate change is the third time on this file -- read the screen
+	 * before assuming the screen is wrong.
 	 */
 	test('signs the page at the top and the bottom, and nowhere else', async ({
 		admin,
@@ -316,7 +338,13 @@ test.describe('settings screen', () => {
 			app.getByRole('heading', { name: 'Spacery', level: 1 })
 		).toBeVisible();
 		await expect(app.locator('svg[viewBox="0 0 77 77"]')).toHaveCount(2);
-		await expect(app.getByText(/^Version \d/)).toBeVisible();
+
+		// The masthead tag: the number on its own, beside the h1.
+		await expect(app.getByText(/^\d+\.\d+\.\d+$/)).toBeVisible();
+
+		// The footer signature: the name and the number together.
+		await expect(app.getByText(/^Spacery \d+\.\d+\.\d+$/)).toBeVisible();
+
 		await expect(
 			app.getByRole('link', { name: 'Documentation' })
 		).toBeVisible();

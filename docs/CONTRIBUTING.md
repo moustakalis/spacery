@@ -192,6 +192,31 @@ was still grey. Load `wp-admin`, provoke the state, and read
 `getComputedStyle(el).borderColor`. The same check found an earlier commit whose
 message described nine edits that an aborted script never wrote.
 
+## `getByLabel` is ambiguous now that the ruler has a description
+
+The ruler is one `role="img"` whose accessible name is a sentence per band --
+"Desktop, over 1024px, up to 1280px. Laptop, over 782px, up to 1024px. …" --
+built by `described()`. Playwright matches accessible names as **substrings**,
+so any label text that also appears in that sentence now matches two elements:
+
+```js
+page.getByLabel('Up to')          // the field AND the drawing: strict mode fails
+page.getByLabel('Up to').last()   // silently the drawing -- it is below the table
+```
+
+The second is the dangerous one. It does not fail as an ambiguity; it resolves
+to a `div` and then `fill()` fails somewhere unrelated-looking. Use a role:
+
+```js
+page.getByRole('spinbutton', { name: 'Up to' })
+page.getByRole('textbox', { name: 'Name' })
+```
+
+Verified against the live screen rather than reasoned about: every `Up to`
+field's accessible name is exactly `Up to` and its role is `spinbutton`, the
+ruler's name begins `desktop, over 1300px, up to 11920px`, and the ruler follows
+the last row in document order.
+
 ## A failing E2E test may be defending a bug
 
 `settings.spec.ts` asserted that a refused save reported "nothing changed" — in
