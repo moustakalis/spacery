@@ -6,6 +6,71 @@ Spacery does — CI already proves most of that on every push. It is the set of
 things a human has to look at, grouped by the decision each one is meant to hold
 up.
 
+## Where this pass stopped
+
+**Read this first on a cold start.** The pass was run on 12 September 2026
+against the MAMP playground and stopped part-way through §2, with 21 boxes
+ticked and 28 to go. `[x]` means checked on a real screen; `[~]` means partly.
+Every box that found something says what it found, in place — those notes are
+the most useful thing in this file.
+
+**Done:** §1 entirely. §2 down to and including the preset item, plus the
+refused-value item. Three items of §5 (the tag in `<head>` on a block theme, two
+blocks sharing one rule, and a page with no Spacery values emitting nothing) and
+half of the disjoint-bands item.
+
+**Next, in order:**
+
+1. §2's remaining items — the `>5 tiers` dropdown and the icons-vs-names
+   fallback (both D17 claims, both needing a different breakpoint set saved),
+   the widest/narrower and middle-tier cascade checks, and the whole reset and
+   undo/redo group.
+2. §3, which is one mu-plugin and two checks.
+3. **§4, the takeover.** The largest untested thing in the plugin, the only
+   feature that rewrites the author's content, and the one that produces the
+   mixed preset/length values D22 is about. Do this before anything below it.
+4. §5's classic-theme check, which needs Twenty Twenty-One installed first.
+5. §6 through §9.
+
+**The pass has found four defects in code and four false claims in
+documentation.** That rate is the argument for finishing it before submitting:
+each one was invisible to CI, and three of the four code defects were in
+behaviour no test could reach — a CSS specificity loss, an attribution, a value
+that escaped its declaration, and a box mode. See D21, D22 and D23 in
+`PLAN.md` §8.
+
+**State left on the playground**, which the next session can reuse rather than
+rebuild:
+
+- A draft page, **"Spacery manual pass (scratch)"** (`post=45`), holding two
+  Groups and a Columns block. Group A carries a preset, a `var()` and a `2rem`
+  at `desktop`; Group B carries the same four values as A once did, so the two
+  share one class; the inner Column carries a **core** `style.spacing.padding`
+  with `var:preset|spacing|60` on top — which is the fixture §4 wants.
+- `wp-content/mu-plugins/spacery-dev-reset.php`, as this document prescribes.
+  Nothing else: the `spacery_breakpoints` filter experiment, the probe and the
+  child theme were all removed, and Twenty Twenty-Five is active again.
+- The stored breakpoint set is the author's own four: `desktop 11920px`,
+  `laptop 1300px`, `tablet 888px`, `mobile 450px`. The `11920px` is a
+  deliberate typo kept from before the pass — it is what triggers the
+  wider-than-any-screen caution, so it is worth leaving.
+
+**Two things that make the pass faster**, both learned the hard way:
+
+- `build/` can be rebuilt without asking anyone. `pnpm` is absent from the
+  session VM and the `wp-scripts` shim is a shell script, so run
+  `node node_modules/@wordpress/scripts/bin/wp-scripts.js build`. It fails once
+  with `MODULE_NOT_FOUND` from `browserslist`, which looks for
+  `@wordpress/browserslist-config` in the project root rather than where pnpm
+  put it; one symlink fixes it permanently. `spacery-status.md` in the project
+  has the command.
+- The editor can be driven from the browser console faster than by clicking:
+  `wp.data.dispatch('core/block-editor').selectBlock(id)`,
+  `updateBlockAttributes`, and a native-setter helper for React inputs. Reading
+  `wp.data.select('core/block-editor').getBlock(id).attributes.spacery` is the
+  only way to check what was actually stored. **Client ids are regenerated on
+  every editor load**, so re-read them after a reload rather than reusing them.
+
 ## The site
 
 `~/Dev/playground` is served by MAMP Pro, and
@@ -192,33 +257,33 @@ though this pass does not.
 
 Any block with spacing support — Group, Cover, Columns, a Paragraph.
 
-- [ ] Resize the canvas. The panel's tier selector follows core's viewport, and
+- [x] Resize the canvas. The panel's tier selector follows core's viewport, and
       the fields below it change with it.
-- [ ] Click a different tier in the selector. The canvas must **not** move, and
+- [x] Click a different tier in the selector. The canvas must **not** move, and
       a line under the selector should say which tier the canvas is still
       previewing (D17).
-- [ ] Change the preview viewport again. The selector re-points at the matching
+- [x] Change the preview viewport again. The selector re-points at the matching
       tier, discarding the manual choice — that is the intended precedence.
 - [ ] With five or fewer tiers the selector is segmented; switch the source to a
       set with more and confirm it becomes a dropdown rather than twelve
       unreadable segments.
-- [ ] All four sides of padding and margin are editable at once, linked by
+- [x] All four sides of padding and margin are editable at once, linked by
       default. Type once and confirm the four fields move together; unlink and
       confirm they part company again.
-- [ ] Unlink, set the four sides to four different values, then link again and
+- [x] Unlink, set the four sides to four different values, then link again and
       edit one. All four must take the new value — linking is not "fill in the
       blanks".
-- [ ] Pick a unit, type a value, then clear the field. The unit must stay as you
+- [x] Pick a unit, type a value, then clear the field. The unit must stay as you
       set it rather than reverting to px.
-- [ ] Empty a side that a wider tier sets. Its field should show the inherited
+- [x] Empty a side that a wider tier sets. Its field should show the inherited
       value as a placeholder — and the *right* one per side, not one value
       repeated across all four.
-- [ ] Change a box's unit. The numbers stay and the unit swaps; nothing is
+- [x] Change a box's unit. The numbers stay and the unit swaps; nothing is
       converted behind your back.
-- [ ] Switch a box to **custom**. The fields become free text and keep what they
+- [x] Switch a box to **custom**. The fields become free text and keep what they
       held. Set four different values — `0`, `30rem`, `1vw`,
       `calc(100% - 2rem)` — and check all four on the front end.
-- [ ] Switch back to a real unit. Everything clears, deliberately: `calc()` has
+- [x] Switch back to a real unit. Everything clears, deliberately: `calc()` has
       no number to put in a number field.
 - [x] Type something WordPress will refuse (`red`, or a value with a stray `;`).
       No CSS should be emitted for that side, and nothing malformed should reach
@@ -310,7 +375,7 @@ control.
 View source. Spacery's declarations belong in
 `<style id="wp-style-engine-spacery-inline-css">`.
 
-- [ ] **Block theme** (Twenty Twenty-Five / -Four / -Three, all three installed):
+- [x] **Block theme** (Twenty Twenty-Five / -Four / -Three, all three installed):
       the tag is in `<head>`.
 - [ ] **Classic theme** — none is installed on this site, so install one first:
       Appearance → Themes → Add New → **Twenty Twenty-One**, activate. The tag
@@ -318,10 +383,15 @@ View source. Spacery's declarations belong in
       `wp_hoist_late_printed_styles()`.
       Spacery must not be printing it anywhere itself; this is the only place
       that claim gets tested.
-- [ ] Bands are disjoint (`480px < width <= 782px`), widest first, and never
-      overlap a core `@mobile` value.
-- [ ] Two blocks with identical spacing share one rule.
-- [ ] A page with no Spacery values emits no Spacery stylesheet at all.
+- [~] Bands are disjoint (`480px < width <= 782px`), widest first, and never
+      overlap a core `@mobile` value. **Half done.** Disjoint and widest-first
+      confirmed on a real page — `(1300px < width <= 11920px)`,
+      `(888px < width <= 1300px)`, `(450px < width <= 888px)`,
+      `(width <= 450px)`, in that order, every declaration `!important` per
+      §3.3a. The core `@mobile` half needs a block carrying a core responsive
+      value, which is §4.
+- [x] Two blocks with identical spacing share one rule.
+- [x] A page with no Spacery values emits no Spacery stylesheet at all.
 
 ## 6. The Spacer block
 
