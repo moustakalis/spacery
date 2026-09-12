@@ -220,9 +220,26 @@ Any block with spacing support — Group, Cover, Columns, a Paragraph.
       `calc(100% - 2rem)` — and check all four on the front end.
 - [ ] Switch back to a real unit. Everything clears, deliberately: `calc()` has
       no number to put in a number field.
-- [ ] Type something WordPress will refuse (`red`, or a value with a stray `;`).
+- [x] Type something WordPress will refuse (`red`, or a value with a stray `;`).
       No CSS should be emitted for that side, and nothing malformed should reach
-      the stylesheet — `safecss_filter_attr()` drops the whole declaration.
+      the stylesheet. **Both halves failed, and the reason given here was the
+      mistake**: `safecss_filter_attr()` is not in this path. The value goes
+      from the block attribute to `wp_style_engine_get_styles()`, which takes a
+      string for a length and passes it through, and the stylesheet is built by
+      joining `property:value` with semicolons.
+
+      So `10px;color:red` typed into a padding field shipped as
+      `padding-right:10px; color:red !important` — arbitrary CSS, written by
+      anyone who can edit a post, in a stylesheet served to every visitor. And
+      `red` in a padding field shipped as `padding-top:red !important`.
+
+      Fixed with a positive allowlist in `Generator::is_value()`: a preset
+      reference, a number with an optional unit, one of `calc`/`min`/`max`/
+      `clamp`/`var` (nesting checked, so `calc(url(x))` is refused), or one of
+      the global keywords plus `auto`. Everything else is dropped before the
+      value is hashed, so it cannot inherit into narrower bands either. 38 cases
+      in `GeneratorTest`, and re-checked on the page: `color` and `red` gone,
+      `0` / `30rem` / `1vw` / `calc(100% - 2rem)` all still emitted.
 - [ ] Give a block a preset spacing value through core's own control, then open
       the Spacery panel at a tier. The box should open in custom mode showing
       that value, not as an empty px field.

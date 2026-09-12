@@ -145,7 +145,7 @@ final class Generator {
 	}
 
 	/**
-	 * Recursively drops empty values and sorts keys.
+	 * Recursively drops empty and unsafe values, and sorts keys.
 	 *
 	 * @param array<mixed> $node Style subtree.
 	 * @return array<mixed>
@@ -156,6 +156,8 @@ final class Generator {
 		foreach ( $node as $key => $value ) {
 			if ( is_array( $value ) ) {
 				$value = self::prune( $value );
+			} elseif ( is_string( $value ) && ! self::is_value( $value ) ) {
+				continue;
 			}
 
 			if ( null === $value || '' === $value || array() === $value ) {
@@ -168,6 +170,133 @@ final class Generator {
 		ksort( $pruned );
 
 		return $pruned;
+	}
+
+	/**
+	 * CSS keywords a spacing property may legitimately be set to.
+	 *
+	 * `auto` is the one that matters -- `margin: auto` is real CSS and the
+	 * custom box can author it. The rest are the global keywords, which mean
+	 * something at every property.
+	 */
+	private const KEYWORDS = array(
+		'auto',
+		'inherit',
+		'initial',
+		'none',
+		'revert',
+		'revert-layer',
+		'unset',
+	);
+
+	/**
+	 * Functions whose result is a value, and which the box can author.
+	 *
+	 * An allowlist, not a filter on the argument list: `url()` and the legacy
+	 * `expression()` are the two that turn a length into something else, and
+	 * naming what is allowed means a function nobody has thought of is refused
+	 * rather than waved through.
+	 */
+	private const FUNCTIONS = array( 'calc', 'clamp', 'max', 'min', 'var' );
+
+	/**
+	 * Whether a leaf value is a single CSS value, safe to concatenate.
+	 *
+	 * **This is a guard, not a nicety.** Every value here was typed by an
+	 * author into an inspector field and ends up inside a stylesheet, and the
+	 * stylesheet is built by joining `property:value` with semicolons. A value
+	 * containing a semicolon therefore closes its own declaration and opens
+	 * another: `10px;color:red` typed into a padding field shipped as
+	 * `padding-right:10px; color:red !important`, which is arbitrary CSS
+	 * written by whoever can edit a post. Found by running
+	 * `docs/MANUAL-TESTING.md` §2, which had assumed core's
+	 * `safecss_filter_attr()` was in the path. It is not: the value goes
+	 * straight to `wp_style_engine_get_styles()`, which takes a string for a
+	 * length and passes it through.
+	 *
+	 * An allowlist rather than a denylist, because the set of values Spacery
+	 * has any business emitting is small and known:
+	 *
+	 * - a preset reference, `var:preset|spacing|40`, which is what core's own
+	 *   controls store and what the takeover flow moves;
+	 * - a number with an optional unit, including a bare `0`;
+	 * - one of {@see self::FUNCTIONS}, nested how you like, with an argument
+	 *   list free of anything that could end the declaration;
+	 * - one of {@see self::KEYWORDS}.
+	 *
+	 * A denylist of dangerous characters would have needed to be right about
+	 * every future way of escaping a declaration. This has to be right about
+	 * what a length looks like, which is written down.
+	 *
+	 * The cost is that a value with no meaning as spacing -- `red` in a padding
+	 * field -- is now dropped rather than emitted as dead CSS, which is what
+	 * §2 asked for in the same breath.
+	 *
+	 * @param string $value The authored value.
+	 * @return bool True when it may be emitted.
+	 */
+	private static function is_value( string $value ): bool {
+		$trimmed = trim( $value );
+
+		if ( '' === $trimmed ) {
+			return false;
+		}
+
+		if ( in_array( strtolower( $trimmed ), self::KEYWORDS, true ) ) {
+			return true;
+		}
+
+		// A core preset reference: `var:preset|spacing|40`.
+		if ( self::matches( '/^var:[a-z0-9_-]+\|[a-z0-9_-]+\|[a-z0-9_-]+$/i', $trimmed ) ) {
+			return true;
+		}
+
+		// A number, with or without a unit. `%` is a unit here.
+		if ( self::matches( '/^[+-]?(?:\d+\.?\d*|\.\d+)(?:[a-z]+|%)?$/i', $trimmed ) ) {
+			return true;
+		}
+
+		/*
+		 * A function call. The argument list may hold digits, units, operators,
+		 * whitespace, commas, nested parentheses and custom-property names --
+		 * and nothing that could close the declaration or start another.
+		 */
+		if ( ! self::matches( '/^[a-z]+\([a-z0-9_.,%+\-*\/\s()#]*\)$/i', $trimmed ) ) {
+			return false;
+		}
+
+		/*
+		 * Every function named anywhere in it has to be one of ours, nesting
+		 * included. Checking only the outermost name let `calc(url(x))` through
+		 * -- caught by this class's own test table, which is the argument for
+		 * writing the rejections down beside the acceptances.
+		 *
+		 * An empty name is a bare parenthesis doing arithmetic grouping, as in
+		 * `calc((1px + 2px) * 2)`, and is fine.
+		 */
+		preg_match_all( '/([a-z-]*)\(/i', $trimmed, $found );
+
+		foreach ( $found[1] as $name ) {
+			if ( '' !== $name && ! in_array( strtolower( $name ), self::FUNCTIONS, true ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Whether a pattern matches.
+	 *
+	 * A named helper because `1 === preg_match( … )` inside an argument list
+	 * reads to phpcs as a broken Yoda condition; see `docs/CONTRIBUTING.md`.
+	 *
+	 * @param string $pattern Delimited PCRE pattern.
+	 * @param string $subject Subject.
+	 * @return bool
+	 */
+	private static function matches( string $pattern, string $subject ): bool {
+		return 1 === preg_match( $pattern, $subject );
 	}
 
 	/**

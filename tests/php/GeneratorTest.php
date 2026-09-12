@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Spacery\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Spacery\Breakpoints\Registry;
 use Spacery\Styles\Collector;
@@ -210,6 +211,146 @@ final class GeneratorTest extends TestCase {
 			),
 			'a renamed tier loses its value rather than breaking the block'
 		);
+	}
+
+	// -- Values -----------------------------------------------------------
+
+	/**
+	 * Values an author may legitimately store, which must survive verbatim.
+	 *
+	 * @return array<string, array{string}>
+	 */
+	public static function accepted_values(): array {
+		$values = array(
+			'0',
+			'10px',
+			'1.5rem',
+			'-3px',
+			'100%',
+			'1vw',
+			'.5rem',
+			'calc(100% - 2rem)',
+			'clamp(1rem, 2vw, 3rem)',
+			'min(10px,2vw)',
+			'max(1rem, 5%)',
+			'calc((1px + 2px) * 2)',
+			'var(--wp--preset--spacing--50)',
+			'var:preset|spacing|40',
+			'auto',
+			'inherit',
+			'unset',
+		);
+
+		$cases = array();
+
+		foreach ( $values as $value ) {
+			$cases[ $value ] = array( $value );
+		}
+
+		return $cases;
+	}
+
+	/**
+	 * @param string $value An authored value.
+	 */
+	#[DataProvider( 'accepted_values' )]
+	public function test_a_legitimate_value_is_emitted( string $value ): void {
+		$styles = $this->generator->generate(
+			array( 'mobile' => array( 'spacing' => array( 'padding' => array( 'top' => $value ) ) ) )
+		);
+
+		$this->assertNotNull( $styles, sprintf( '%s must not be dropped', $value ) );
+	}
+
+	/**
+	 * Values that must never reach a stylesheet.
+	 *
+	 * The first two are the finding: the stylesheet is built by joining
+	 * `property:value` with semicolons, so a value carrying one closes its own
+	 * declaration and opens another. `10px;color:red` typed into a padding
+	 * field shipped as `padding-right:10px; color:red !important` -- arbitrary
+	 * CSS written by anyone who can edit a post. The rest are the same trick by
+	 * other routes, plus values with no meaning as spacing.
+	 *
+	 * @return array<string, array{string}>
+	 */
+	public static function refused_values(): array {
+		$values = array(
+			'10px;color:red',
+			';color:red',
+			'10px} body{display:none',
+			'url(https://example.com/x.png)',
+			'expression(alert(1))',
+			'calc(url(x))',
+			'attr(style)',
+			'10px !important',
+			'10px/*x*/',
+			'@import url(x)',
+			'<script>',
+			'red',
+			'10px;',
+		);
+
+		$cases = array();
+
+		foreach ( $values as $value ) {
+			$cases[ $value ] = array( $value );
+		}
+
+		return $cases;
+	}
+
+	/**
+	 * @param string $value An authored value.
+	 */
+	#[DataProvider( 'refused_values' )]
+	public function test_an_unsafe_or_meaningless_value_is_dropped( string $value ): void {
+		$this->assertNull(
+			$this->generator->generate(
+				array( 'mobile' => array( 'spacing' => array( 'padding' => array( 'top' => $value ) ) ) )
+			),
+			sprintf( '%s must not reach a stylesheet', $value )
+		);
+	}
+
+	/**
+	 * One bad side must not take the good ones with it, or spare them.
+	 */
+	public function test_a_refused_side_leaves_the_others_alone(): void {
+		$styles = $this->generator->generate(
+			array(
+				'mobile' => array(
+					'spacing' => array(
+						'padding' => array(
+							'top'    => 'red',
+							'right'  => '10px;color:red',
+							'bottom' => '20px',
+							'left'   => 'calc(100% - 2rem)',
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertNotNull( $styles );
+
+		$properties = array_keys( $styles->rules[0]['declarations'] );
+
+		sort( $properties );
+
+		$this->assertSame(
+			array( 'padding-bottom', 'padding-left' ),
+			$properties,
+			'only the two sides that were values should be emitted'
+		);
+
+		$collector = new Collector();
+		$collector->add( $styles );
+
+		$css = $collector->to_css();
+
+		$this->assertStringNotContainsString( 'color', $css );
+		$this->assertStringNotContainsString( 'red', $css );
 	}
 
 	// -- Exit criterion ----------------------------------------------------
