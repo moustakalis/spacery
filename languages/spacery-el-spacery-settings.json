@@ -145,6 +145,9 @@
 			"Spacery's own set": [
 				"το δικό του σύνολο του Spacery"
 			],
+			"a filter on this site": [
+				"ένα φίλτρο σε αυτόν τον ιστότοπο"
+			],
 			"This theme — it declares no breakpoints": [
 				"Αυτό το θέμα — δεν δηλώνει σημεία διακοπής"
 			],
@@ -159,6 +162,9 @@
 			],
 			"Breakpoints I define below": [
 				"Σημεία διακοπής που ορίζω παρακάτω"
+			],
+			"A spacery_breakpoints filter on this site replaces the set, so the breakpoints above are stored but not in use.": [
+				"Ένα φίλτρο spacery_breakpoints σε αυτόν τον ιστότοπο αντικαθιστά το σύνολο, οπότε τα σημεία διακοπής παραπάνω είναι αποθηκευμένα αλλά δεν χρησιμοποιούνται."
 			],
 			"Your theme declares breakpoints Spacery could not read, so %s is in use.": [
 				"Το θέμα σας δηλώνει σημεία διακοπής που το Spacery δεν μπόρεσε να διαβάσει, οπότε χρησιμοποιείται %s."

@@ -7,8 +7,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-12T10:37:57+00:00\n"
-"PO-Revision-Date: 2026-09-12T10:37:57+00:00\n"
+"POT-Creation-Date: 2026-09-12T15:17:59+00:00\n"
+"PO-Revision-Date: 2026-09-12T15:17:59+00:00\n"
 "Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Domain: spacery\n"
@@ -45,19 +45,19 @@ msgstr ""
 msgid "Spacery has no build output. If you installed it from source, run \"pnpm install && pnpm run build\"."
 msgstr "Το Spacery δεν έχει αρχεία build. Αν το εγκαταστήσατε από τον πηγαίο κώδικα, εκτελέστε «pnpm install && pnpm run build»."
 
-#: includes/Breakpoints/Registry.php:84
+#: includes/Breakpoints/Registry.php:107
 msgid "Desktop"
 msgstr "Υπολογιστής"
 
-#: includes/Breakpoints/Registry.php:85
+#: includes/Breakpoints/Registry.php:108
 msgid "Laptop"
 msgstr "Φορητός"
 
-#: includes/Breakpoints/Registry.php:86
+#: includes/Breakpoints/Registry.php:109
 msgid "Tablet"
 msgstr "Τάμπλετ"
 
-#: includes/Breakpoints/Registry.php:87
+#: includes/Breakpoints/Registry.php:110
 msgid "Mobile"
 msgstr "Κινητό"
 
@@ -389,85 +389,85 @@ msgstr "Τεκμηρίωση"
 msgid "Support"
 msgstr "Υποστήριξη"
 
-#: src/settings/BreakpointRows.js:98
-#: src/settings/BreakpointRows.js:107
+#: src/settings/BreakpointRows.js:89
+#: src/settings/BreakpointRows.js:94
 msgid "Name"
 msgstr "Όνομα"
 
-#: src/settings/BreakpointRows.js:98
-#: src/settings/BreakpointRows.js:114
+#: src/settings/BreakpointRows.js:89
+#: src/settings/BreakpointRows.js:101
 msgid "Slug"
 msgstr "Σύντομο όνομα"
 
-#: src/settings/BreakpointRows.js:98
-#: src/settings/BreakpointRows.js:120
+#: src/settings/BreakpointRows.js:89
+#: src/settings/BreakpointRows.js:107
 msgid "Up to"
 msgstr "Έως"
 
-#: src/settings/BreakpointRows.js:98
+#: src/settings/BreakpointRows.js:89
 msgid "Covers"
 msgstr "Καλύπτει"
 
 #. translators: %s: the slug the breakpoint was saved under.
-#: src/settings/BreakpointRows.js:120
+#: src/settings/BreakpointRows.js:107
 #, js-format
 msgid "Spacing already saved under %s will stop applying. To change only what this breakpoint is called, edit its name and leave the slug alone."
 msgstr "Τα κενά που έχουν ήδη αποθηκευτεί με το %s θα πάψουν να ισχύουν. Για να αλλάξετε μόνο το πώς ονομάζεται αυτό το σημείο διακοπής, επεξεργαστείτε το όνομά του και αφήστε το σύντομο όνομα ως έχει."
 
 #. translators: %s: breakpoint name.
-#: src/settings/BreakpointRows.js:124
+#: src/settings/BreakpointRows.js:111
 #, js-format
 msgid "Remove %s"
 msgstr "Αφαίρεση %s"
 
-#: src/settings/BreakpointRows.js:125
+#: src/settings/BreakpointRows.js:112
 msgid "Add breakpoint"
 msgstr "Προσθήκη σημείου διακοπής"
 
 #. translators: %d: maximum number of breakpoints.
-#: src/settings/BreakpointRows.js:128
+#: src/settings/BreakpointRows.js:115
 #, js-format
 msgid "%d breakpoints is the maximum. Beyond that the editor asks more of an author than it gives back."
 msgstr "Τα %d σημεία διακοπής είναι το ανώτατο όριο. Πέρα από αυτό, ο επεξεργαστής ζητά από τον συντάκτη περισσότερα απ' όσα του δίνει."
 
-#: src/settings/BreakpointRows.js:129
+#: src/settings/BreakpointRows.js:116
 msgid "Name is shown in the editor. Slug is stored in block attributes and follows the name until you change it."
 msgstr "Το όνομα εμφανίζεται στον επεξεργαστή. Το slug αποθηκεύεται στα χαρακτηριστικά των μπλοκ και ακολουθεί το όνομα μέχρι να το αλλάξετε."
 
-#: src/settings/BreakpointRows.js:144
+#: src/settings/BreakpointRows.js:131
 msgid "You have not defined any breakpoints yet"
 msgstr "Δεν έχετε ορίσει ακόμη κανένα σημείο διακοπής"
 
 #. translators: %s: the breakpoint set in use meanwhile.
-#: src/settings/BreakpointRows.js:146
+#: src/settings/BreakpointRows.js:133
 #, js-format
 msgid "Until you add one, Spacery falls back to %s, which is what \"In use now\" below is showing."
 msgstr "Μέχρι να προσθέσετε ένα, το Spacery χρησιμοποιεί %s, που είναι αυτό που δείχνει η ενότητα «Σε χρήση τώρα» παρακάτω."
 
-#: src/settings/BreakpointRows.js:146
+#: src/settings/BreakpointRows.js:133
 msgid "Add your first breakpoint"
 msgstr "Προσθέστε το πρώτο σας σημείο διακοπής"
 
 #. translators: 1: breakpoint name. 2: a CSS length.
-#: src/settings/Ruler.js:93
+#: src/settings/Ruler.js:95
 #, js-format
 msgid "%1$s to %2$s"
 msgstr "%1$s έως %2$s"
 
 #. translators: 1: breakpoint name. 2: the range it covers.
-#: src/settings/Ruler.js:111
+#: src/settings/Ruler.js:113
 #, js-format
 msgid "%1$s, %2$s."
 msgstr "%1$s, %2$s."
 
 #. translators: %s: a CSS length, e.g. "11920px".
-#: src/settings/Ruler.js:184
+#: src/settings/Ruler.js:186
 #, js-format
 msgid "The widest band runs to %s, past the edge of this ruler, and is cut short here."
 msgstr "Η πλατύτερη ζώνη φτάνει έως %s, πέρα από την άκρη αυτού του χάρακα, και κόβεται εδώ."
 
 #. translators: %s: a CSS length, e.g. "1280px".
-#: src/settings/Ruler.js:187
+#: src/settings/Ruler.js:189
 #, js-format
 msgid "Screens wider than %s match no breakpoint, so blocks use their ordinary, non-responsive spacing there. Raise the widest breakpoint if that is not what you want."
 msgstr "Οθόνες πλατύτερες από %s δεν αντιστοιχούν σε κανένα σημείο διακοπής, οπότε τα μπλοκ χρησιμοποιούν εκεί τα συνηθισμένα, μη αποκρίσιμα κενά τους. Αυξήστε το πλατύτερο σημείο διακοπής αν δεν είναι αυτό που θέλετε."
@@ -480,64 +480,72 @@ msgid_plural "%1$s and %2$d more"
 msgstr[0] "%1$s και %2$d ακόμη"
 msgstr[1] "%1$s και %2$d ακόμη"
 
-#: src/settings/sources.js:65
+#: src/settings/sources.js:69
 msgid "your theme"
 msgstr "το θέμα σας"
 
-#: src/settings/sources.js:67
+#: src/settings/sources.js:71
 msgid "the breakpoints you defined"
 msgstr "τα σημεία διακοπής που ορίσατε"
 
-#: src/settings/sources.js:69
+#: src/settings/sources.js:73
 msgid "Spacery's own set"
 msgstr "το δικό του σύνολο του Spacery"
 
-#: src/settings/sources.js:84
+#: src/settings/sources.js:75
+msgid "a filter on this site"
+msgstr "ένα φίλτρο σε αυτόν τον ιστότοπο"
+
+#: src/settings/sources.js:94
 msgid "This theme — it declares no breakpoints"
 msgstr "Αυτό το θέμα — δεν δηλώνει σημεία διακοπής"
 
 #. translators: %s: a list of breakpoint names.
-#: src/settings/sources.js:87
+#: src/settings/sources.js:97
 #, js-format
 msgid "This theme — %s"
 msgstr "Αυτό το θέμα — %s"
 
 #. translators: %s: the source that will be followed.
-#: src/settings/sources.js:93
+#: src/settings/sources.js:103
 #, js-format
 msgid "Decide for me — currently %s"
 msgstr "Ας αποφασίσει το Spacery — τώρα: %s"
 
 #. translators: %s: a list of breakpoint names.
-#: src/settings/sources.js:100
+#: src/settings/sources.js:110
 #, js-format
 msgid "Spacery's own — %s"
 msgstr "Του ίδιου του Spacery — %s"
 
-#: src/settings/sources.js:102
+#: src/settings/sources.js:112
 msgid "Breakpoints I define below"
 msgstr "Σημεία διακοπής που ορίζω παρακάτω"
 
+#: src/settings/sources.js:152
+msgid "A spacery_breakpoints filter on this site replaces the set, so the breakpoints above are stored but not in use."
+msgstr "Ένα φίλτρο spacery_breakpoints σε αυτόν τον ιστότοπο αντικαθιστά το σύνολο, οπότε τα σημεία διακοπής παραπάνω είναι αποθηκευμένα αλλά δεν χρησιμοποιούνται."
+
 #. translators: %s: the breakpoint set in use instead.
-#: src/settings/sources.js:136
+#: src/settings/sources.js:163
 #, js-format
 msgid "Your theme declares breakpoints Spacery could not read, so %s is in use."
 msgstr "Το θέμα σας δηλώνει σημεία διακοπής που το Spacery δεν μπόρεσε να διαβάσει, οπότε χρησιμοποιείται %s."
 
 #. translators: %s: the breakpoint set in use instead.
-#: src/settings/sources.js:141
+#: src/settings/sources.js:168
 #, js-format
 msgid "You chose your own breakpoints but have not defined any yet, so %s is in use until you add one."
 msgstr "Επιλέξατε δικά σας σημεία διακοπής αλλά δεν έχετε ορίσει ακόμη κανένα, οπότε χρησιμοποιείται %s μέχρι να προσθέσετε ένα."
 
 #. translators: %s: the breakpoint set in use instead.
-#: src/settings/sources.js:146
+#: src/settings/sources.js:173
 #, js-format
 msgid "You chose your theme's breakpoints, but it declares none Spacery can use, so %s is in use."
 msgstr "Επιλέξατε τα σημεία διακοπής του θέματός σας, αλλά αυτό δεν δηλώνει κανένα που να μπορεί να χρησιμοποιήσει το Spacery, οπότε χρησιμοποιείται %s."
 
 #. translators: %s: the breakpoint set in use instead.
-#: src/settings/sources.js:150
+#: src/settings/sources.js:177
 #, js-format
 msgid "The set you chose is empty, so %s is in use."
 msgstr "Το σύνολο που επιλέξατε είναι κενό, οπότε χρησιμοποιείται %s."
