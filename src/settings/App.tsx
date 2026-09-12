@@ -18,7 +18,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from 'react';
 
-import { band } from './bands';
 import { Footer, Masthead } from './Brand';
 import { BreakpointRows } from './BreakpointRows';
 import { Ruler } from './Ruler';
@@ -300,9 +299,28 @@ export function App(): React.ReactElement {
 			<FlexItem>
 				<Card>
 					<CardHeader>
-						<Heading level={2}>
-							{__('In use now', 'spacery')}
-						</Heading>
+						{/*
+						 * The heading and one line of right-aligned meta, which
+						 * is what a CardHeader is for (§4). `From:` belongs
+						 * here rather than in the body: it qualifies the whole
+						 * card, and the card's content is now a drawing.
+						 */}
+						<Flex justify="space-between" align="center">
+							<FlexItem>
+								<Heading level={2}>
+									{__('In use now', 'spacery')}
+								</Heading>
+							</FlexItem>
+							<FlexItem>
+								<Text variant="muted" size={12}>
+									{sprintf(
+										/* translators: %s: where the breakpoints come from. */
+										__('From: %s', 'spacery'),
+										sourceName(info.resolvedSource)
+									)}
+								</Text>
+							</FlexItem>
+						</Flex>
 					</CardHeader>
 					<CardBody>
 						<ResolvedSet info={info} source={source} />
@@ -356,11 +374,14 @@ export function App(): React.ReactElement {
 }
 
 /**
- * The set actually in effect, with the media query each tier will emit.
+ * The set actually in effect, drawn rather than listed.
  *
- * Showing the query rather than only the boundary is what makes the disjoint
- * bands visible: a tier covers a range, and its lower edge is the next tier's
- * boundary rather than zero.
+ * "Show the bands instead of describing them" — `docs/design/settings-screen.png`.
+ * This card used to print `over 782px, up to 1024px` once per tier and leave
+ * the reader to assemble a mental picture; the ruler makes the two facts that
+ * matter visible at once, that the bands are disjoint and that nothing covers
+ * screens wider than the widest one. The sentences did not disappear: they are
+ * the ruler's accessible description.
  *
  * @param root0        Component props.
  * @param root0.info   What each source contains.
@@ -391,45 +412,34 @@ function ResolvedSet({
 	}
 
 	return (
-		<Flex direction="column" gap={2}>
-			<FlexItem>
-				<Text variant="muted" size={12}>
-					{sprintf(
-						/* translators: %s: where the breakpoints come from. */
-						__('From: %s', 'spacery'),
-						sourceName(info.resolvedSource)
-					)}
-				</Text>
-			</FlexItem>
-
+		<Flex direction="column" gap={4}>
 			{null !== fallback && (
 				<FlexItem>
-					<Text variant="muted" size={12}>
-						{fallback}
-					</Text>
+					{/*
+					 * A caution, not a muted aside: the author chose one thing
+					 * and is looking at another. Border, tint and text are the
+					 * design system's caution triple — and the text is never
+					 * the border colour, which fails contrast at this size.
+					 */}
+					<div
+						style={{
+							borderLeft: '4px solid #dba617',
+							background: '#fcf9e8',
+							padding: '12px 16px',
+							color: '#8a6616',
+						}}
+					>
+						<Text size={13}>{fallback}</Text>
+					</div>
 				</FlexItem>
 			)}
+
 			<FlexItem>
 				<Ruler
 					tiers={info.resolved}
 					pixelsPerEm={info.rules.pixelsPerEm}
 				/>
 			</FlexItem>
-
-			{info.resolved.map((tier, index) => (
-				<FlexItem key={tier.slug}>
-					<Flex justify="space-between">
-						<FlexItem>
-							<Text>{tier.label}</Text>
-						</FlexItem>
-						<FlexItem>
-							<Text variant="muted" size={12}>
-								{band(info.resolved, index)}
-							</Text>
-						</FlexItem>
-					</Flex>
-				</FlexItem>
-			))}
 		</Flex>
 	);
 }

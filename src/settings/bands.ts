@@ -14,7 +14,8 @@
 
 import { __, sprintf } from '@wordpress/i18n';
 
-import type { Breakpoint } from './types';
+import type { Row } from './rows';
+import type { Breakpoint, ValidationRules } from './types';
 
 /**
  * Where the axis stops, however wide a tier claims to be.
@@ -31,11 +32,92 @@ export const CEILING_PX = 2560;
 /** Headroom above the widest tier, so the uncovered region is visible. */
 const HEADROOM = 1.15;
 
+/**
+ * The ramp, narrowest band to widest (design system §5.1).
+ *
+ * Hand-picked rather than computed, and the order is the argument: a narrow
+ * band is the darkest because narrow screens are where a spacing value matters
+ * most, and the eye reads dark as heavy. The lightest step is `#3858e9`, which
+ * is WordPress's own primary and holds 5.6:1 against white — the floor for the
+ * 12px white labels drawn inside these bands. **Nothing may be lighter than
+ * the last stop**, which is why a ramp for more bands interpolates *between*
+ * these rather than extending past them.
+ */
+const RAMP = ['#142269', '#1f3399', '#2c46c9', '#3858e9'] as const;
+
+/**
+ * The colour for one band.
+ *
+ * Samples {@link RAMP} at `index / (total - 1)`, interpolating between
+ * adjacent stops, so four bands land on the four published values and twelve
+ * bands share the same range in smaller steps. A lone band is drawn in the
+ * lightest stop: it is the widest band there is, and the accent is the colour
+ * the rest of the admin would use for it.
+ *
+ * @param index Which band, narrowest first.
+ * @param total How many bands are drawn.
+ * @return A hex colour.
+ */
+export function rampColor(index: number, total: number): string {
+	if (2 > total) {
+		return RAMP[RAMP.length - 1]!;
+	}
+
+	const position =
+		(Math.min(Math.max(index, 0), total - 1) / (total - 1)) *
+		(RAMP.length - 1);
+	const lower = Math.floor(position);
+	const upper = Math.min(lower + 1, RAMP.length - 1);
+
+	return mix(RAMP[lower]!, RAMP[upper]!, position - lower);
+}
+
+/**
+ * Two hex colours blended in sRGB.
+ *
+ * Naive on purpose. A perceptual space would space the middle stops more
+ * evenly, but the four they sit between were chosen by eye against this
+ * admin's white, and moving them to satisfy a colour model would be answering
+ * a question nobody asked.
+ *
+ * @param from   Hex colour at `amount` 0.
+ * @param to     Hex colour at `amount` 1.
+ * @param amount Position between them, 0 to 1.
+ * @return A hex colour.
+ */
+function mix(from: string, to: string, amount: number): string {
+	const channels = [1, 3, 5].map((at) => {
+		const start = parseInt(from.slice(at, at + 2), 16);
+		const end = parseInt(to.slice(at, at + 2), 16);
+
+		return Math.round(start + (end - start) * amount);
+	});
+
+	return `#${channels.map((value) => value.toString(16).padStart(2, '0')).join('')}`;
+}
+
+/**
+ * The narrowest share of the axis that can hold a tier's name.
+ *
+ * Below this a name is clipped mid-letter, which reads as a rendering fault
+ * rather than as a small band.
+ */
+export const LABEL_FLOOR = 7;
+
 /** One drawn region of the axis. */
 export interface Segment {
 	/** The tier's slug, or `default` for the region above the widest tier. */
 	key: string;
 	label: string;
+	/**
+	 * The authored upper edge, in the author's own units — empty for the
+	 * uncovered region, which nobody authored.
+	 *
+	 * Carried rather than derived from `toPx` because §5.1 is explicit that
+	 * positions are pixel-derived while labels keep the units that were typed:
+	 * an author who wrote `55.5rem` is owed `55.5rem` back.
+	 */
+	max: string;
 	fromPx: number;
 	/** The real upper edge, which may be beyond the axis. */
 	toPx: number;
@@ -118,7 +200,9 @@ export function ruler(tiers: Breakpoint[], pixelsPerEm: number): Ruler {
 	for (const tier of ascending) {
 		const toPx = toPixels(tier.max, pixelsPerEm);
 
-		segments.push(segment(tier.slug, tier.label, fromPx, toPx, axisMaxPx));
+		segments.push(
+			segment(tier.slug, tier.label, tier.max, fromPx, toPx, axisMaxPx)
+		);
 
 		fromPx = toPx;
 	}
@@ -128,10 +212,17 @@ export function ruler(tiers: Breakpoint[], pixelsPerEm: number): Ruler {
 	 * axis, because then there is nothing above it left to draw.
 	 */
 	if (fromPx < axisMaxPx) {
+		/*
+		 * "no tier", not "Default" (§5.1). This band is drawn hatched because
+		 * nothing claims it, and `Default` is a word this plugin has already
+		 * spent: the spacer block calls its own base height that, and the
+		 * provenance lines deliberately avoid it for the same reason.
+		 */
 		segments.push(
 			segment(
 				'default',
-				__('Default', 'spacery'),
+				__('no tier', 'spacery'),
+				'',
 				fromPx,
 				axisMaxPx,
 				axisMaxPx
@@ -147,6 +238,7 @@ export function ruler(tiers: Breakpoint[], pixelsPerEm: number): Ruler {
  *
  * @param key       Slug or `default`.
  * @param label     Its name.
+ * @param max       The authored upper edge, or an empty string.
  * @param fromPx    Lower edge.
  * @param toPx      Real upper edge.
  * @param axisMaxPx Where the axis stops.
@@ -155,6 +247,7 @@ export function ruler(tiers: Breakpoint[], pixelsPerEm: number): Ruler {
 function segment(
 	key: string,
 	label: string,
+	max: string,
 	fromPx: number,
 	toPx: number,
 	axisMaxPx: number
@@ -165,11 +258,181 @@ function segment(
 	return {
 		key,
 		label,
+		max,
 		fromPx,
 		toPx,
 		share: 0 === axisMaxPx ? 0 : ((drawnTo - drawnFrom) / axisMaxPx) * 100,
 		clipped: toPx > axisMaxPx,
 	};
+}
+
+/** What one editing row covers, for the `Covers` column. */
+export interface Coverage {
+	/** The band as a sentence, or an empty string when there is nothing to say. */
+	text: string;
+	/** False when the row covers no width at all. */
+	covers: boolean;
+}
+
+/**
+ * What each row being edited covers.
+ *
+ * The same question the ruler answers, asked of rows rather than of a resolved
+ * set — so it goes through the same {@link band}, which is the whole reason
+ * that function takes a list and an index rather than one tier. A second
+ * implementation would eventually disagree with the drawing beside it.
+ *
+ * Rows are authored in whatever order they were added and a width can be
+ * half-typed, so this sorts what it can use and ignores what it cannot: a row
+ * with no usable width yet has nothing to say about coverage, and the message
+ * on its own field is already saying it.
+ *
+ * @param rows  The rows being edited.
+ * @param rules The server's own rules, for the pixels-per-em.
+ * @return One entry per row, keyed by the row's client id.
+ */
+export function coverage(
+	rows: Row[],
+	rules: ValidationRules
+): Record<string, Coverage> {
+	const widths = new Set<number>();
+	const usable: Array<{ row: Row; px: number }> = [];
+	const nothing = new Set<string>();
+
+	/*
+	 * Walked in the order they were authored, so the *first* row at a width
+	 * keeps it and a later one at the same width is the one left covering
+	 * nothing. That is not an arbitrary choice between the two: it is the row
+	 * `validate()` puts the error on, and one problem must not accuse two
+	 * different rows in two different columns.
+	 */
+	for (const row of rows) {
+		const px = toPixels(row.max, rules.pixelsPerEm);
+
+		if (!Number.isFinite(px) || 0 >= px) {
+			continue;
+		}
+
+		if (widths.has(px)) {
+			nothing.add(row.id);
+			continue;
+		}
+
+		widths.add(px);
+		usable.push({ row, px });
+	}
+
+	usable.sort((one, other) => other.px - one.px);
+
+	const tiers: Breakpoint[] = usable.map(({ row }) => ({
+		slug: row.slug,
+		label: row.label,
+		max: row.max,
+	}));
+
+	const found: Record<string, Coverage> = {};
+
+	for (const row of rows) {
+		found[row.id] = nothing.has(row.id)
+			? { text: __('Nothing', 'spacery'), covers: false }
+			: { text: '', covers: true };
+	}
+
+	usable.forEach(({ row }, index) => {
+		found[row.id] = { text: band(tiers, index), covers: true };
+	});
+
+	return found;
+}
+
+/**
+ * The closest two axis marks may sit, as a percentage of the axis.
+ *
+ * A label is around 45px wide and the marks are centred on their boundaries,
+ * so two boundaries a few percent apart print one number over another. Twelve
+ * tiers did exactly that: `320px` and `400px` came out as `320p400px`.
+ */
+const MIN_TICK_GAP = 6;
+
+/** One labelled mark on the axis under the ruler. */
+export interface Tick {
+	/** Where it sits, as a percentage of the axis. */
+	at: number;
+	/** What it reads, in the author's own units. */
+	label: string;
+}
+
+/**
+ * The marks under the bar, at zero and at every boundary.
+ *
+ * The boundaries are the numbers the author typed, so the axis is where the
+ * drawing and the table meet: a band's right edge sits above the width that
+ * ends it. A band running past the axis contributes no mark — its real width
+ * is written inside it instead, because a mark at the cut edge would label the
+ * cut rather than the boundary.
+ *
+ * @param segments The bands to draw, narrowest first.
+ * @return One tick per boundary, left to right.
+ */
+export function axisTicks(segments: Segment[]): Tick[] {
+	const boundaries: Tick[] = [];
+	let at = 0;
+
+	for (const region of segments) {
+		at += region.share;
+
+		if ('default' !== region.key && !region.clipped) {
+			boundaries.push({ at, label: region.max });
+		}
+	}
+
+	const kept: Tick[] = [{ at: 0, label: '0' }];
+
+	boundaries.forEach((tick, index) => {
+		const last = kept.at(-1)!;
+
+		if (MIN_TICK_GAP <= tick.at - last.at) {
+			kept.push(tick);
+			return;
+		}
+
+		/*
+		 * The widest boundary is the one number on this axis nobody can infer
+		 * from the others, and the callout beneath refers to it, so it keeps
+		 * its place and the crowded mark before it gives way. Zero never does:
+		 * it is where the axis starts.
+		 */
+		if (index === boundaries.length - 1) {
+			if (0 < last.at) {
+				kept.pop();
+			}
+
+			kept.push(tick);
+		}
+	});
+
+	return kept;
+}
+
+/**
+ * Whether the bands can carry their names, all of them or none.
+ *
+ * All or nothing on purpose. Per-band fitting looked like a defect at twelve
+ * tiers: the shares land either side of the floor almost at random, so one
+ * band came out blank between two labelled ones, which reads as a name that
+ * failed to render rather than as a band too narrow to hold one. The list
+ * beside the ruler names every tier either way.
+ *
+ * The uncovered region is not consulted — it is a remainder, and a thin one is
+ * normal.
+ *
+ * @param segments The bands to draw.
+ * @return Whether to draw names inside them.
+ */
+export function labelsFit(segments: Segment[]): boolean {
+	return segments
+		.filter((region) => 'default' !== region.key)
+		.every((region) => LABEL_FLOOR <= region.share);
 }
 
 /**

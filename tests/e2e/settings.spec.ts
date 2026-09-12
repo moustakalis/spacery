@@ -125,18 +125,35 @@ test.describe('settings screen', () => {
 		await page.getByRole('button', { name: 'Save changes' }).click();
 		await expect(app.getByText('Settings saved.')).toBeVisible();
 
+		await expect(app.getByText("From: Spacery's own set")).toBeVisible();
+
 		/*
 		 * Asserted on the bands rather than the tier names. A name proves only
-		 * that a list was rendered; the bands prove the order is widest-first
-		 * and that the ranges are disjoint, which is the claim -- a tier's lower
-		 * edge is the next tier's boundary, not zero.
+		 * that something was rendered; the bands prove the order is
+		 * widest-first and that the ranges are disjoint, which is the claim --
+		 * a tier's lower edge is the next tier's boundary, not zero.
+		 *
+		 * They are read off the ruler's accessible description, which is where
+		 * they live now that the drawing has replaced the list it used to sit
+		 * beside. That makes this one assertion cover two things: the bands,
+		 * and the fact that the picture is described at all.
 		 */
-		await expect(app.getByText("From: Spacery's own set")).toBeVisible();
-		await expect(app.getByText('over 1024px, up to 1280px')).toBeVisible();
-		await expect(app.getByText('over 782px, up to 1024px')).toBeVisible();
-		await expect(app.getByText('over 480px, up to 782px')).toBeVisible();
 		await expect(
-			app.getByText('up to 480px', { exact: true })
+			app.getByRole('img', {
+				name:
+					'Desktop, over 1024px, up to 1280px. ' +
+					'Laptop, over 782px, up to 1024px. ' +
+					'Tablet, over 480px, up to 782px. ' +
+					'Mobile, up to 480px.',
+			})
+		).toBeVisible();
+
+		// And the one thing on that card an author may have to act on.
+		await expect(
+			app.getByText(
+				'Screens wider than 1280px match no breakpoint, so blocks use their ordinary, non-responsive spacing there.',
+				{ exact: false }
+			)
 		).toBeVisible();
 	});
 

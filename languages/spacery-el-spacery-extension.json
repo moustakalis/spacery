@@ -123,14 +123,17 @@
 			"Inherited from Default": [
 				"Κληρονομείται από την Προεπιλογή"
 			],
-			"Default": [
-				"Προεπιλογή"
-			],
 			"up to %s": [
 				"έως %s"
 			],
 			"over %1$s, up to %2$s": [
 				"πάνω από %1$s, έως %2$s"
+			],
+			"no tier": [
+				"κανένα σημείο"
+			],
+			"Nothing": [
+				"Τίποτα"
 			],
 			"%1$s and %2$d more": [
 				"%1$s και %2$d ακόμη",
@@ -190,14 +193,14 @@
 			"In use now": [
 				"Σε χρήση τώρα"
 			],
+			"From: %s": [
+				"Από: %s"
+			],
 			"Save changes": [
 				"Αποθήκευση αλλαγών"
 			],
 			"No breakpoints are active.": [
 				"Δεν υπάρχουν ενεργά σημεία διακοπής."
-			],
-			"From: %s": [
-				"Από: %s"
 			],
 			"Settings saved.": [
 				"Οι ρυθμίσεις αποθηκεύτηκαν."
@@ -245,11 +248,17 @@
 			"Inherited from %d different places": [
 				"Κληρονομείται από %d διαφορετικά σημεία"
 			],
-			"%1$s runs to %2$s, past the edge of this ruler.": [
-				"Το %1$s φτάνει έως %2$s, πέρα από το άκρο αυτού του χάρακα."
+			"%1$s to %2$s": [
+				"%1$s έως %2$s"
 			],
-			"Above %s no breakpoint applies, so the default does.": [
-				"Πάνω από %s δεν ισχύει κανένα σημείο διακοπής, οπότε ισχύει η προεπιλογή."
+			"%1$s, %2$s.": [
+				"%1$s, %2$s."
+			],
+			"The widest band runs to %s, past the edge of this ruler, and is cut short here.": [
+				"Η πλατύτερη ζώνη φτάνει έως %s, πέρα από την άκρη αυτού του χάρακα, και κόβεται εδώ."
+			],
+			"Screens wider than %s match no breakpoint, so blocks use their ordinary, non-responsive spacing there. Raise the widest breakpoint if that is not what you want.": [
+				"Οθόνες πλατύτερες από %s δεν αντιστοιχούν σε κανένα σημείο διακοπής, οπότε τα μπλοκ χρησιμοποιούν εκεί τα συνηθισμένα, μη αποκρίσιμα κενά τους. Αυξήστε το πλατύτερο σημείο διακοπής αν δεν είναι αυτό που θέλετε."
 			],
 			"%1$s · ≤%2$s": [
 				"%1$s · ≤%2$s"
@@ -265,6 +274,9 @@
 			],
 			"Height": [
 				"Ύψος"
+			],
+			"Default": [
+				"Προεπιλογή"
 			],
 			"Applies at every width unless a narrower breakpoint overrides it.": [
 				"Ισχύει σε κάθε πλάτος, εκτός αν το αντικαταστήσει ένα στενότερο σημείο διακοπής."
