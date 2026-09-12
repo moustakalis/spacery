@@ -11,6 +11,8 @@ import {
 	sameBreakpoints,
 	slugFrom,
 	slugHasMoved,
+	slugIsDerived,
+	slugTyped,
 	toBreakpoints,
 	toRows,
 	toSlug,
@@ -188,5 +190,54 @@ describe('isDirty', () => {
 		const reversed = toRows([...both.spacery_custom_breakpoints].reverse());
 
 		expect(isDirty(reversed, 'custom', both)).toBe(false);
+	});
+});
+
+/**
+ * The hybrid the design's grey slug column can honestly support.
+ *
+ * A placeholder says "nothing is stored, this is what we would use". That is
+ * true of a row just added and false of a row the server returned, whose slug
+ * is a key posts may reference — the thing S1 exists to protect.
+ */
+describe('slugIsDerived', () => {
+	it('is a hint while the slug still follows the name', () => {
+		const rows = toRows([]);
+		const row = { ...blankRow(), label: 'Laptop', slug: 'laptop' };
+
+		expect(rows).toStrictEqual([]);
+		expect(slugIsDerived(row)).toBe(true);
+	});
+
+	it('is a value once the author has chosen one', () => {
+		const row = { ...blankRow(), label: 'Laptop', slug: 'lap' };
+
+		expect(slugIsDerived(row)).toBe(false);
+	});
+
+	it('is a value for anything the server has stored', () => {
+		const [row] = toRows([
+			{ slug: 'laptop', label: 'Laptop', max: '1024px' },
+		]);
+
+		expect(slugIsDerived(row!)).toBe(false);
+	});
+});
+
+describe('slugTyped', () => {
+	it('takes what was typed', () => {
+		const row = { ...blankRow(), label: 'Laptop', slug: 'laptop' };
+
+		expect(slugTyped('wide-laptop', row)).toBe('wide-laptop');
+	});
+
+	/**
+	 * Clearing the field is the only reading of "empty" the placeholder leaves
+	 * available, and an empty slug is not one the server would take.
+	 */
+	it('reads an emptied field as going back to the name', () => {
+		const row = { ...blankRow(), label: 'Wide Laptop', slug: 'lap' };
+
+		expect(slugTyped('', row)).toBe('wide-laptop');
 	});
 });

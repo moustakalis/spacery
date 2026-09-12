@@ -177,6 +177,37 @@ export function band(tiers: Breakpoint[], index: number): string {
 }
 
 /**
+ * What a tier covers, as a range.
+ *
+ * The compact form the `Covers` column uses, where a sentence per row would be
+ * four sentences saying the same shape. {@link band} is the same fact written
+ * out, for the ruler's description and anywhere else a reader needs prose.
+ *
+ * @param tiers The set, widest first.
+ * @param index Which tier.
+ * @return Its band as `888px – 1400px`, or `up to 450px` for the narrowest.
+ */
+export function range(tiers: Breakpoint[], index: number): string {
+	const tier = tiers[index]!;
+	const narrower = tiers[index + 1];
+
+	if (!narrower) {
+		return sprintf(
+			/* translators: %s: a CSS length, e.g. "480px". */
+			__('up to %s', 'spacery'),
+			tier.max
+		);
+	}
+
+	return sprintf(
+		/* translators: 1: a CSS length. 2: a wider CSS length. An en dash separates them. */
+		__('%1$s – %2$s', 'spacery'),
+		narrower.max,
+		tier.max
+	);
+}
+
+/**
  * The bands to draw, narrowest first, and the axis they sit on.
  *
  * @param tiers       The resolved set, widest first.
@@ -339,7 +370,7 @@ export function coverage(
 	}
 
 	usable.forEach(({ row }, index) => {
-		found[row.id] = { text: band(tiers, index), covers: true };
+		found[row.id] = { text: range(tiers, index), covers: true };
 	});
 
 	return found;

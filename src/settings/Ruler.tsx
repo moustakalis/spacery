@@ -34,6 +34,7 @@ import {
 	ruler,
 	type Segment,
 } from './bands';
+import { emphasise } from './emphasise';
 import type { Breakpoint } from './types';
 
 /**
@@ -143,32 +144,6 @@ function described(tiers: Breakpoint[]): string {
 			)
 		)
 		.join(' ');
-}
-
-/**
- * A sentence with one value emphasised.
- *
- * `createInterpolateElement()` is the WordPress tool for this, and
- * `@wordpress/element` is a script external that is not in `node_modules`, so
- * its signature cannot be checked here — and `docs/CONTRIBUTING.md` says to
- * use plain markup rather than guess a declaration. Splitting the translated
- * format on its own placeholder does the same job with nothing to declare, and
- * leaves the translator one ordinary `%s`.
- *
- * @param format A translated format string containing one `%s`.
- * @param value  What to emphasise.
- * @return The sentence, with the value in bold.
- */
-function emphasise(format: string, value: string): React.ReactElement {
-	const [before = '', after = ''] = format.split('%s');
-
-	return (
-		<>
-			{before}
-			<strong>{value}</strong>
-			{after}
-		</>
-	);
 }
 
 /**

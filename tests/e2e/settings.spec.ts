@@ -184,7 +184,15 @@ test.describe('settings screen', () => {
 		const app = page.locator(appRoot);
 
 		await app.locator(sourceRadio('custom')).check();
-		await page.getByRole('button', { name: 'Add breakpoint' }).click();
+
+		/*
+		 * The empty card has its own button, because a lone *Add breakpoint*
+		 * left the author guessing what the site was doing about spacing
+		 * meanwhile. Every later row is added by the plain one.
+		 */
+		await page
+			.getByRole('button', { name: 'Add your first breakpoint' })
+			.click();
 		await page.getByLabel('Name').fill('Broken');
 
 		/*
@@ -223,6 +231,18 @@ test.describe('settings screen', () => {
 		await expect(
 			app.getByText('From: the breakpoints you defined')
 		).toBeVisible();
+
+		// Derived, never editable: the row says what it covers (§5.2).
+		await expect(app.getByText('up to 900px')).toBeVisible();
+
+		/*
+		 * The rule that started the redesign, as an assertion: "Per-row `help`
+		 * is forbidden -- N rows repeat it N times". One row, one line; four
+		 * rows, still one line.
+		 */
+		await expect(
+			app.getByText('Name is shown in the editor.', { exact: false })
+		).toHaveCount(1);
 	});
 
 	/**

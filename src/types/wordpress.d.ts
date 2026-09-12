@@ -235,7 +235,28 @@ declare module '@wordpress/components' {
 
 	export const TextControl: React.ComponentType<{
 		label?: string;
-		help?: string;
+		/*
+		 * `TextControlProps` picks this from `BaseControlProps`, the same way
+		 * `RadioControl` and `UnitControl` do -- and §4 of the design system
+		 * prescribes exactly this pattern for a table: "labels move to the
+		 * column header and `help` is dropped". The label still has to exist,
+		 * or four unlabelled inputs per row announce nothing.
+		 */
+		hideLabelFromVision?: boolean;
+		/*
+		 * Explicitly `| undefined`: this project has
+		 * `exactOptionalPropertyTypes` on, and a message that is only
+		 * sometimes there is passed as `help={maybe}` rather than by building
+		 * the props object key by key at every call site.
+		 */
+		help?: string | undefined;
+		/*
+		 * Passed straight through to the input, like every other unrecognised
+		 * prop: `TextControl` spreads `...additionalProps` onto it. Declared
+		 * because the slug column shows a derived slug as a hint until the
+		 * author chooses one.
+		 */
+		placeholder?: string | undefined;
 		value?: string;
 		onChange?: (value: string) => void;
 	}>;
@@ -285,7 +306,7 @@ declare module '@wordpress/components' {
 		 * declared on `UnitControlProps` itself, only inherited.
 		 */
 		hideLabelFromVision?: boolean;
-		help?: string;
+		help?: string | undefined;
 		value?: string | undefined;
 		placeholder?: string;
 		units?: Array<{ value: string; label: string }>;

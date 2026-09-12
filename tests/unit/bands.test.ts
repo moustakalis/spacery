@@ -12,6 +12,7 @@ import {
 	labelsFit,
 	LABEL_FLOOR,
 	rampColor,
+	range,
 	ruler,
 } from '../../src/settings/bands';
 import { toRows } from '../../src/settings/rows';
@@ -242,8 +243,8 @@ describe('coverage', () => {
 
 		const found = coverage(rows, RULES);
 
-		expect(found[rows[0]!.id]?.text).toBe('over 480px, up to 782px');
-		expect(found[rows[1]!.id]?.text).toBe('over 782px, up to 1280px');
+		expect(found[rows[0]!.id]?.text).toBe('480px – 782px');
+		expect(found[rows[1]!.id]?.text).toBe('782px – 1280px');
 		expect(found[rows[2]!.id]?.text).toBe('up to 480px');
 	});
 
@@ -314,9 +315,7 @@ describe('coverage', () => {
 			{ slug: 'narrow', label: 'Narrow', max: '30em' },
 		]);
 
-		expect(coverage(rows, RULES)[rows[0]!.id]?.text).toBe(
-			'over 30em, up to 60rem'
-		);
+		expect(coverage(rows, RULES)[rows[0]!.id]?.text).toBe('30em – 60rem');
 	});
 });
 
@@ -430,5 +429,20 @@ describe('axisTicks', () => {
 				);
 			}
 		});
+	});
+});
+
+describe('range', () => {
+	it('gives the narrowest tier an open lower edge', () => {
+		expect(range(PRESET, 3)).toBe('up to 480px');
+	});
+
+	/**
+	 * The same fact as `band()`, in the form the `Covers` column wants: four
+	 * rows of prose saying the same shape is three rows too many.
+	 */
+	it('writes a tier as a range', () => {
+		expect(range(PRESET, 2)).toBe('480px – 782px');
+		expect(band(PRESET, 2)).toBe('over 480px, up to 782px');
 	});
 });

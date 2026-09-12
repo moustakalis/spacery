@@ -135,6 +135,40 @@ export function slugFrom(label: string, row: Row): string {
 }
 
 /**
+ * Whether the slug field should show a hint rather than a value.
+ *
+ * The design draws this column grey, as a slug the author has not chosen —
+ * which is true of a row that has just been added, where nothing is stored and
+ * the value really is derived from the name. It is not true of a row that came
+ * back from the server: that slug is a key posts may already reference, and
+ * presenting stored data as hint text invites exactly the edit S1 exists to
+ * prevent. So the hint is for rows that have one, and a stored slug is shown as
+ * what it is.
+ *
+ * @param row The row.
+ * @return True when the field should render its slug as a placeholder.
+ */
+export function slugIsDerived(row: Row): boolean {
+	return !isStored(row) && row.slug === toSlug(row.label);
+}
+
+/**
+ * What an edit to the slug field means.
+ *
+ * Clearing it returns the row to deriving from the name, which is the only
+ * reading of "empty" that the placeholder makes available: the field then shows
+ * the hint again, so the author can see what undoing their choice got them. An
+ * empty slug is not a thing the server would accept anyway.
+ *
+ * @param next The field's new contents.
+ * @param row  The row before this edit.
+ * @return The slug to hold.
+ */
+export function slugTyped(next: string, row: Row): string {
+	return '' === next ? toSlug(row.label) : next;
+}
+
+/**
  * Lowercases and dashes a name, matching what the server accepts.
  *
  * @param label A human-readable name.

@@ -57,29 +57,29 @@
 			"Name": [
 				"Όνομα"
 			],
-			"Shown in the editor, e.g. Laptop.": [
-				"Εμφανίζεται στον επεξεργαστή, π.χ. Φορητός."
-			],
 			"Slug": [
 				"Σύντομο όνομα"
-			],
-			"Stored in block attributes. Lowercase letters, numbers and dashes.": [
-				"Αποθηκεύεται στις ιδιότητες του μπλοκ. Πεζά λατινικά γράμματα, αριθμοί και παύλες."
-			],
-			"Spacing already saved under %s will stop applying. To change only what this breakpoint is called, edit its name and leave the slug alone.": [
-				"Τα κενά που έχουν ήδη αποθηκευτεί με το %s θα πάψουν να ισχύουν. Για να αλλάξετε μόνο το πώς ονομάζεται αυτό το σημείο διακοπής, επεξεργαστείτε το όνομά του και αφήστε το σύντομο όνομα ως έχει."
 			],
 			"Up to": [
 				"Έως"
 			],
-			"The widest screen this breakpoint covers.": [
-				"Η ευρύτερη οθόνη που καλύπτει αυτό το σημείο διακοπής."
+			"Covers": [
+				"Καλύπτει"
+			],
+			"Spacing already saved under %s will stop applying. To change only what this breakpoint is called, edit its name and leave the slug alone.": [
+				"Τα κενά που έχουν ήδη αποθηκευτεί με το %s θα πάψουν να ισχύουν. Για να αλλάξετε μόνο το πώς ονομάζεται αυτό το σημείο διακοπής, επεξεργαστείτε το όνομά του και αφήστε το σύντομο όνομα ως έχει."
 			],
 			"Remove %s": [
 				"Αφαίρεση %s"
 			],
-			"Remove": [
-				"Αφαίρεση"
+			"Add breakpoint": [
+				"Προσθήκη σημείου διακοπής"
+			],
+			"%d breakpoints is the maximum. Beyond that the editor asks more of an author than it gives back.": [
+				"Τα %d σημεία διακοπής είναι το ανώτατο όριο. Πέρα από αυτό, ο επεξεργαστής ζητά από τον συντάκτη περισσότερα απ' όσα του δίνει."
+			],
+			"Name is shown in the editor. Slug is stored in block attributes and follows the name until you change it.": [
+				"Το όνομα εμφανίζεται στον επεξεργαστή. Το slug αποθηκεύεται στα χαρακτηριστικά των μπλοκ και ακολουθεί το όνομα μέχρι να το αλλάξετε."
 			],
 			"You have not defined any breakpoints yet": [
 				"Δεν έχετε ορίσει ακόμη κανένα σημείο διακοπής"
@@ -87,11 +87,8 @@
 			"Until you add one, Spacery falls back to %s, which is what \"In use now\" below is showing.": [
 				"Μέχρι να προσθέσετε ένα, το Spacery χρησιμοποιεί %s, που είναι αυτό που δείχνει η ενότητα «Σε χρήση τώρα» παρακάτω."
 			],
-			"Add breakpoint": [
-				"Προσθήκη σημείου διακοπής"
-			],
-			"%d breakpoints is the maximum. Beyond that the editor asks more of an author than it gives back.": [
-				"Τα %d σημεία διακοπής είναι το ανώτατο όριο. Πέρα από αυτό, ο επεξεργαστής ζητά από τον συντάκτη περισσότερα απ' όσα του δίνει."
+			"Add your first breakpoint": [
+				"Προσθέστε το πρώτο σας σημείο διακοπής"
 			],
 			"custom": [
 				"προσαρμοσμένο"
@@ -128,6 +125,9 @@
 			],
 			"over %1$s, up to %2$s": [
 				"πάνω από %1$s, έως %2$s"
+			],
+			"%1$s – %2$s": [
+				"%1$s – %2$s"
 			],
 			"no tier": [
 				"κανένα σημείο"
@@ -189,6 +189,9 @@
 			],
 			"Your breakpoints": [
 				"Τα σημεία διακοπής σας"
+			],
+			"%1$d of %2$d · saved order is widest first": [
+				"%1$d από %2$d · η αποθηκευμένη σειρά είναι από το πλατύτερο"
 			],
 			"In use now": [
 				"Σε χρήση τώρα"

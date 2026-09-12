@@ -18,6 +18,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from 'react';
 
+import { coverage } from './bands';
 import { Footer, Masthead } from './Brand';
 import { BreakpointRows } from './BreakpointRows';
 import { Ruler } from './Ruler';
@@ -278,15 +279,40 @@ export function App(): React.ReactElement {
 				<FlexItem>
 					<Card>
 						<CardHeader>
-							<Heading level={2}>
-								{__('Your breakpoints', 'spacery')}
-							</Heading>
+							<Flex justify="space-between" align="center">
+								<FlexItem>
+									<Heading level={2}>
+										{__('Your breakpoints', 'spacery')}
+									</Heading>
+								</FlexItem>
+								{/*
+								 * How many, out of how many, and why the order
+								 * changes under the author's hands after a
+								 * save. The count also retires a guidance
+								 * line: the maximum is visible before it is
+								 * reached.
+								 */}
+								<FlexItem>
+									<Text variant="muted" size={12}>
+										{sprintf(
+											/* translators: 1: how many breakpoints are defined. 2: the maximum. */
+											__(
+												'%1$d of %2$d · saved order is widest first',
+												'spacery'
+											),
+											rows.length,
+											info.maxBreakpoints
+										)}
+									</Text>
+								</FlexItem>
+							</Flex>
 						</CardHeader>
 						<CardBody>
 							<BreakpointRows
 								rows={rows}
 								problems={problems.rows}
 								cautions={cautions(rows, rules)}
+								coverage={coverage(rows, rules)}
 								max={info.maxBreakpoints}
 								fallback={sourceName(info.resolvedSource)}
 								onChange={(next: Row[]) => setRows(next)}
