@@ -25,10 +25,22 @@ defined( 'ABSPATH' ) || exit;
  * Loading on `plugins_loaded`, as plugins did for a decade, is now the way to
  * get a notice rather than the way to avoid one.
  *
- * The call is still worth making. A site that installs Spacery from WordPress.org
- * gets its translations from `WP_LANG_DIR/plugins`, which just-in-time loading
- * finds without any registration at all; a site that installs from GitHub has
- * them inside the plugin, and nothing would look there otherwise.
+ * **The call is still the only thing that finds Spacery's own translations**
+ * (D20). Plugin Check warns that `load_plugin_textdomain()` has been
+ * discouraged since 4.6, which is true of the plugin it was written about: one
+ * whose translations arrive in `WP_LANG_DIR/plugins` from
+ * translate.wordpress.org, where just-in-time loading finds them with no
+ * registration at all. Spacery also ships Greek inside the plugin, and that is
+ * a path nothing looks in by default. Read against 7.1:
+ * `_load_textdomain_just_in_time()` asks `WP_Textdomain_Registry`, whose
+ * `get_path_from_lang_dir()` searches the standard language directories and
+ * then falls back to a *custom path* -- and `set_custom_path()` is called from
+ * exactly one place, this function. Remove the call and `languages/` becomes
+ * dead weight in the zip.
+ *
+ * That ordering is also why the bundled files cannot shadow anything: the
+ * standard locations are searched first, so a language pack from
+ * translate.wordpress.org wins the moment one exists.
  */
 final class I18n {
 
@@ -42,7 +54,17 @@ final class I18n {
 	 * Attaches hooks.
 	 */
 	public function register(): void {
-		add_action( 'init', array( $this, 'load_textdomain' ) );
+		/*
+		 * Priority 0, for the half of the timing this class's docblock does not
+		 * cover. `init` is late enough to avoid the notice; priority 0 is early
+		 * enough to beat anything that registers a block on `init`, because
+		 * `register_block_type_from_metadata()` translates the titles in
+		 * `block.json` as it registers them. Today `Plugin::boot()` happens to
+		 * construct this class first, which would be enough -- but that is an
+		 * ordering nothing states and a reordered constructor would silently
+		 * untranslate every block title.
+		 */
+		add_action( 'init', array( $this, 'load_textdomain' ), 0 );
 	}
 
 	/**

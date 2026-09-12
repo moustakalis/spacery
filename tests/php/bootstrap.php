@@ -34,9 +34,10 @@ define( 'Spacery\VERSION', $spacery_version[1] ?? '0.0.0' );
  * Resets all stub state. Call from setUp().
  */
 function spacery_test_reset(): void {
-	$GLOBALS['spacery_test_options']  = array();
-	$GLOBALS['spacery_test_settings'] = array();
-	$GLOBALS['spacery_test_filters']  = array();
+	$GLOBALS['spacery_test_options']    = array();
+	$GLOBALS['spacery_test_settings']   = array();
+	$GLOBALS['spacery_test_filters']    = array();
+	$GLOBALS['spacery_test_priorities'] = array();
 
 	$GLOBALS['spacery_test_settings_errors'] = array();
 }
@@ -99,11 +100,17 @@ function add_filter( string $hook, callable $callback ): void {
 /**
  * Stub of add_action(). Actions and filters share one registry here.
  *
+ * The priority is recorded rather than honoured: nothing here re-orders
+ * callbacks, but a class that depends on running before something else should
+ * be able to say so in a test. {@see \Spacery\Tests\I18nTest}.
+ *
  * @param string   $hook     Hook name.
  * @param callable $callback Callback.
+ * @param int      $priority Hook priority.
  */
-function add_action( string $hook, callable $callback ): void {
-	$GLOBALS['spacery_test_filters'][ $hook ][] = $callback;
+function add_action( string $hook, callable $callback, int $priority = 10 ): void {
+	$GLOBALS['spacery_test_filters'][ $hook ][]    = $callback;
+	$GLOBALS['spacery_test_priorities'][ $hook ][] = $priority;
 }
 
 /**
