@@ -105,23 +105,34 @@ export function unitFor(
 ): string {
 	const fallback = allowed.includes('px') ? 'px' : (allowed[0] ?? 'px');
 
+	/*
+	 * A value no number field can hold puts the box in custom mode, and it is
+	 * checked *first* -- before looking for a unit to use.
+	 *
+	 * This used to be the last resort, so a box holding `var:preset|spacing|60`
+	 * on one side and `24px` on another opened in `px` and rendered the preset
+	 * as an empty field: invisible to the author, still applied on the front
+	 * end, and overwritten by the next linked edit. That mixture is not
+	 * hypothetical -- it is what Spacery's own takeover produces from a block
+	 * whose author set one side from core's preset list and typed the other.
+	 *
+	 * The old order was defended on the grounds that jumping to custom takes
+	 * the other sides out of the number fields they were typed in. True, and
+	 * the wrong trade: those sides are still shown, still editable, just as
+	 * `24px` rather than `24`. The alternative hides a value that is on the
+	 * page. A box cannot be in two modes, so it should be in the one that shows
+	 * everything it holds.
+	 */
+	if (values.some((value) => value && !parseLength(value))) {
+		return CUSTOM;
+	}
+
 	for (const value of values) {
 		const unit = parseLength(value)?.unit;
 
 		if (unit && allowed.includes(unit)) {
 			return unit;
 		}
-	}
-
-	/*
-	 * A stored value no number field can hold puts the box in custom mode.
-	 * Otherwise it would render as an empty field: invisible to the author,
-	 * still applied on the front end, and destroyed by the next linked edit.
-	 * Values reach a block that way through core's own controls and through
-	 * Spacery's takeover, not only by being typed here.
-	 */
-	if (values.some((value) => value && !parseLength(value))) {
-		return CUSTOM;
 	}
 
 	return fallback;

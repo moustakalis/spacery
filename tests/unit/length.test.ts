@@ -87,9 +87,57 @@ describe('unitFor', () => {
 		);
 	});
 
-	it('prefers a real unit when one of the values has it', () => {
+	/*
+	 * This asserted the opposite until the manual pass, and the two tests
+	 * contradicted each other: the one above says a value a number field cannot
+	 * hold is "invisible to the author, still applied on the front end, and
+	 * lost to the next linked edit", and that is exactly what happened to the
+	 * `calc()` here when `rem` won. The test with the reason wins.
+	 *
+	 * The cost of the reversal is that `2rem` is now shown as `2rem` instead of
+	 * `2` in a rem box. The benefit is that the `calc()` beside it is shown at
+	 * all.
+	 */
+	it('prefers custom over a unit a sibling side happens to carry', () => {
 		expect(unitFor(['2rem', 'calc(100% - 2rem)'], ['px', 'rem'])).toBe(
-			'rem'
+			CUSTOM
 		);
+	});
+});
+
+/**
+ * Found by running `docs/MANUAL-TESTING.md` §2: set a preset through core's own
+ * spacing control, open the Spacery panel, and the box was in `px` with
+ * `var:preset|spacing|60` as the placeholder of a number field -- beside a
+ * sibling side reading a tidy `24`. The document had predicted the shape of it
+ * ("not as an empty px field") and the custom box's help text already mentioned
+ * presets; only the unit resolution had missed it.
+ *
+ * The rule is now one rule: a value the box cannot show in a number field puts
+ * the whole box in custom mode, whoever supplied it.
+ */
+describe('unitFor with a value no number field can hold', () => {
+	it('chooses custom over a unit it could have used', () => {
+		expect(unitFor(['var:preset|spacing|60', '24px'], ['px'])).toBe(CUSTOM);
+	});
+
+	/**
+	 * The mixture is what a takeover produces from a block whose author set one
+	 * side from core's preset list and typed the other. Under the old order it
+	 * opened in `px`, and the preset rendered as an empty field: invisible,
+	 * still applied, and overwritten by the next linked edit.
+	 */
+	it('does not hide a preset behind a sibling length', () => {
+		expect(
+			unitFor(
+				['var:preset|spacing|50', '10px', '10px', '10px'],
+				['px', 'rem']
+			)
+		).toBe(CUSTOM);
+	});
+
+	it('still reads a unit when every value is a plain length', () => {
+		expect(unitFor(['2rem', '4rem'], ['px', 'rem'])).toBe('rem');
+		expect(unitFor([undefined, '24px'], ['px', 'rem'])).toBe('px');
 	});
 });

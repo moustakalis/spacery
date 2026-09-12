@@ -240,9 +240,25 @@ Any block with spacing support — Group, Cover, Columns, a Paragraph.
       value is hashed, so it cannot inherit into narrower bands either. 38 cases
       in `GeneratorTest`, and re-checked on the page: `color` and `red` gone,
       `0` / `30rem` / `1vw` / `calc(100% - 2rem)` all still emitted.
-- [ ] Give a block a preset spacing value through core's own control, then open
+- [x] Give a block a preset spacing value through core's own control, then open
       the Spacery panel at a tier. The box should open in custom mode showing
-      that value, not as an empty px field.
+      that value, not as an empty px field. **It opened in px**, with
+      `var:preset|spacing|60` rendered as the placeholder of an
+      `input[type=number]`, next to a sibling side reading a tidy `24`. The
+      custom box's own help text already said "a length, calc() or a preset";
+      only the unit resolution had missed it.
+
+      The fix turned out to cover a second, worse case. `unitFor()` checked for
+      an unholdable value *last*, so a box storing `var:preset|spacing|50` on
+      one side and `10px` on another opened in px and rendered the preset as an
+      **empty** field — invisible, still applied, and overwritten by the next
+      linked edit. That mixture is what a takeover produces from a block whose
+      author set one side from core's preset list and typed the other. One rule
+      now: a value the box cannot show in a number field puts the whole box in
+      custom mode, whoever supplied it.
+
+      A test asserted the old order and had to be reversed. It carried no
+      reason, and the test directly above it states the principle it violated.
 - [ ] On a set whose tiers land on distinct device widths the selector shows
       icons; on one where two tiers would share an icon it falls back to names.
       Hovering an icon must still name its tier.

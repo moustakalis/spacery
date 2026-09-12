@@ -136,13 +136,37 @@ export function SpacingBox({
 		...units,
 		{ value: CUSTOM, label: __('custom', 'spacery') },
 	];
-	const unit =
-		chosen && (CUSTOM === chosen || allowed.includes(chosen))
-			? chosen
-			: unitFor(
-					sides.map((side) => values[side]),
-					allowed
-				);
+
+	/**
+	 * Which unit the box is in.
+	 *
+	 * Three sources, in order of who decided. The author's own pick outranks
+	 * everything, for as long as this page is loaded. Then the box's stored
+	 * values, which the author also typed. Only a box holding nothing of its
+	 * own is described by what it inherits -- which matters, because a box
+	 * inheriting `var:preset|spacing|60` from core's own control used to open
+	 * in `px` and put that string inside a number field.
+	 *
+	 * @return The unit, or `CUSTOM`.
+	 */
+	const resolveUnit = (): string => {
+		if (chosen && (CUSTOM === chosen || allowed.includes(chosen))) {
+			return chosen;
+		}
+
+		const stored = sides.map((side) => values[side]);
+
+		if (stored.some((value) => value)) {
+			return unitFor(stored, allowed);
+		}
+
+		return unitFor(
+			sides.map((side) => placeholders[side]),
+			allowed
+		);
+	};
+
+	const unit = resolveUnit();
 
 	/**
 	 * Applies one field's new number.
