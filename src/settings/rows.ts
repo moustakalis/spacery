@@ -209,6 +209,39 @@ export function sameBreakpoints(a: Breakpoint[], b: Breakpoint[]): boolean {
 }
 
 /**
+ * How many breakpoints differ from what the server holds.
+ *
+ * The save bar says so rather than saying only that something changed: "two
+ * breakpoints" tells an author who has been typing for a minute how much is at
+ * stake if they leave, and "something" does not.
+ *
+ * An edited row counts once, not twice. A removed one counts as its own change
+ * — it is absent here and present there, and the author did something to make
+ * that true.
+ *
+ * @param rows   The rows being edited.
+ * @param stored What the server last returned.
+ * @return How many breakpoints an author would lose by discarding.
+ */
+export function changedCount(rows: Row[], stored: Breakpoint[]): number {
+	const edited = toBreakpoints(rows).filter(
+		(one) =>
+			!stored.some(
+				(other) =>
+					other.slug === one.slug &&
+					other.label === one.label &&
+					other.max === one.max
+			)
+	).length;
+
+	const removed = stored.filter(
+		(one) => !rows.some((row) => row.slug === one.slug)
+	).length;
+
+	return edited + removed;
+}
+
+/**
  * Whether the screen holds anything the server does not.
  *
  * The screen had no idea: `Save changes` looked identical whether or not

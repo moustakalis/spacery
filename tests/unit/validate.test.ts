@@ -135,23 +135,41 @@ describe('saveHint', () => {
 	});
 
 	it('counts the problems ahead of the changes', () => {
-		expect(saveHint(broken(3), true, false)).toBe(
+		expect(saveHint(broken(3), 2, false)).toBe(
 			'Fix 3 problems above to save.'
 		);
 	});
 
 	it('counts one problem in the singular', () => {
-		expect(saveHint(broken(1), true, false)).toBe(
+		expect(saveHint(broken(1), 0, false)).toBe(
 			'Fix 1 problem above to save.'
 		);
 	});
 
-	it('says what the button is waiting for', () => {
-		expect(saveHint(clean, true, true)).toBe('Unsaved changes.');
+	/**
+	 * "Two breakpoints" tells an author who has been typing for a minute how
+	 * much is at stake if they leave. "Something" does not.
+	 */
+	it('says how many breakpoints are unsaved', () => {
+		expect(saveHint(clean, 2, false)).toBe(
+			'Unsaved changes to 2 breakpoints.'
+		);
+		expect(saveHint(clean, 1, false)).toBe(
+			'Unsaved change to 1 breakpoint.'
+		);
+	});
+
+	/**
+	 * There is one source, so a count about it would be wrong in both halves.
+	 */
+	it('says so when only the source moved', () => {
+		expect(saveHint(clean, 0, true)).toBe(
+			'Unsaved change to the breakpoint source.'
+		);
 	});
 
 	it('says why a valid, unchanged screen cannot save', () => {
-		expect(saveHint(clean, false, true)).toBe('No changes to save.');
+		expect(saveHint(clean, 0, false)).toBe('No changes to save.');
 	});
 });
 

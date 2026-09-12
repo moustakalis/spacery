@@ -71,20 +71,20 @@ export function countProblems(problems: Problems): number {
  * A disabled control with nothing beside it is a question the author cannot
  * answer: whether the screen is broken, whether the work is already saved, or
  * whether something above is wrong. An invalid set outranks a dirty one —
- * knowing there are three problems to fix is more use than being told there are
- * changes that cannot go anywhere.
+ * knowing there are three problems to fix is more use than being told there
+ * are changes that cannot go anywhere.
  *
- * @param problems From validate().
- * @param dirty    Whether the screen holds anything the server does not.
- * @param valid    Whether the server would accept what it holds.
+ * @param problems      From validate().
+ * @param changed       How many breakpoints differ from the stored set.
+ * @param sourceChanged Whether the chosen source differs from the stored one.
  * @return One sentence.
  */
 export function saveHint(
 	problems: Problems,
-	dirty: boolean,
-	valid: boolean
+	changed: number,
+	sourceChanged: boolean
 ): string {
-	if (!valid) {
+	if (!isValid(problems)) {
 		const count = countProblems(problems);
 
 		return sprintf(
@@ -99,9 +99,28 @@ export function saveHint(
 		);
 	}
 
-	return dirty
-		? __('Unsaved changes.', 'spacery')
-		: __('No changes to save.', 'spacery');
+	if (0 < changed) {
+		return sprintf(
+			/* translators: %d: how many breakpoints have been changed. */
+			_n(
+				'Unsaved change to %d breakpoint.',
+				'Unsaved changes to %d breakpoints.',
+				changed,
+				'spacery'
+			),
+			changed
+		);
+	}
+
+	/*
+	 * A source change on its own has no count to give -- there is one source --
+	 * and saying "1 breakpoint" about it would be wrong in both halves.
+	 */
+	if (sourceChanged) {
+		return __('Unsaved change to the breakpoint source.', 'spacery');
+	}
+
+	return __('No changes to save.', 'spacery');
 }
 
 /**

@@ -125,12 +125,15 @@ export function Masthead(): React.ReactElement {
 							padding: '2px 6px',
 						}}
 					>
+						{/*
+						 * The number alone, as the drawing has it. A screen
+						 * reader reads it straight after the h1, so it comes
+						 * out as "Spacery 1.0.0" -- which is what the footer
+						 * says too, and what a version tag beside a name
+						 * means anywhere.
+						 */}
 						<Text variant="muted" size={12}>
-							{sprintf(
-								/* translators: %s: the plugin version. */
-								__('Version %s', 'spacery'),
-								version
-							)}
+							{version}
 						</Text>
 					</div>
 				</FlexItem>
@@ -159,34 +162,47 @@ export function Footer(): React.ReactElement | null {
 
 	return (
 		<div style={{ borderTop: '1px solid #e5e5e5', paddingTop: '16px' }}>
-			<Flex justify="flex-start" align="center" gap={3}>
+			{/* Signature left, where to go next right. */}
+			<Flex justify="space-between" align="center">
 				<FlexItem>
-					<Mark size={18} accent="#646464" frame="#646464" />
+					<Flex align="center" gap={2}>
+						<FlexItem>
+							<Mark size={18} accent="#646464" frame="#646464" />
+						</FlexItem>
+
+						{'' !== version && (
+							<FlexItem>
+								<Text variant="muted" size={12}>
+									{sprintf(
+										/* translators: %s: the plugin version. */
+										__('Spacery %s', 'spacery'),
+										version
+									)}
+								</Text>
+							</FlexItem>
+						)}
+					</Flex>
 				</FlexItem>
 
-				{'' !== version && (
-					<FlexItem>
-						<Text variant="muted" size={12}>
-							{sprintf(
-								/* translators: %s: the plugin version. */
-								__('Spacery %s', 'spacery'),
-								version
-							)}
-						</Text>
-					</FlexItem>
-				)}
+				<FlexItem>
+					<Flex align="center" gap={4}>
+						{'' !== docsUrl && (
+							<FlexItem>
+								<a href={docsUrl}>
+									{__('Documentation', 'spacery')}
+								</a>
+							</FlexItem>
+						)}
 
-				{'' !== docsUrl && (
-					<FlexItem>
-						<a href={docsUrl}>{__('Documentation', 'spacery')}</a>
-					</FlexItem>
-				)}
-
-				{'' !== supportUrl && (
-					<FlexItem>
-						<a href={supportUrl}>{__('Support', 'spacery')}</a>
-					</FlexItem>
-				)}
+						{'' !== supportUrl && (
+							<FlexItem>
+								<a href={supportUrl}>
+									{__('Support', 'spacery')}
+								</a>
+							</FlexItem>
+						)}
+					</Flex>
+				</FlexItem>
 			</Flex>
 		</div>
 	);

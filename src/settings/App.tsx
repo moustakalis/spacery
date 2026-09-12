@@ -23,7 +23,7 @@ import { Footer, Masthead } from './Brand';
 import { BreakpointRows } from './BreakpointRows';
 import { Ruler } from './Ruler';
 import { fetchInfo, fetchSettings, saveSettings, wasAccepted } from './data';
-import { isDirty, toBreakpoints, toRows, type Row } from './rows';
+import { changedCount, isDirty, toBreakpoints, toRows, type Row } from './rows';
 import { fallbackNotice, sourceName, sourceOptions } from './sources';
 import { cautions, isValid, saveHint, validate } from './validate';
 import type { BreakpointInfo, StoredSettings, StoredSource } from './types';
@@ -165,6 +165,22 @@ export function App(): React.ReactElement {
 	const rules = { ...info.rules, maxBreakpoints: info.maxBreakpoints };
 	const problems = validate(rows, rules);
 	const valid = isValid(problems);
+	const changed = changedCount(rows, settings.spacery_custom_breakpoints);
+	const sourceChanged = source !== settings.spacery_breakpoint_source;
+
+	/**
+	 * Puts the screen back to what the server holds.
+	 *
+	 * The counterpart to the count beside it: an author told that two
+	 * breakpoints are unsaved needs a way to say "not those two". Reverting to
+	 * `settings` rather than reloading keeps the notice and the rest of the
+	 * page where they are.
+	 */
+	const discard = () => {
+		setRows(toRows(settings.spacery_custom_breakpoints));
+		setSource(settings.spacery_breakpoint_source);
+		setStatus({ kind: 'idle' });
+	};
 
 	const save = async () => {
 		setStatus({ kind: 'saving' });
@@ -365,25 +381,51 @@ export function App(): React.ReactElement {
 				<div style={{ position: 'sticky', bottom: 0 }}>
 					<Card>
 						<CardBody>
+							{/*
+							 * Save first, then why it is as it is, then the way
+							 * out (§5.3, and the drawing). The button leads
+							 * because it is the thing being explained; a
+							 * sentence in front of it reads as a caption to
+							 * nothing.
+							 */}
 							<Flex justify="space-between" align="center">
 								<FlexItem>
-									<Text variant="muted" size={12}>
-										{saveHint(problems, dirty, valid)}
-									</Text>
+									<Flex align="center" gap={3}>
+										<FlexItem>
+											<Button
+												variant="primary"
+												onClick={save}
+												isBusy={
+													'saving' === status.kind
+												}
+												disabled={
+													'saving' === status.kind ||
+													!valid ||
+													!dirty
+												}
+											>
+												{__('Save changes', 'spacery')}
+											</Button>
+										</FlexItem>
+										<FlexItem>
+											<Text variant="muted" size={12}>
+												{saveHint(
+													problems,
+													changed,
+													sourceChanged
+												)}
+											</Text>
+										</FlexItem>
+									</Flex>
 								</FlexItem>
 
 								<FlexItem>
 									<Button
-										variant="primary"
-										onClick={save}
-										isBusy={'saving' === status.kind}
-										disabled={
-											'saving' === status.kind ||
-											!valid ||
-											!dirty
-										}
+										variant="tertiary"
+										onClick={discard}
+										disabled={!dirty}
 									>
-										{__('Save changes', 'spacery')}
+										{__('Discard', 'spacery')}
 									</Button>
 								</FlexItem>
 							</Flex>
