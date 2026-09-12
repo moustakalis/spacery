@@ -46,24 +46,6 @@ const UNITS = [
 ];
 
 /**
- * The five columns, once.
- *
- * `minmax(0, …)` on the flexible ones because a grid track sized `1fr` will
- * not shrink below its content, and an input's default width is wide enough to
- * push the last column off the card.
- */
-const COLUMNS = 'minmax(0, 1.3fr) minmax(0, 1.3fr) 130px minmax(0, 1fr) 36px';
-
-/** 11px / 600 / .04em caps in `#545454` — design system §2. */
-const HEADING: React.CSSProperties = {
-	fontSize: '11px',
-	fontWeight: 600,
-	letterSpacing: '.04em',
-	textTransform: 'uppercase',
-	color: '#545454',
-};
-
-/**
  * The × that removes a row.
  *
  * Inline rather than from `@wordpress/icons`, which is a script external this
@@ -127,11 +109,28 @@ export function BreakpointRows({
 	 * @param field Which field is being rendered.
 	 * @return The message, or undefined when the field is fine.
 	 */
-	const messageFor = (row: Row, field: Field): string | undefined => {
+	const noteFor = (row: Row, field: Field): RowProblem | undefined => {
 		// A refusal outranks a caution: one stops the save, the other advises.
 		const note = problems[row.id] ?? cautions[row.id];
 
-		return note && note.field === field ? note.message : undefined;
+		return note && note.field === field ? note : undefined;
+	};
+
+	/**
+	 * The class that colours a field and its message.
+	 *
+	 * Three severities, two treatments: red for a row fighting another row,
+	 * amber for a field that is unfinished or probably a typo. See
+	 * `style.scss`, and `validate.ts` for which is which.
+	 *
+	 * @param row   The row.
+	 * @param field Which field is being rendered.
+	 * @return A class name, or an empty string.
+	 */
+	const fieldClass = (row: Row, field: Field): string => {
+		const note = noteFor(row, field);
+
+		return note ? `spacery-field spacery-field--${note.severity}` : '';
 	};
 
 	const update = (index: number, patch: Partial<Row>) => {
@@ -152,17 +151,7 @@ export function BreakpointRows({
 	return (
 		<Flex direction="column" gap={0}>
 			<FlexItem>
-				<div
-					style={{
-						display: 'grid',
-						gridTemplateColumns: COLUMNS,
-						gap: '12px',
-						alignItems: 'center',
-						padding: '8px 0',
-						borderBottom: '1px solid #e5e5e5',
-						...HEADING,
-					}}
-				>
+				<div className="spacery-table__head">
 					<div>{__('Name', 'spacery')}</div>
 					<div>{__('Slug', 'spacery')}</div>
 					<div>{__('Up to', 'spacery')}</div>
@@ -173,24 +162,22 @@ export function BreakpointRows({
 
 			{rows.map((row, index) => {
 				const covers = coverage[row.id];
+				const conflicted = 'conflict' === problems[row.id]?.severity;
 
 				return (
 					<FlexItem key={row.id}>
 						<div
-							style={{
-								display: 'grid',
-								gridTemplateColumns: COLUMNS,
-								gap: '12px',
-								alignItems: 'flex-start',
-								padding: '12px 0',
-								borderBottom: '1px solid #f0f0f0',
-							}}
+							className={`spacery-table__row${
+								conflicted
+									? ' spacery-table__row--conflict'
+									: ''
+							}`}
 						>
-							<div>
+							<div className={fieldClass(row, 'label')}>
 								<TextControl
 									label={__('Name', 'spacery')}
 									hideLabelFromVision
-									help={messageFor(row, 'label')}
+									help={noteFor(row, 'label')?.message}
 									value={row.label}
 									onChange={(label: string) =>
 										update(index, {
@@ -205,7 +192,7 @@ export function BreakpointRows({
 								/>
 							</div>
 
-							<div>
+							<div className={fieldClass(row, 'slug')}>
 								{/*
 								 * A hint while the slug is still derived from
 								 * the name, the stored value once there is
@@ -214,7 +201,7 @@ export function BreakpointRows({
 								<TextControl
 									label={__('Slug', 'spacery')}
 									hideLabelFromVision
-									help={messageFor(row, 'slug')}
+									help={noteFor(row, 'slug')?.message}
 									value={slugIsDerived(row) ? '' : row.slug}
 									placeholder={
 										slugIsDerived(row)
@@ -241,11 +228,11 @@ export function BreakpointRows({
 								)}
 							</div>
 
-							<div>
+							<div className={fieldClass(row, 'max')}>
 								<UnitControl
 									label={__('Up to', 'spacery')}
 									hideLabelFromVision
-									help={messageFor(row, 'max')}
+									help={noteFor(row, 'max')?.message}
 									value={row.max}
 									units={UNITS}
 									onChange={(next?: string) =>
