@@ -45,6 +45,23 @@ import reached CI:
 … | grep -v 'Resolve error'
 ```
 
+## The E2E suite can run somewhere other than `wp-env`
+
+`WP_BASE_URL` chooses the site and `WP_USERNAME` / `WP_PASSWORD` choose the
+account, so the whole suite can run against the MAMP playground in
+`docs/MANUAL-TESTING.md` instead of Docker:
+
+```bash
+WP_BASE_URL=http://localhost:8888 WP_USERNAME=admin WP_PASSWORD=… \
+  pnpm run test:e2e
+```
+
+Only worth doing deliberately. On a site nothing resets between runs, the suite
+leaves draft posts behind, overwrites Spacery's two options, and
+`extension.spec.ts` deactivates and reactivates the plugin — which a failure in
+the wrong place leaves deactivated. It deletes no content, but do not point it
+at a site you would mind explaining.
+
 ## The POT goes stale when code *moves*, not when strings change
 
 This is the single most frequent CI failure in this repository, and the rule
