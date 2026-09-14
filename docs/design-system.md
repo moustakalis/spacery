@@ -261,6 +261,59 @@ the active scheme. The mark survives that because its bars differ by
 
 ## 7 · Rules
 
+### Words
+
+Derived from the strings that already worked here rather than imposed on them.
+`validate.ts` was the model: every message names the field, names the other row
+involved, and stops.
+
+1. **Lead with the consequence to the site.** "Nothing — no screens left" is
+   the consequence; "slugs must be unique" is a recital of the rule that
+   produces it. Where the consequence is already on screen beside the message,
+   the message does not repeat it: a duplicate width says only "Same width as
+   Laptop", because the `Covers` cell one column over already reads "Nothing".
+2. **One sentence, unless a second adds a *fact*.** A second sentence that
+   explains why Spacery is built this way belongs in `PLAN.md`. This was the
+   commonest fault when the screen was audited: "…produce a set nobody
+   designed", "…asks more of an author than it gives back".
+3. **Address the author as "you", actively.** "Only one source applies at a
+   time" beats "One source is used at a time"; "this is what you pick in the
+   editor" beats "what authors pick".
+4. **Name an internal only where the author can act on it.** A slug they edit,
+   yes — and there, only to explain why editing it is destructive. "Block
+   attributes" as a bare noun, no.
+5. **Say what happened, not what the code did.** "Reload the page to see what
+   is in use" beats "what is in use could not be read back".
+6. **Help text under ~90 characters**, and given a measure it can be read at.
+
+There is one deliberate exception to (1). The notice shown when the *server*
+refuses a set has to recite the rules, because it fires exactly when the screen
+thought the set was valid — so no field is marked and there is nothing to point
+at. A recital is the honest answer there; everywhere else it is laziness.
+
+### Measure
+
+Help text is capped at **420px**, which is ~65 characters at 12px — inside the
+45–75 band prose is comfortable at.
+
+Not a new value: the breakpoint table's guidance line already used it, which is
+precisely why that line read well while two `CardBody` sentences beside it ran
+to **128 characters on a single line** at a 1502px viewport. Measured on the
+live screen, not estimated.
+
+A sentence in a `CardBody` has the whole card and must be given one. A sentence
+inside a table cell has its column, which is usually enough.
+
+**The `UP TO` column is the exception, and it is the tighter constraint.** It is
+a fixed **130px**, so its help wraps at **~20 characters a line** — measured, by
+cloning the live help node and probing candidate strings in it. A message that
+named the other row *and* its consequence became a four-line ribbon under a
+one-line field; `settings-screen.png` §C draws it that way, at five lines. So
+anything that can land under a width is written to **fit two lines at 130px**,
+which is about 44 characters including the interpolated name. That is a lower
+bound on measure, not an upper one, and it outranks rule (1) above wherever the
+two disagree.
+
 ### Do
 
 - Say a value's **consequence**, not just its name — every band, empty state and

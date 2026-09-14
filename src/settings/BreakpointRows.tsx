@@ -219,7 +219,7 @@ export function BreakpointRows({
 										{sprintf(
 											/* translators: %s: the slug the breakpoint was saved under. */
 											__(
-												'Spacing already saved under %s will stop applying. To change only what this breakpoint is called, edit its name and leave the slug alone.',
+												'Spacing saved under %s will stop applying. To rename it, change the name and leave the slug alone.',
 												'spacery'
 											),
 											row.storedSlug ?? ''
@@ -304,13 +304,13 @@ export function BreakpointRows({
 									? sprintf(
 											/* translators: %d: maximum number of breakpoints. */
 											__(
-												'%d breakpoints is the maximum. Beyond that the editor asks more of an author than it gives back.',
+												'%d breakpoints is the maximum.',
 												'spacery'
 											),
 											max
 										)
 									: __(
-											'Name is shown in the editor. Slug is stored in block attributes and follows the name until you change it.',
+											'Name appears in the editor. Slug is stored on your blocks and follows the name until you edit it.',
 											'spacery'
 										)}
 							</Text>
@@ -344,14 +344,14 @@ function EmptyState({
 	return (
 		<div style={{ textAlign: 'center', padding: '24px 0' }}>
 			<Text weight={600}>
-				{__('You have not defined any breakpoints yet', 'spacery')}
+				{__("You haven't defined any breakpoints yet", 'spacery')}
 			</Text>
 			<div style={{ margin: '8px auto 20px', maxWidth: '440px' }}>
 				<Text variant="muted" size={13}>
 					{sprintf(
 						/* translators: %s: the breakpoint set in use meanwhile. */
 						__(
-							'Until you add one, Spacery falls back to %s, which is what "In use now" below is showing.',
+							'Until you add one, Spacery uses %s — shown in In use now below.',
 							'spacery'
 						),
 						fallback

@@ -292,7 +292,7 @@ export function Ruler({
 							? emphasise(
 									/* translators: %s: a CSS length, e.g. "11920px". */
 									__(
-										'The widest band runs to %s, past the edge of this ruler, and is cut short here.',
+										'The widest band runs to %s and is cut short here.',
 										'spacery'
 									),
 									widest.max
@@ -300,7 +300,7 @@ export function Ruler({
 							: emphasise(
 									/* translators: %s: a CSS length, e.g. "1280px". */
 									__(
-										'Screens wider than %s match no breakpoint, so blocks use their ordinary, non-responsive spacing there. Raise the widest breakpoint if that is not what you want.',
+										'Screens wider than %s match no breakpoint, so blocks use their ordinary spacing. Raise the widest breakpoint to cover them.',
 										'spacery'
 									),
 									widest.max

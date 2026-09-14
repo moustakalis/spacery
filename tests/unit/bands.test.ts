@@ -163,7 +163,7 @@ describe('cautions', () => {
 		expect(cautions(rows, RULES)[rows[0]!.id]).toStrictEqual({
 			field: 'max',
 			severity: 'caution',
-			message: 'Wider than any common screen. Did you mean 1920px?',
+			message: 'Too wide for the ruler. Did you mean 1920px?',
 		});
 	});
 
@@ -173,7 +173,7 @@ describe('cautions', () => {
 		]);
 
 		expect(cautions(rows, RULES)[rows[0]!.id]?.message).toBe(
-			'Wider than any common screen, so the ruler stops short of it.'
+			'Too wide for the ruler.'
 		);
 	});
 });

@@ -69,7 +69,7 @@ export function TakeoverNotice({
 			{movable.length > 0 && (
 				<Text variant="muted" size={12}>
 					{__(
-						'Moved into Spacery they follow its breakpoints, so narrower screens inherit them too unless a narrower breakpoint sets its own value.',
+						'In Spacery they also reach narrower screens, unless a narrower breakpoint sets its own value.',
 						'spacery'
 					)}
 				</Text>

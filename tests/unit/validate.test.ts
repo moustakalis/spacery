@@ -106,8 +106,7 @@ describe('validate', () => {
 		expect(problemFor(rows, 1)).toStrictEqual({
 			field: 'max',
 			severity: 'conflict',
-			message:
-				'Same width as Laptop. Two breakpoints at one width would cover the same screens.',
+			message: 'Same width as Laptop.',
 		});
 	});
 

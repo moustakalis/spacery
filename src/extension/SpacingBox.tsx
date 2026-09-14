@@ -313,7 +313,7 @@ export function SpacingBox({
 				<FlexItem>
 					<Text variant="muted" size={12}>
 						{__(
-							'Any CSS value, one per side — a length, calc() or a preset. WordPress drops anything it cannot verify.',
+							'A length, calc() or a preset, one per side. Anything else is dropped.',
 							'spacery'
 						)}
 					</Text>

@@ -260,7 +260,7 @@ export function App(): React.ReactElement {
 				<Masthead />
 				<Text variant="muted">
 					{__(
-						'Spacery adds responsive padding and margin to any block that supports spacing. These are the breakpoints it offers.',
+						'Responsive padding and margin for any block that supports spacing.',
 						'spacery'
 					)}
 				</Text>
@@ -294,12 +294,21 @@ export function App(): React.ReactElement {
 								setSource(next as StoredSource)
 							}
 						/>
-						<Text variant="muted" size={12}>
-							{__(
-								'One source is used at a time. Spacery never mixes two sets: values from different intentions sitting side by side produce a set nobody designed.',
-								'spacery'
-							)}
-						</Text>
+						{/*
+						 * Capped at the measure the design system prescribes
+						 * (§7). A `CardBody` gives a sentence the whole card --
+						 * 814px here, which ran the previous copy to 128
+						 * characters on one line. The breakpoint table's
+						 * guidance line already used this value.
+						 */}
+						<div style={{ maxWidth: '420px' }}>
+							<Text variant="muted" size={12}>
+								{__(
+									'Only one source applies at a time — Spacery never merges two sets.',
+									'spacery'
+								)}
+							</Text>
+						</div>
 					</CardBody>
 				</Card>
 			</FlexItem>
@@ -326,7 +335,7 @@ export function App(): React.ReactElement {
 										{sprintf(
 											/* translators: 1: how many breakpoints are defined. 2: the maximum. */
 											__(
-												'%1$d of %2$d · saved order is widest first',
+												'%1$d of %2$d · sorted widest first',
 												'spacery'
 											),
 											rows.length,
@@ -401,25 +410,27 @@ export function App(): React.ReactElement {
 						 * four slugs at different widths — and its spacing
 						 * quietly changes. See D24.
 						 */}
-						<CheckboxControl
-							label={__(
-								'Delete my Spacery settings when the plugin is deleted',
-								'spacery'
-							)}
-							help={
-								deleteData
-									? __(
-											'Your breakpoints will be removed. Spacing already set on blocks stays in your content, but it will resolve against whatever breakpoints a future install has — which may not be these.',
-											'spacery'
-										)
-									: __(
-											'Your breakpoints are kept, so deleting and reinstalling Spacery leaves your spacing exactly as it is. Nothing is written into your posts either way.',
-											'spacery'
-										)
-							}
-							checked={deleteData}
-							onChange={setDeleteData}
-						/>
+						<div style={{ maxWidth: '420px' }}>
+							<CheckboxControl
+								label={__(
+									'Delete my settings when Spacery is deleted',
+									'spacery'
+								)}
+								help={
+									deleteData
+										? __(
+												'Your breakpoints go too. Spacing on your blocks stays, but a future install may apply it at different widths.',
+												'spacery'
+											)
+										: __(
+												'Your breakpoints are kept, so reinstalling leaves your spacing exactly as it is.',
+												'spacery'
+											)
+								}
+								checked={deleteData}
+								onChange={setDeleteData}
+							/>
+						</div>
 					</CardBody>
 				</Card>
 			</FlexItem>
@@ -618,7 +629,7 @@ function StatusNotice({
 		return (
 			<Notice status="warning" onRemove={onDismiss}>
 				{__(
-					'Settings saved. What is in use could not be read back — reload the page to see it.',
+					'Settings saved. Reload the page to see what is in use.',
 					'spacery'
 				)}
 			</Notice>
@@ -630,11 +641,11 @@ function StatusNotice({
 			<Notice status="error" onRemove={onDismiss}>
 				{status.sourceChanged
 					? __(
-							'Your breakpoint source was saved. Those breakpoints were not: every breakpoint needs a name and a width in px, em or rem, and no two may share a width.',
+							'Your source was saved. The breakpoints were not: each needs a name and a width in px, em or rem, and no two may share a width.',
 							'spacery'
 						)
 					: __(
-							'Those breakpoints were not saved, and nothing changed. Every breakpoint needs a name and a width in px, em or rem, and no two may share a width.',
+							'Nothing was saved: each breakpoint needs a name and a width in px, em or rem, and no two may share a width.',
 							'spacery'
 						)}
 			</Notice>

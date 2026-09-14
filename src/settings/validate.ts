@@ -186,7 +186,7 @@ export function validate(rows: Row[], rules: ValidationRules): Problems {
 				field: 'label',
 				severity: 'incomplete',
 				message: __(
-					'Needs a name — this is what authors pick in the editor.',
+					'Needs a name — this is what you pick in the editor.',
 					'spacery'
 				),
 			};
@@ -221,7 +221,7 @@ export function validate(rows: Row[], rules: ValidationRules): Problems {
 				message: sprintf(
 					/* translators: %s: the name of the breakpoint already using this slug. */
 					__(
-						'Already used by %s. Slugs are stored in block attributes, so two rows cannot share one.',
+						'Already used by %s. Two breakpoints cannot share a slug.',
 						'spacery'
 					),
 					seenSlugs.get(row.slug.trim()) ?? ''
@@ -233,10 +233,7 @@ export function validate(rows: Row[], rules: ValidationRules): Problems {
 				severity: 'conflict',
 				message: sprintf(
 					/* translators: %s: the name of the breakpoint at this width. */
-					__(
-						'Same width as %s. Two breakpoints at one width would cover the same screens.',
-						'spacery'
-					),
+					__('Same width as %s.', 'spacery'),
 					seenWidths.get(width) ?? ''
 				),
 			};
@@ -294,15 +291,12 @@ export function cautions(
 				? sprintf(
 						/* translators: %s: a narrower CSS length, e.g. "1920px". */
 						__(
-							'Wider than any common screen. Did you mean %s?',
+							'Too wide for the ruler. Did you mean %s?',
 							'spacery'
 						),
 						suggestion
 					)
-				: __(
-						'Wider than any common screen, so the ruler stops short of it.',
-						'spacery'
-					),
+				: __('Too wide for the ruler.', 'spacery'),
 		};
 	}
 

@@ -169,7 +169,7 @@ export function TierSelector({
 				<FlexItem>
 					<Text variant="muted" size={12}>
 						{__(
-							'Responsive editing is switched off for this site, so the canvas does not follow along.',
+							'Responsive editing is off for this site, so the canvas does not follow.',
 							'spacery'
 						)}
 					</Text>

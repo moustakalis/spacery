@@ -189,7 +189,7 @@ export function fallbackNotice(
 	 */
 	if ('filter' === info.resolvedSource) {
 		return __(
-			'A spacery_breakpoints filter on this site replaces the set, so the breakpoints above are stored but not in use.',
+			'A spacery_breakpoints filter replaces the set, so these are stored but not in use.',
 			'spacery'
 		);
 	}
@@ -215,10 +215,7 @@ export function fallbackNotice(
 	if ('custom' === source) {
 		return sprintf(
 			/* translators: %s: the breakpoint set in use instead. */
-			__(
-				'You chose your own breakpoints but have not defined any yet, so %s is in use until you add one.',
-				'spacery'
-			),
+			__('You have not defined any yet, so %s is in use.', 'spacery'),
 			inUse
 		);
 	}
@@ -227,7 +224,7 @@ export function fallbackNotice(
 		return sprintf(
 			/* translators: %s: the breakpoint set in use instead. */
 			__(
-				"You chose your theme's breakpoints, but it declares none Spacery can use, so %s is in use.",
+				'Your theme declares none Spacery can use, so %s is in use.',
 				'spacery'
 			),
 			inUse
