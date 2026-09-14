@@ -287,6 +287,7 @@ function TierFields({
 				<FlexItem key={boxKey(clientId, feature.feature)}>
 					<SpacingBox
 						stateKey={boxKey(clientId, feature.feature)}
+						feature={feature.feature}
 						label={feature.label}
 						sides={feature.sides}
 						units={units}

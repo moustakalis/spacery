@@ -70,5 +70,27 @@ final class Extension {
 		);
 
 		\Spacery\I18n::set_script_translations( self::HANDLE );
+
+		$style = $directory . '/build/style-extension.css';
+
+		/*
+		 * Enqueued under the script's own handle rather than a second one, so
+		 * the two cannot load out of step: WordPress accepts a style for a
+		 * handle already registered as a script.
+		 *
+		 * Guarded separately from the script. A build that emitted the bundle
+		 * but not the stylesheet is not a reason to leave the panel without
+		 * its JavaScript.
+		 */
+		if ( ! is_readable( $style ) ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			self::HANDLE,
+			plugins_url( 'build/style-extension.css', \Spacery\PLUGIN_FILE ),
+			array(),
+			is_string( $version ) ? $version : \Spacery\VERSION
+		);
 	}
 }

@@ -87,6 +87,23 @@ screen that pulls a font is a settings screen that flashes.
 11px is the floor and is reserved for caps column labels, where the letterforms
 are wide. Nothing smaller; no 11px sentence copy.
 
+**One exception, in the inspector only: the four side labels are 10px caps.**
+Not a second scale — every other size on that panel is the one above. The
+inspector is 280px and the panel 248px, so four fields across it are **59px
+each**, where core's own Dimensions panel spends the same width on a single
+Vertical/Horizontal pair at the identical 11px. `TOP` / `RIGHT` / `BOTTOM` /
+`LEFT` are three to six letters under a 59px field: the place the floor buys
+least and costs most. Measured, and the margin is the argument — at 11px
+`BOTTOM` renders **49px in a 49px box**, flush to the edge with nothing spare;
+at 10px it is 45px. The floor holds everywhere else, including the `PADDING`
+and `MARGIN` headings directly above these labels.
+
+**It does not fix Greek, and that is recorded rather than papered over.**
+`ΑΡΙΣΤΕΡΑ` (Left) measures 55px at 11px and 50px at 10px in the same 49px box,
+so it is clipped either way — the change narrows the overflow from 6px to 1px
+and no further. Fixing it is a layout question (fewer labels, or abbreviated
+ones), not a type one.
+
 ---
 
 ## 3 · Space, edges, depth
@@ -215,6 +232,8 @@ slot is WordPress's and every plugin fills it.
 | Panel dot | 6px, `#3858e9`, via `PanelBody`'s `icon` prop. Gate on tiers that still exist. Mirror in the accessible name. |
 | Tier dots | 5px, top-right of the glyph. **Both** selector branches — icons and labels. |
 | Provenance | One line per box, 12px muted. Omit when nothing is inherited rather than naming a source that does not exist. |
+| Side labels | 10px caps — §2's one exception, and the only rule in `extension/style.scss`. Needs `!important` against the emotion class. |
+| Number fields | `spinControls="native"`. Core's `custom` renders a 60px suffix, which leaves 12px of a 59px field. `min={0}` on padding only: margin may be negative, padding may not. |
 
 ---
 

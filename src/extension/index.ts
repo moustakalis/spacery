@@ -6,6 +6,7 @@
  * block is used.
  */
 
+import './style.scss';
 import { register } from './register';
 
 register();

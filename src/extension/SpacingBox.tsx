@@ -73,6 +73,8 @@ const RESET = (
 interface SpacingBoxProps {
 	/** Identifies this box's remembered preferences. From `boxKey()`. */
 	stateKey: string;
+	/** Which property this box sets. Only the floor below depends on it. */
+	feature: 'padding' | 'margin';
 	label: string;
 	sides: Side[];
 	/** Values authored at this tier. */
@@ -88,6 +90,7 @@ interface SpacingBoxProps {
  *
  * @param root0              Component props.
  * @param root0.stateKey     Identifies this box's remembered preferences.
+ * @param root0.feature      Which property this box sets.
  * @param root0.label        Feature name, e.g. "Padding".
  * @param root0.sides        Sides the block supports, in canonical order.
  * @param root0.values       Values authored at this tier.
@@ -98,6 +101,7 @@ interface SpacingBoxProps {
  */
 export function SpacingBox({
 	stateKey,
+	feature,
 	label,
 	sides,
 	values,
@@ -272,41 +276,74 @@ export function SpacingBox({
 			</FlexItem>
 
 			<FlexItem>
-				<Flex gap={1} align="flex-start">
-					{sides.map((side) => (
-						<FlexBlock key={side}>
-							{CUSTOM === unit ? (
-								<InputControl
-									label={sideLabel(side)}
-									labelPosition="bottom"
-									size="compact"
-									value={values[side] ?? ''}
-									placeholder={placeholders[side]}
-									onChange={(next?: string) =>
-										change(side, next)
-									}
-								/>
-							) : (
-								<NumberControl
-									label={sideLabel(side)}
-									labelPosition="bottom"
-									size="compact"
-									spinControls="none"
-									value={
-										parseLength(values[side])?.value ?? ''
-									}
-									placeholder={placeholderFor(
-										placeholders[side],
-										unit
-									)}
-									onChange={(next?: string) =>
-										change(side, next)
-									}
-								/>
-							)}
-						</FlexBlock>
-					))}
-				</Flex>
+				{/*
+				 * The class is the stylesheet's only hook. `Flex` is declared
+				 * in the hand-written `src/types/wordpress.d.ts` and does not
+				 * take `className`, which is not something to assert about a
+				 * component whose source is not in `node_modules` to check --
+				 * so the row carries a plain wrapper instead.
+				 */}
+				<div className="spacery-sides">
+					<Flex gap={1} align="flex-start">
+						{sides.map((side) => (
+							<FlexBlock key={side}>
+								{CUSTOM === unit ? (
+									<InputControl
+										label={sideLabel(side)}
+										labelPosition="bottom"
+										size="compact"
+										value={values[side] ?? ''}
+										placeholder={placeholders[side]}
+										onChange={(next?: string) =>
+											change(side, next)
+										}
+									/>
+								) : (
+									<NumberControl
+										label={sideLabel(side)}
+										labelPosition="bottom"
+										size="compact"
+										/*
+										 * Native, not `custom`. Core's custom spin
+										 * buttons render as a suffix two 24px
+										 * buttons wide: measured at **60px inside a
+										 * 59px field**, which left the number
+										 * itself 12px. Four sides is the whole
+										 * point of this box, so the field is 59px
+										 * and stays 59px; the browser's own arrows
+										 * sit inside it and cost nothing until the
+										 * field is hovered or focused.
+										 */
+										spinControls="native"
+										/*
+										 * Padding has a floor and margin does not.
+										 * `Generator::is_value()` allows a leading
+										 * `-`, so a negative padding is emitted and
+										 * then dropped by the browser -- invisible
+										 * either way, but the arrows are what make
+										 * it reachable by holding a key rather than
+										 * by deliberately typing a minus sign.
+										 */
+										{...('padding' === feature
+											? { min: 0 }
+											: {})}
+										value={
+											parseLength(values[side])?.value ??
+											''
+										}
+										placeholder={placeholderFor(
+											placeholders[side],
+											unit
+										)}
+										onChange={(next?: string) =>
+											change(side, next)
+										}
+									/>
+								)}
+							</FlexBlock>
+						))}
+					</Flex>
+				</div>
 			</FlexItem>
 
 			{CUSTOM === unit && (

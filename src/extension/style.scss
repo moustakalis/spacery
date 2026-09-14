@@ -1,0 +1,30 @@
+/**
+ * The inspector panel's own states.
+ *
+ * The extension's first stylesheet, and it exists for the same reason
+ * `settings/style.scss` does: one thing `@wordpress/components` will not take
+ * from a prop. `NumberControl` has no size for its label, and the label is a
+ * borrowed component's own markup.
+ *
+ * **The four side labels are the one place Spacery goes below the design
+ * system's 11px floor** (§2), and the reason is the column rather than taste.
+ * Measured in the inspector: the sidebar is 280px, the panel 248px, and four
+ * fields across it are **59px each** -- where core's Dimensions panel, at the
+ * identical 11px caps, spends the same width on a single Vertical/Horizontal
+ * pair. `TOP` / `RIGHT` / `BOTTOM` / `LEFT` are three to six letters of caps
+ * under a 59px field, which is where 11px buys least and costs most.
+ * Everything else on this panel -- the `PADDING` and `MARGIN` headings, the
+ * values, the provenance line -- stays on the scale.
+ *
+ * `!important` is required, not defensive. The label's size comes from an
+ * emotion class emitted three times over (`.css-HASH.css-HASH.css-HASH`,
+ * specificity 0,3,0) precisely so that plugin CSS cannot move it. Measured:
+ * the same rule without `!important` left the label at 11px and with it
+ * reached 10px. `docs/CONTRIBUTING.md` carries the same finding for borders.
+ */
+.spacery-sides {
+
+	.components-input-control__label {
+		font-size: 10px !important;
+	}
+}
