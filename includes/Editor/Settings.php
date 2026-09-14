@@ -51,6 +51,15 @@ final class Settings {
 	private bool $responsive_editing = true;
 
 	/**
+	 * Whether the payload has already been attached this request.
+	 *
+	 * `block_editor_settings_all` can be applied more than once in a request,
+	 * and attaching twice would assign the global twice. Harmless, but the
+	 * second copy would be a puzzle for anyone reading the page source.
+	 */
+	private bool $attached = false;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param Registry  $registry  Breakpoint registry.
@@ -65,14 +74,12 @@ final class Settings {
 	 * Attaches hooks.
 	 */
 	public function register(): void {
-		// Late, so anything else that filters the value has already run.
-		add_filter( 'block_editor_settings_all', array( $this, 'capture_settings' ), 999 );
-
 		/*
-		 * Priority 20: `wp_add_inline_script()` needs its handle registered
-		 * already, and the extension registers its own at the default priority.
+		 * Late, so anything else that filters the value has already run — and
+		 * this is also where the payload is attached, not just where the flag
+		 * is read. See `capture_settings()` for why the two cannot be split.
 		 */
-		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_settings' ), 20 );
+		add_filter( 'block_editor_settings_all', array( $this, 'capture_settings' ), 999 );
 	}
 
 	/**
@@ -90,6 +97,8 @@ final class Settings {
 
 		$settings['spacery'] = $this->data();
 
+		$this->enqueue_settings();
+
 		return $settings;
 	}
 
@@ -99,8 +108,31 @@ final class Settings {
 	 * Inline `before` the block's own handle, so the global exists by the time
 	 * the block's module runs. Attaching to the real handle rather than a
 	 * separate one avoids relying on enqueue ordering.
+	 *
+	 * **Called from `capture_settings()`, not from `enqueue_block_editor_assets`.**
+	 * This looked like an asset concern and was hooked there, one priority late,
+	 * on the assumption that the settings filter had already run. It has not:
+	 * measured on WordPress 7.1, `enqueue_block_editor_assets` fires *before*
+	 * `block_editor_settings_all`, so the payload was encoded while
+	 * `$responsive_editing` still held its initialised `true`. A site switching
+	 * responsive editing off through `block_editor_settings_all` was published
+	 * to the editor as having it on — which is the one configuration D12's
+	 * fallback selector exists for, so that fallback could never appear. The
+	 * value was correct in `$settings['spacery']`, which JavaScript cannot read,
+	 * and wrong in the global, which it can.
+	 *
+	 * Attaching from inside the filter is safe in both directions: the handles
+	 * are registered by then (the asset hook has already run), and inline
+	 * scripts are still printed afterwards, because the block editor prints its
+	 * scripts in the footer. Both halves verified on a live 7.1 install.
 	 */
 	public function enqueue_settings(): void {
+		if ( $this->attached ) {
+			return;
+		}
+
+		$this->attached = true;
+
 		$javascript = sprintf(
 			'window.%s = %s;',
 			self::GLOBAL_NAME,

@@ -40,6 +40,7 @@ function spacery_test_reset(): void {
 	$GLOBALS['spacery_test_priorities'] = array();
 
 	$GLOBALS['spacery_test_settings_errors'] = array();
+	$GLOBALS['spacery_test_inline_scripts']  = array();
 }
 
 spacery_test_reset();
@@ -174,6 +175,55 @@ function add_settings_error( string $setting, string $code, string $message, str
  */
 function wp_json_encode( $data ) {
 	return json_encode( $data ); // phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode
+}
+
+/**
+ * Stub of wp_add_inline_script().
+ *
+ * Recorded, because the payload's *content at the moment it is attached* is the
+ * whole question: `Settings` used to encode it on an earlier hook than the one
+ * that reads core's flag, so the JSON was right in a place JavaScript cannot
+ * read and stale in the place it can. {@see \Spacery\Tests\SettingsTest}.
+ *
+ * @param string $handle   Script handle.
+ * @param string $data     JavaScript to attach.
+ * @param string $position 'before' or 'after'.
+ */
+function wp_add_inline_script( string $handle, string $data, string $position = 'after' ): bool {
+	$GLOBALS['spacery_test_inline_scripts'][] = compact( 'handle', 'data', 'position' );
+
+	return true;
+}
+
+/**
+ * Stub of wp_script_is(). Spacery's editor handle is registered; nothing else.
+ *
+ * @param string $handle Script handle.
+ * @param string $status Status being asked about.
+ */
+function wp_script_is( string $handle, string $status = 'enqueued' ): bool {
+	return 'spacery-extension' === $handle;
+}
+
+/**
+ * Minimal stand-in for core's block type registry.
+ *
+ * Empty on purpose: the blocks it would list contribute further handles, and
+ * this suite is about *what* is attached rather than how many handles receive
+ * it.
+ */
+class WP_Block_Type_Registry {
+
+	public static function get_instance(): self {
+		return new self();
+	}
+
+	/**
+	 * @return array<string, object>
+	 */
+	public function get_all_registered(): array {
+		return array();
+	}
 }
 
 /*
