@@ -301,7 +301,7 @@ export function App(): React.ReactElement {
 						 * characters on one line. The breakpoint table's
 						 * guidance line already used this value.
 						 */}
-						<div style={{ maxWidth: '420px' }}>
+						<div style={{ maxWidth: '420px', textWrap: 'balance' }}>
 							<Text variant="muted" size={12}>
 								{__(
 									'Only one source applies at a time — Spacery never merges two sets.',
@@ -410,7 +410,7 @@ export function App(): React.ReactElement {
 						 * four slugs at different widths — and its spacing
 						 * quietly changes. See D24.
 						 */}
-						<div style={{ maxWidth: '420px' }}>
+						<div style={{ maxWidth: '420px', textWrap: 'balance' }}>
 							<CheckboxControl
 								label={__(
 									'Delete my settings when Spacery is deleted',

@@ -314,6 +314,44 @@ which is about 44 characters including the interpolated name. That is a lower
 bound on measure, not an upper one, and it outranks rule (1) above wherever the
 two disagree.
 
+### Where a line breaks
+
+Measure says how wide a line may be. This says how the words are divided inside
+it, and it is a separate fault with a separate fix.
+
+A sentence a few characters past one line wraps to a **widow**. Measured on the
+live screen: `Your breakpoints are kept, so reinstalling leaves your spacing
+exactly as it is.` broke **70 / 9**, and a row's own message, in the 130px
+column, broke **13 / 8**. Both are inside the measure; both read as a mistake.
+
+**This cannot be fixed by writing shorter strings**, and that is the whole
+reason it is a CSS rule and not an editing rule. A break point is a *rendered
+width*, so a sentence tuned to fall well in English falls somewhere else in
+every translation — Greek runs longer and would re-rag every line fitted by hand
+for English. `text-wrap: balance` turns 70 / 9 into 42 / 37 and 13 / 8 into
+10 / 11, and fixes the Greek nobody measured.
+
+Two things about applying it, both found by it not working:
+
+- **It is not inherited.** `#spacery-settings { text-wrap: balance }` changed
+  nothing: every descendant computed `pretty`, with no stylesheet on the page
+  setting `pretty` at all (Chrome 152). The declaration has to be on the element
+  that holds the text.
+- **It needs a block container.** `Text` renders `display: inline` and cannot
+  balance itself. On this screen the three `maxWidth: 420px` wrappers do it —
+  the element that decides how wide a line may be also decides how it is
+  divided, which is where the two rules belong together. In the inspector, a
+  plain `div` inside each column item does the same job.
+
+### Two `Text` elements side by side are one paragraph
+
+Not a wrapping question but found by the same audit, and worse than any widow.
+`Text` is inline, so three of them as siblings in a fragment flowed together
+**with no whitespace between the sentences** — the takeover notice rendered
+`narrower screens.In Spacery they also`. Separate statements go in a column,
+each in its own block. A fragment of `Text`s is a paragraph, whether or not it
+was meant as one.
+
 ### Do
 
 - Say a value's **consequence**, not just its name — every band, empty state and

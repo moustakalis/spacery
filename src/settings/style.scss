@@ -127,3 +127,50 @@ $caution-text: #8a6616;
 		}
 	}
 }
+
+/*
+ * Where a sentence breaks, not how wide it is allowed to get.
+ *
+ * §7's measure cap fixed the lines that were too long and left a second fault
+ * untouched: a sentence a few characters past one line wraps to a **widow**.
+ * Measured on this screen, `Your breakpoints are kept, so reinstalling leaves
+ * your spacing exactly as it is.` broke 70 / 9 -- nine characters alone on a
+ * second line -- and a row's own message, in the 130px column, broke 13 / 8.
+ * Both are inside the measure and both read as a mistake.
+ *
+ * This cannot be fixed by writing shorter strings, which is the argument for
+ * putting it here. The break point is a *rendered width*, so a sentence tuned
+ * to fall well in English falls somewhere else in every translation -- Greek
+ * runs longer and would re-rag every line fitted by hand for English. Only the
+ * browser knows where the words land, so the browser is told to balance them:
+ * 70 / 9 becomes 42 / 37, 13 / 8 becomes 10 / 11, and the same declaration
+ * fixes the Greek nobody measured.
+ *
+ * **It has to be set on the element that holds the text, and inheriting it
+ * does not work.** `#spacery-settings { text-wrap: balance }` was tried first
+ * and changed nothing: every descendant computed `text-wrap: pretty`, because
+ * `balance` is not passed down. Measured in Chrome 152, root `balance` and
+ * children `pretty`, with no stylesheet on the page setting `pretty` at all.
+ * So the selectors are the help elements themselves.
+ *
+ * Browsers without `balance` ignore it and wrap as they do today, and the ones
+ * with it bail out on blocks past their own line limit -- also today's
+ * behaviour. Nothing here can make a line worse.
+ *
+ * Not listed: `.components-truncate`, which is what `Text` renders. It is
+ * `display: inline`, and balancing is done by the nearest *block* container, so
+ * the declaration would have no effect there without also changing its display
+ * -- and `Text` is used inline inside sentences on this screen (`emphasise`),
+ * where a block would be wrong. Those are balanced from the other side instead:
+ * the three `maxWidth: 420px` wrappers that give this screen its measure now
+ * set `textWrap` too, so the element that decides how wide a sentence may be
+ * also decides how its lines are divided. Measured there: 73 / 23 to 45 / 51.
+ */
+#spacery-settings {
+
+	.components-base-control__help,
+	.components-checkbox-control__help,
+	.components-notice__content {
+		text-wrap: balance;
+	}
+}

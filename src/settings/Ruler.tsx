@@ -287,25 +287,36 @@ export function Ruler({
 						padding: '12px 16px',
 					}}
 				>
-					<Text size={13}>
-						{clamped
-							? emphasise(
-									/* translators: %s: a CSS length, e.g. "11920px". */
-									__(
-										'The widest band runs to %s and is cut short here.',
-										'spacery'
-									),
-									widest.max
-								)
-							: emphasise(
-									/* translators: %s: a CSS length, e.g. "1280px". */
-									__(
-										'Screens wider than %s match no breakpoint, so blocks use their ordinary spacing. Raise the widest breakpoint to cover them.',
-										'spacery'
-									),
-									widest.max
-								)}
-					</Text>
+					{/*
+					 * The band is full width; its sentence is not. Without this
+					 * the note ran to 101 characters on one line -- it escaped
+					 * §7's measure pass because `emphasise()` splits the string
+					 * into several text nodes and the audit was reading whole
+					 * ones. `textWrap` rides along for the same reason it does
+					 * on the other three: the cap decides how wide a line may
+					 * be, so it is also where the line division belongs.
+					 */}
+					<div style={{ maxWidth: '420px', textWrap: 'balance' }}>
+						<Text size={13}>
+							{clamped
+								? emphasise(
+										/* translators: %s: a CSS length, e.g. "11920px". */
+										__(
+											'The widest band runs to %s and is cut short here.',
+											'spacery'
+										),
+										widest.max
+									)
+								: emphasise(
+										/* translators: %s: a CSS length, e.g. "1280px". */
+										__(
+											'Screens wider than %s match no breakpoint, so blocks use their ordinary spacing. Raise the widest breakpoint to cover them.',
+											'spacery'
+										),
+										widest.max
+									)}
+						</Text>
+					</div>
 				</div>
 			</FlexItem>
 		</Flex>

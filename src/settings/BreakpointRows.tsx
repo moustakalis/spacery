@@ -298,7 +298,13 @@ export function BreakpointRows({
 					 * and which one the content is stored under.
 					 */}
 					<FlexItem>
-						<div style={{ textAlign: 'right', maxWidth: '420px' }}>
+						<div
+							style={{
+								textAlign: 'right',
+								maxWidth: '420px',
+								textWrap: 'balance',
+							}}
+						>
 							<Text variant="muted" size={12}>
 								{rows.length >= max
 									? sprintf(

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spacery 1.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/moustakalis/spacery/issues\n"
-"POT-Creation-Date: 2026-09-14T13:20:36+00:00\n"
+"POT-Creation-Date: 2026-09-14T14:23:33+00:00\n"
 "PO-Revision-Date: 2026-09-12T15:17:59+00:00\n"
 "Last-Translator: Nickos Moustakas\n"
 "Language-Team: Greek\n"
@@ -282,13 +282,13 @@ msgid "Left"
 msgstr "Αριστερά"
 
 #. translators: %d: number of values WordPress sets for narrower screens.
-#: src/extension/TakeoverNotice.js:39
+#: src/extension/TakeoverNotice.js:55
 msgid "WordPress already sets %d value here for narrower screens."
 msgid_plural "WordPress already sets %d values here for narrower screens."
 msgstr[0] "Το WordPress ορίζει ήδη %d τιμή εδώ για στενότερες οθόνες."
 msgstr[1] "Το WordPress ορίζει ήδη %d τιμές εδώ για στενότερες οθόνες."
 
-#: src/extension/TakeoverNotice.js:39
+#: src/extension/TakeoverNotice.js:55
 msgid ""
 "In Spacery they also reach narrower screens, unless a narrower breakpoint "
 "sets its own value."
@@ -296,12 +296,12 @@ msgstr ""
 "Στο Spacery φτάνουν και σε στενότερες οθόνες, εκτός αν κάποιο στενότερο "
 "σημείο διακοπής ορίσει δική του τιμή."
 
-#: src/extension/TakeoverNotice.js:50
+#: src/extension/TakeoverNotice.js:66
 msgid "Manage these in Spacery"
 msgstr "Διαχείριση από το Spacery"
 
 #. translators: %s: comma-separated list of WordPress viewport names.
-#: src/extension/TakeoverNotice.js:65
+#: src/extension/TakeoverNotice.js:81
 msgid "Leaving %s to WordPress: no Spacery breakpoint covers the same widths."
 msgstr ""
 "Το %s παραμένει στο WordPress: κανένα σημείο διακοπής του Spacery δεν "
@@ -476,11 +476,11 @@ msgid "Add breakpoint"
 msgstr "Προσθήκη σημείου διακοπής"
 
 #. translators: %d: maximum number of breakpoints.
-#: src/settings/BreakpointRows.js:115 src/settings/validate.js:171
+#: src/settings/BreakpointRows.js:119 src/settings/validate.js:171
 msgid "%d breakpoints is the maximum."
 msgstr "Τα %d σημεία διακοπής είναι το ανώτατο όριο."
 
-#: src/settings/BreakpointRows.js:116
+#: src/settings/BreakpointRows.js:120
 msgid ""
 "Name appears in the editor. Slug is stored on your blocks and follows the "
 "name until you edit it."
@@ -488,18 +488,18 @@ msgstr ""
 "Το όνομα εμφανίζεται στον επεξεργαστή. Το slug αποθηκεύεται στα μπλοκ σας "
 "και ακολουθεί το όνομα μέχρι να το επεξεργαστείτε."
 
-#: src/settings/BreakpointRows.js:131
+#: src/settings/BreakpointRows.js:135
 msgid "You haven't defined any breakpoints yet"
 msgstr "Δεν έχετε ορίσει ακόμη σημεία διακοπής"
 
 #. translators: %s: the breakpoint set in use meanwhile.
-#: src/settings/BreakpointRows.js:133
+#: src/settings/BreakpointRows.js:137
 msgid "Until you add one, Spacery uses %s — shown in In use now below."
 msgstr ""
 "Μέχρι να προσθέσετε ένα, το Spacery χρησιμοποιεί %s — αυτό που δείχνει η "
 "ενότητα «Σε χρήση τώρα» παρακάτω."
 
-#: src/settings/BreakpointRows.js:133
+#: src/settings/BreakpointRows.js:137
 msgid "Add your first breakpoint"
 msgstr "Προσθέστε το πρώτο σας σημείο διακοπής"
 

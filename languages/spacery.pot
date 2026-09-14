@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-14T13:26:07+00:00\n"
+"POT-Creation-Date: 2026-09-14T14:23:33+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: spacery\n"
@@ -272,23 +272,23 @@ msgid "Left"
 msgstr ""
 
 #. translators: %d: number of values WordPress sets for narrower screens.
-#: src/extension/TakeoverNotice.js:39
+#: src/extension/TakeoverNotice.js:55
 #, js-format
 msgid "WordPress already sets %d value here for narrower screens."
 msgid_plural "WordPress already sets %d values here for narrower screens."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/extension/TakeoverNotice.js:39
+#: src/extension/TakeoverNotice.js:55
 msgid "In Spacery they also reach narrower screens, unless a narrower breakpoint sets its own value."
 msgstr ""
 
-#: src/extension/TakeoverNotice.js:50
+#: src/extension/TakeoverNotice.js:66
 msgid "Manage these in Spacery"
 msgstr ""
 
 #. translators: %s: comma-separated list of WordPress viewport names.
-#: src/extension/TakeoverNotice.js:65
+#: src/extension/TakeoverNotice.js:81
 #, js-format
 msgid "Leaving %s to WordPress: no Spacery breakpoint covers the same widths."
 msgstr ""
@@ -450,27 +450,27 @@ msgid "Add breakpoint"
 msgstr ""
 
 #. translators: %d: maximum number of breakpoints.
-#: src/settings/BreakpointRows.js:115
+#: src/settings/BreakpointRows.js:119
 #: src/settings/validate.js:171
 #, js-format
 msgid "%d breakpoints is the maximum."
 msgstr ""
 
-#: src/settings/BreakpointRows.js:116
+#: src/settings/BreakpointRows.js:120
 msgid "Name appears in the editor. Slug is stored on your blocks and follows the name until you edit it."
 msgstr ""
 
-#: src/settings/BreakpointRows.js:131
+#: src/settings/BreakpointRows.js:135
 msgid "You haven't defined any breakpoints yet"
 msgstr ""
 
 #. translators: %s: the breakpoint set in use meanwhile.
-#: src/settings/BreakpointRows.js:133
+#: src/settings/BreakpointRows.js:137
 #, js-format
 msgid "Until you add one, Spacery uses %s — shown in In use now below."
 msgstr ""
 
-#: src/settings/BreakpointRows.js:133
+#: src/settings/BreakpointRows.js:137
 msgid "Add your first breakpoint"
 msgstr ""
 
