@@ -89,6 +89,26 @@ second route, both cost a run to find:
 - Symlinking `src` and `tests` into it makes vite resolve every test through
   `/@fs/...` and report `Cannot find module` for all 17 files. Copy them.
 
+## After a string changes, check the assertions from the tests' side
+
+Searching `src/` for the new wording finds nothing, and searching for the old
+wording misses every assertion that uses a **prefix** of it — which is what
+`getByText( '…', { exact: false } )` is for. Both directions were tried on this
+repo and both let stale assertions through: eight into one CI run, four into the
+next.
+
+The check that works goes the other way. Pull every `getByText` /
+`toHaveText` / `toContainText` literal out of `tests/`, blank out the values a
+test supplies itself (widths, breakpoint names), and assert each remaining
+fragment appears in `build/*.js` or `includes/**/*.php` — the built bundles are
+the only honest record of what the screen can render. Anything left over is a
+string no code produces.
+
+Run it after any wording change. On this repo it also found a locator that had
+matched nothing for six commits: `shownTier()` looked for a hint deleted in
+`384de53`, behind `.isVisible().catch(() => false)`, so it never failed — it
+just quietly reported the wrong one of its two diagnostic states.
+
 ## The E2E suite can run somewhere other than `wp-env`
 
 `WP_BASE_URL` chooses the site and `WP_USERNAME` / `WP_PASSWORD` choose the
