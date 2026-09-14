@@ -236,7 +236,7 @@ final class OptionsTest extends TestCase {
 	 * reasoning as `BreakpointPatternsTest` and D19.
 	 */
 	public function test_uninstall_repeats_the_option_names_this_class_registers(): void {
-		$source = (string) file_get_contents( dirname( __DIR__, 2 ) . '/uninstall.php' );
+		$source = $this->uninstall_source();
 
 		foreach ( array( Registry::OPTION_SOURCE, Registry::OPTION_CUSTOM, Options::OPTION_DELETE_DATA ) as $option ) {
 			$this->assertStringContainsString(
@@ -255,10 +255,23 @@ final class OptionsTest extends TestCase {
 	 * uninstall rather than a broken file.
 	 */
 	public function test_uninstall_loads_no_plugin_code(): void {
-		$source = (string) file_get_contents( dirname( __DIR__, 2 ) . '/uninstall.php' );
+		$source = $this->uninstall_source();
 
 		$this->assertStringNotContainsString( 'Spacery\\', $source );
 		$this->assertStringNotContainsString( 'require', $source );
 		$this->assertStringContainsString( "defined( 'WP_UNINSTALL_PLUGIN' )", $source );
+	}
+
+	/**
+	 * `uninstall.php` as text.
+	 *
+	 * Read rather than included, because including it is exactly what must not
+	 * happen: the file exits unless `WP_UNINSTALL_PLUGIN` is defined, and
+	 * defining it to find out would be arranging the conditions for deleting
+	 * the options this suite is asserting about.
+	 */
+	private function uninstall_source(): string {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- reading a file in this repository from a test that has no WordPress.
+		return (string) file_get_contents( dirname( __DIR__, 2 ) . '/uninstall.php' );
 	}
 }

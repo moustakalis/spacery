@@ -205,26 +205,12 @@ function wp_script_is( string $handle, string $status = 'enqueued' ): bool {
 	return 'spacery-extension' === $handle;
 }
 
-/**
- * Minimal stand-in for core's block type registry.
- *
- * Empty on purpose: the blocks it would list contribute further handles, and
- * this suite is about *what* is attached rather than how many handles receive
- * it.
+/*
+ * The block type registry stub lives in its own file: this one declares
+ * functions, and `Universal.Files.SeparateFunctionsFromOO` refuses a file that
+ * declares both.
  */
-class WP_Block_Type_Registry {
-
-	public static function get_instance(): self {
-		return new self();
-	}
-
-	/**
-	 * @return array<string, object>
-	 */
-	public function get_all_registered(): array {
-		return array();
-	}
-}
+require_once __DIR__ . '/block-type-registry.php';
 
 /*
  * The Style Engine is real, not stubbed. It is what turns a style object into

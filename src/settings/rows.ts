@@ -249,9 +249,10 @@ export function changedCount(rows: Row[], stored: Breakpoint[]): number {
  * silence. On a page whose main task is typing several rows, that is a real
  * loss, and the author gets no signal it is about to happen.
  *
- * @param rows   The rows being edited.
- * @param source The source chosen on screen.
- * @param stored What the server last returned.
+ * @param rows       The rows being edited.
+ * @param source     The source chosen on screen.
+ * @param deleteData Whether the delete-on-uninstall box is ticked (D24).
+ * @param stored     What the server last returned.
  * @return True when saving would change something.
  */
 export function isDirty(
