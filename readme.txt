@@ -94,6 +94,21 @@ In two options, `spacery_breakpoint_source` and `spacery_custom_breakpoints`, bo
 registered with WordPress so they are available through the REST API and WP-CLI with the
 same validation the settings screen uses.
 
+= What happens to my settings if I delete the plugin? =
+
+They are kept, unless you ask for them to be removed. There is a checkbox at the bottom of
+the Spacery screen, off by default.
+
+Keeping them is the safe default, and not just tidiness. Your breakpoints are what the
+spacing on your blocks is measured against: a value saved at "tablet" means whatever your
+tablet breakpoint says it means. Remove the breakpoints and a later reinstall starts from
+Spacery's own set, so that value would apply at a different width - or, if you had renamed
+your breakpoints, stop applying at all. Nothing would warn you, because nothing is broken;
+the spacing would just be different.
+
+So the choice is yours and it is off until you make it. Either way Spacery never writes
+anything into your posts, and never removes anything from them.
+
 == Changelog ==
 
 = 1.0.0 =

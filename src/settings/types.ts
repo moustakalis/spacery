@@ -24,10 +24,18 @@ export type EffectiveSource = Exclude<StoredSource, ''>;
  */
 export type ResolvedSource = EffectiveSource | 'filter';
 
-/** The two options, exactly as `/wp/v2/settings` returns them. */
+/** The stored options, exactly as `/wp/v2/settings` returns them. */
 export interface StoredSettings {
 	spacery_breakpoint_source: StoredSource;
 	spacery_custom_breakpoints: Breakpoint[];
+	/**
+	 * Whether to delete Spacery's settings when the plugin is deleted (D24).
+	 *
+	 * Part of this screen's save cycle rather than a control that writes on
+	 * click, because a screen with two save models is a screen where nobody
+	 * knows which half of it is committed.
+	 */
+	spacery_delete_data: boolean;
 }
 
 /**

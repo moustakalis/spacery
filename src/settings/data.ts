@@ -29,14 +29,7 @@ export async function fetchSettings(): Promise<StoredSettings> {
 		path: SETTINGS,
 	});
 
-	return {
-		spacery_breakpoint_source: all.spacery_breakpoint_source ?? '',
-		spacery_custom_breakpoints: Array.isArray(
-			all.spacery_custom_breakpoints
-		)
-			? all.spacery_custom_breakpoints
-			: [],
-	};
+	return read(all);
 }
 
 /**
@@ -67,6 +60,21 @@ export async function saveSettings(
 		data: settings,
 	});
 
+	return read(all);
+}
+
+/**
+ * Narrows what `/wp/v2/settings` returns to the three values Spacery owns.
+ *
+ * The endpoint carries every registered setting on the site, and a missing key
+ * is a real possibility rather than a defensive flourish: `register_setting()`
+ * runs on `init`, so a request that somehow reaches this screen before Spacery
+ * registered would return an object without them.
+ *
+ * @param all Everything the endpoint returned.
+ * @return Spacery's settings.
+ */
+function read(all: Partial<StoredSettings>): StoredSettings {
 	return {
 		spacery_breakpoint_source: all.spacery_breakpoint_source ?? '',
 		spacery_custom_breakpoints: Array.isArray(
@@ -74,6 +82,7 @@ export async function saveSettings(
 		)
 			? all.spacery_custom_breakpoints
 			: [],
+		spacery_delete_data: true === all.spacery_delete_data,
 	};
 }
 

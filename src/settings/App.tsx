@@ -7,6 +7,7 @@ import {
 	Card,
 	CardBody,
 	CardHeader,
+	CheckboxControl,
 	Flex,
 	FlexItem,
 	Notice,
@@ -60,6 +61,13 @@ export function App(): React.ReactElement {
 	 */
 	const [rows, setRows] = useState<Row[]>([]);
 	const [source, setSource] = useState<StoredSource>('');
+
+	/*
+	 * D24, and part of the same save cycle as everything above it. A checkbox
+	 * that wrote on click would be a second way to commit this screen, and the
+	 * Discard button beside it would then mean "all of it except that".
+	 */
+	const [deleteData, setDeleteData] = useState(false);
 	const [status, setStatus] = useState<Status>({ kind: 'idle' });
 
 	useEffect(() => {
@@ -71,6 +79,7 @@ export function App(): React.ReactElement {
 					setSettings(stored);
 					setRows(toRows(stored.spacery_custom_breakpoints));
 					setSource(stored.spacery_breakpoint_source);
+					setDeleteData(stored.spacery_delete_data);
 					setInfo(breakpoints);
 				}
 			})
@@ -90,7 +99,8 @@ export function App(): React.ReactElement {
 	 * run on every render. `settings` is the last thing the server returned, so
 	 * this is "does the screen hold anything the server does not".
 	 */
-	const dirty = null !== settings && isDirty(rows, source, settings);
+	const dirty =
+		null !== settings && isDirty(rows, source, deleteData, settings);
 
 	/*
 	 * The browser's own warning, which is the only one that can interrupt a
@@ -179,6 +189,7 @@ export function App(): React.ReactElement {
 	const discard = () => {
 		setRows(toRows(settings.spacery_custom_breakpoints));
 		setSource(settings.spacery_breakpoint_source);
+		setDeleteData(settings.spacery_delete_data);
 		setStatus({ kind: 'idle' });
 	};
 
@@ -201,6 +212,7 @@ export function App(): React.ReactElement {
 			stored = await saveSettings({
 				spacery_breakpoint_source: sentSource,
 				spacery_custom_breakpoints: sent,
+				spacery_delete_data: deleteData,
 			});
 		} catch (error: unknown) {
 			setStatus({ kind: 'error', message: describe(error) });
@@ -210,6 +222,7 @@ export function App(): React.ReactElement {
 		setSettings(stored);
 		setRows(toRows(stored.spacery_custom_breakpoints));
 		setSource(stored.spacery_breakpoint_source);
+		setDeleteData(stored.spacery_delete_data);
 
 		/*
 		 * The two options are sanitised independently, so a half-typed row can
@@ -371,6 +384,47 @@ export function App(): React.ReactElement {
 			</FlexItem>
 
 			<FlexItem>
+				<Card>
+					<CardHeader>
+						<Heading level={2}>
+							{__('When you delete Spacery', 'spacery')}
+						</Heading>
+					</CardHeader>
+					<CardBody>
+						{/*
+						 * Off by default, and the help text says what the
+						 * default costs rather than only what the checkbox
+						 * does. Deleting is not neutral tidying: the stored
+						 * breakpoints are the key every stored block value
+						 * resolves through, so a site that removes them and
+						 * later reinstalls gets Spacery's preset — the same
+						 * four slugs at different widths — and its spacing
+						 * quietly changes. See D24.
+						 */}
+						<CheckboxControl
+							label={__(
+								'Delete my Spacery settings when the plugin is deleted',
+								'spacery'
+							)}
+							help={
+								deleteData
+									? __(
+											'Your breakpoints will be removed. Spacing already set on blocks stays in your content, but it will resolve against whatever breakpoints a future install has — which may not be these.',
+											'spacery'
+										)
+									: __(
+											'Your breakpoints are kept, so deleting and reinstalling Spacery leaves your spacing exactly as it is. Nothing is written into your posts either way.',
+											'spacery'
+										)
+							}
+							checked={deleteData}
+							onChange={setDeleteData}
+						/>
+					</CardBody>
+				</Card>
+			</FlexItem>
+
+			<FlexItem>
 				{/*
 				 * Sticky, because the rows it saves can run past the fold: a
 				 * save button below twelve breakpoints is a scroll away from
@@ -430,7 +484,9 @@ export function App(): React.ReactElement {
 												{saveHint(
 													problems,
 													changed,
-													sourceChanged
+													sourceChanged,
+													deleteData !==
+														settings.spacery_delete_data
 												)}
 											</Text>
 										</FlexItem>

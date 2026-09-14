@@ -218,6 +218,23 @@ declare module '@wordpress/components' {
 		children?: React.ReactNode;
 	}>;
 
+	export const CheckboxControl: React.ComponentType<{
+		label?: string;
+		/*
+		 * Picked from `BaseControlProps` like every other control here, and
+		 * explicitly `| undefined` because this project has
+		 * `exactOptionalPropertyTypes` on and the help text below the box
+		 * changes with the box's own state rather than being constant.
+		 */
+		help?: string | undefined;
+		checked?: boolean;
+		/*
+		 * `CheckboxControl` hands its `onChange` a boolean, not an event --
+		 * which is what lets a `useState` setter be passed straight in.
+		 */
+		onChange?: (checked: boolean) => void;
+	}>;
+
 	export const RadioControl: React.ComponentType<{
 		label?: string;
 		/*

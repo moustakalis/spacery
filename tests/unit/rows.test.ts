@@ -140,17 +140,28 @@ describe('isDirty', () => {
 		spacery_custom_breakpoints: [
 			{ slug: 'laptop', label: 'Laptop', max: '1024px' },
 		],
+		spacery_delete_data: false,
 	};
 
 	it('is clean when the screen matches what the server holds', () => {
 		expect(
-			isDirty(toRows(stored.spacery_custom_breakpoints), 'custom', stored)
+			isDirty(
+				toRows(stored.spacery_custom_breakpoints),
+				'custom',
+				false,
+				stored
+			)
 		).toBe(false);
 	});
 
 	it('is dirty when the source changes', () => {
 		expect(
-			isDirty(toRows(stored.spacery_custom_breakpoints), 'theme', stored)
+			isDirty(
+				toRows(stored.spacery_custom_breakpoints),
+				'theme',
+				false,
+				stored
+			)
 		).toBe(true);
 	});
 
@@ -158,7 +169,7 @@ describe('isDirty', () => {
 		const rows = toRows(stored.spacery_custom_breakpoints);
 
 		expect(
-			isDirty([{ ...rows[0]!, max: '1000px' }], 'custom', stored)
+			isDirty([{ ...rows[0]!, max: '1000px' }], 'custom', false, stored)
 		).toBe(true);
 	});
 
@@ -172,9 +183,40 @@ describe('isDirty', () => {
 					{ ...blankRow(), slug: 'm', label: 'M', max: '480px' },
 				],
 				'custom',
+				false,
 				stored
 			)
 		).toBe(true);
+	});
+
+	/**
+	 * D24's checkbox rides the same save cycle as everything else on the
+	 * screen, so the Save button has to light up for it alone -- with no row
+	 * edited and no source changed, this is the only thing that can be
+	 * unsaved.
+	 */
+	it('is dirty when only the delete-on-uninstall choice changes', () => {
+		expect(
+			isDirty(
+				toRows(stored.spacery_custom_breakpoints),
+				'custom',
+				true,
+				stored
+			)
+		).toBe(true);
+	});
+
+	it('is clean when the delete-on-uninstall choice matches', () => {
+		const opted: StoredSettings = { ...stored, spacery_delete_data: true };
+
+		expect(
+			isDirty(
+				toRows(opted.spacery_custom_breakpoints),
+				'custom',
+				true,
+				opted
+			)
+		).toBe(false);
 	});
 
 	/** Reordering changes nothing a save would store. */
@@ -189,7 +231,7 @@ describe('isDirty', () => {
 
 		const reversed = toRows([...both.spacery_custom_breakpoints].reverse());
 
-		expect(isDirty(reversed, 'custom', both)).toBe(false);
+		expect(isDirty(reversed, 'custom', false, both)).toBe(false);
 	});
 });
 

@@ -211,8 +211,27 @@ describe('saveHint', () => {
 		);
 	});
 
+	/**
+	 * D24's checkbox, and the regression it caused when it was first added:
+	 * ticking it enabled a primary Save button while this sentence still read
+	 * "No changes to save.", so the control and its own caption disagreed.
+	 */
+	it('says so when only the delete-on-uninstall choice moved', () => {
+		expect(saveHint(clean, 0, false, true)).toBe(
+			'Unsaved change to what happens on deletion.'
+		);
+	});
+
+	/** Breakpoint edits outrank it: they are what the author came here for. */
+	it('prefers a breakpoint count over the deletion choice', () => {
+		expect(saveHint(clean, 2, false, true)).toBe(
+			'Unsaved changes to 2 breakpoints.'
+		);
+	});
+
 	it('says why a valid, unchanged screen cannot save', () => {
 		expect(saveHint(clean, 0, false)).toBe('No changes to save.');
+		expect(saveHint(clean, 0, false, false)).toBe('No changes to save.');
 	});
 });
 

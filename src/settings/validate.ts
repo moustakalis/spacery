@@ -87,15 +87,22 @@ export function countProblems(problems: Problems): number {
  * knowing there are three problems to fix is more use than being told there
  * are changes that cannot go anywhere.
  *
+ * Every unsaved thing on the screen has to be able to reach this sentence. When
+ * D24's checkbox was added it was not, so ticking it lit up a primary Save
+ * button with "No changes to save." beside it — the control and its own caption
+ * disagreeing, which is worse than either being absent.
+ *
  * @param problems      From validate().
  * @param changed       How many breakpoints differ from the stored set.
  * @param sourceChanged Whether the chosen source differs from the stored one.
+ * @param deleteChanged Whether the delete-on-uninstall choice differs.
  * @return One sentence.
  */
 export function saveHint(
 	problems: Problems,
 	changed: number,
-	sourceChanged: boolean
+	sourceChanged: boolean,
+	deleteChanged = false
 ): string {
 	if (!isValid(problems)) {
 		const count = countProblems(problems);
@@ -131,6 +138,15 @@ export function saveHint(
 	 */
 	if (sourceChanged) {
 		return __('Unsaved change to the breakpoint source.', 'spacery');
+	}
+
+	/*
+	 * Last, because it is the least of them: a breakpoint edit or a source
+	 * change is what the author came here to do, and this is a preference
+	 * about a plugin they have not deleted.
+	 */
+	if (deleteChanged) {
+		return __('Unsaved change to what happens on deletion.', 'spacery');
 	}
 
 	return __('No changes to save.', 'spacery');

@@ -257,9 +257,14 @@ export function changedCount(rows: Row[], stored: Breakpoint[]): number {
 export function isDirty(
 	rows: Row[],
 	source: StoredSource,
+	deleteData: boolean,
 	stored: StoredSettings
 ): boolean {
 	if (source !== stored.spacery_breakpoint_source) {
+		return true;
+	}
+
+	if (deleteData !== stored.spacery_delete_data) {
 		return true;
 	}
 
