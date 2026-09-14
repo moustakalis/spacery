@@ -12,7 +12,6 @@ import {
 	labelsFit,
 	LABEL_FLOOR,
 	rampColor,
-	range,
 	ruler,
 } from '../../src/settings/bands';
 import { toRows } from '../../src/settings/rows';
@@ -433,17 +432,35 @@ describe('axisTicks', () => {
 	});
 });
 
-describe('range', () => {
-	it('gives the narrowest tier an open lower edge', () => {
-		expect(range(PRESET, 3)).toBe('up to 480px');
+/**
+ * `range()` is gone, and this is what it got wrong.
+ *
+ * It wrote a band as `480px - 782px`, which names 782px on this row and again
+ * on the row above. Bands are disjoint -- `@media (480px < width <= 782px)` --
+ * so a screen exactly 782px wide is matched by this tier alone, and a dashed
+ * range reads as an overlap that cannot happen. The `Covers` column uses
+ * `band()` now, and the two readings of one fact are one function again.
+ */
+describe('the Covers column and the ruler agree', () => {
+	it('states the lower edge as exclusive', () => {
+		expect(band(PRESET, 2)).toBe('over 480px, up to 782px');
+		expect(band(PRESET, 2)).not.toContain('–');
 	});
 
-	/**
-	 * The same fact as `band()`, in the form the `Covers` column wants: four
-	 * rows of prose saying the same shape is three rows too many.
-	 */
-	it('writes a tier as a range', () => {
-		expect(range(PRESET, 2)).toBe('480px – 782px');
-		expect(band(PRESET, 2)).toBe('over 480px, up to 782px');
+	it('gives the narrowest tier an open lower edge', () => {
+		expect(band(PRESET, 3)).toBe('up to 480px');
+	});
+
+	it('is what coverage() puts in the column', () => {
+		const rows = PRESET.map((tier, index) => ({
+			id: `row-${index}`,
+			label: tier.label,
+			slug: tier.slug,
+			max: tier.max,
+		}));
+		const found = coverage(rows, RULES);
+
+		expect(found['row-2']!.text).toBe(band(PRESET, 2));
+		expect(found['row-3']!.text).toBe(band(PRESET, 3));
 	});
 });

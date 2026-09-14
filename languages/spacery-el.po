@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spacery 1.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/moustakalis/spacery/issues\n"
-"POT-Creation-Date: 2026-09-14T14:23:33+00:00\n"
+"POT-Creation-Date: 2026-09-14T21:02:50+00:00\n"
 "PO-Revision-Date: 2026-09-12T15:17:59+00:00\n"
 "Last-Translator: Nickos Moustakas\n"
 "Language-Team: Greek\n"
@@ -406,25 +406,20 @@ msgid "Something went wrong talking to the site."
 msgstr "Κάτι πήγε στραβά στην επικοινωνία με τον ιστότοπο."
 
 #. translators: %s: a CSS length, e.g. "480px".
-#: src/settings/bands.js:116 src/settings/bands.js:139
+#: src/settings/bands.js:127
 msgid "up to %s"
 msgstr "έως %s"
 
 #. translators: 1: a CSS length. 2: a wider CSS length.
-#: src/settings/bands.js:120
+#: src/settings/bands.js:131
 msgid "over %1$s, up to %2$s"
 msgstr "πάνω από %1$s, έως %2$s"
 
-#. translators: 1: a CSS length. 2: a wider CSS length. An en dash separates them.
-#: src/settings/bands.js:143
-msgid "%1$s – %2$s"
-msgstr "%1$s – %2$s"
-
-#: src/settings/bands.js:178
+#: src/settings/bands.js:166
 msgid "no tier"
 msgstr "κανένα σημείο"
 
-#: src/settings/bands.js:256
+#: src/settings/bands.js:244
 msgid "Nothing — no screens left"
 msgstr "Τίποτα — δεν μένει καμία οθόνη"
 

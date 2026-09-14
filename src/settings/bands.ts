@@ -152,6 +152,17 @@ export function toPixels(value: string, pixelsPerEm: number): number {
 /**
  * What a tier covers, as a sentence.
  *
+ * **"over 888px, up to 1300px" rather than "888px - 1300px", and the words are
+ * the point.** Bands are disjoint: `BreakpointSet::media_queries()` emits
+ * `@media (888px < width <= 1300px)`, so a screen exactly 888px wide is matched
+ * by the *narrower* tier and by that one alone. A dashed range names 888px on
+ * both rows and looks like an overlap that cannot happen -- which is how this
+ * was reported. The `Covers` column used to use a compact dashed form for
+ * tidiness; tidiness is not worth a column that says two rows share a width.
+ *
+ * One function, not two. The column and the ruler answer the same question and
+ * a second implementation of it drifted from this one the moment it existed.
+ *
  * @param tiers The resolved set, widest first.
  * @param index Which tier.
  * @return A description of its band.
@@ -171,37 +182,6 @@ export function band(tiers: Breakpoint[], index: number): string {
 	return sprintf(
 		/* translators: 1: a CSS length. 2: a wider CSS length. */
 		__('over %1$s, up to %2$s', 'spacery'),
-		narrower.max,
-		tier.max
-	);
-}
-
-/**
- * What a tier covers, as a range.
- *
- * The compact form the `Covers` column uses, where a sentence per row would be
- * four sentences saying the same shape. {@link band} is the same fact written
- * out, for the ruler's description and anywhere else a reader needs prose.
- *
- * @param tiers The set, widest first.
- * @param index Which tier.
- * @return Its band as `888px – 1400px`, or `up to 450px` for the narrowest.
- */
-export function range(tiers: Breakpoint[], index: number): string {
-	const tier = tiers[index]!;
-	const narrower = tiers[index + 1];
-
-	if (!narrower) {
-		return sprintf(
-			/* translators: %s: a CSS length, e.g. "480px". */
-			__('up to %s', 'spacery'),
-			tier.max
-		);
-	}
-
-	return sprintf(
-		/* translators: 1: a CSS length. 2: a wider CSS length. An en dash separates them. */
-		__('%1$s – %2$s', 'spacery'),
 		narrower.max,
 		tier.max
 	);
@@ -373,7 +353,7 @@ export function coverage(
 	}
 
 	usable.forEach(({ row }, index) => {
-		found[row.id] = { text: range(tiers, index), covers: true };
+		found[row.id] = { text: band(tiers, index), covers: true };
 	});
 
 	return found;
