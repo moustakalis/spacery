@@ -220,26 +220,36 @@ async function measureCanvas(page: Page): Promise<number> {
 /**
  * The tier the inspector is currently showing.
  *
- * Returns 'none' for the default range, and 'missing' when neither the hint nor
- * a tier panel is present -- which distinguishes "Spacery picked the wrong
- * tier" from "the panel is not rendered at all". That distinction is what
- * identified the sidebar being auto-dismissed at narrow widths, after four
- * rounds of guessing at measurement instead.
+ * Returns 'none' for the default range, and 'missing' when the inspector is not
+ * rendered at all -- which distinguishes "Spacery picked the wrong tier" from
+ * "the panel is not there". That distinction is what identified the sidebar
+ * being auto-dismissed at narrow widths, after four rounds of guessing at
+ * measurement instead.
+ *
+ * **'none' was unreachable from `384de53` until now**, and silently: it looked
+ * for the hint `Resize the canvas or switch device view...`, which that commit
+ * deleted when it gave the spacer the tier selector. The locator sits behind
+ * `.isVisible().catch(() => false)`, so it never errored -- it just reported
+ * `missing` for a state that is not missing, in the one helper whose whole
+ * purpose is telling those two apart. Found by checking every `getByText`
+ * literal in this suite against the strings the build can actually render.
+ *
+ * The distinction is drawn from structure now rather than from copy, because
+ * copy is what went stale: above the widest tier there is no active tier, so
+ * `ActiveTier` renders nothing and no `Name · ≤width` button exists -- but the
+ * block's own `Height` panel is always there. Panel present and no tier button
+ * is 'none'; no panel at all is 'missing'.
  *
  * @param page The Playwright page.
  * @return The tier label, 'none', or 'missing'.
  */
 async function shownTier(page: Page): Promise<string> {
-	const hint = page.getByText('Resize the canvas', { exact: false });
-
-	if (await hint.isVisible().catch(() => false)) {
-		return 'none';
-	}
-
 	const panel = page.getByRole('button', { name: /· ≤/ });
 
 	if (0 === (await panel.count())) {
-		return 'missing';
+		const height = page.getByRole('button', { name: 'Height' });
+
+		return (await height.count()) > 0 ? 'none' : 'missing';
 	}
 
 	const label = (await panel.first().textContent()) ?? '';

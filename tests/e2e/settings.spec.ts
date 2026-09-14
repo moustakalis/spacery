@@ -151,7 +151,7 @@ test.describe('settings screen', () => {
 		// And the one thing on that card an author may have to act on.
 		await expect(
 			app.getByText(
-				'Screens wider than 1280px match no breakpoint, so blocks use their ordinary, non-responsive spacing there.',
+				'Screens wider than 1280px match no breakpoint, so blocks use their ordinary spacing.',
 				{ exact: false }
 			)
 		).toBeVisible();
@@ -256,7 +256,7 @@ test.describe('settings screen', () => {
 		 * rows, still one line.
 		 */
 		await expect(
-			app.getByText('Name is shown in the editor.', { exact: false })
+			app.getByText('Name appears in the editor.', { exact: false })
 		).toHaveCount(1);
 
 		/*
@@ -300,7 +300,7 @@ test.describe('settings screen', () => {
 
 		// Before saving: the empty state names what is in effect meanwhile.
 		await expect(
-			app.getByText('You have not defined any breakpoints yet')
+			app.getByText("You haven't defined any breakpoints yet")
 		).toBeVisible();
 
 		await page.getByRole('button', { name: 'Save changes' }).click();
@@ -308,9 +308,7 @@ test.describe('settings screen', () => {
 
 		// After: the resolved set says why it is not the set that was chosen.
 		await expect(
-			app.getByText(
-				'You chose your own breakpoints but have not defined any yet'
-			)
+			app.getByText('You have not defined any yet', { exact: false })
 		).toBeVisible();
 	});
 
