@@ -343,6 +343,24 @@ Two things about applying it, both found by it not working:
   divided, which is where the two rules belong together. In the inspector, a
   plain `div` inside each column item does the same job.
 
+### A band's lower edge is exclusive, and saying so is not optional
+
+Spacery's bands are disjoint — `@media (888px < width <= 1300px)` — so a screen
+exactly 888px wide belongs to the *narrower* tier and to that one alone. Any
+label that names 888px on two rows describes an overlap the CSS cannot produce,
+which is how `Covers` came to read `888px – 1300px` above `450px – 888px`.
+
+**Do not close the gap with arithmetic.** `previous + 1` is the reflex and it is
+wrong: measured by sizing an iframe to each width and reading `matchMedia`, at
+**888.25px** the real query matches while both `(max-width: 888px)` and
+`(min-width: 889px)` miss. The label would then deny a width that is already
+being styled. Widths are not integers — browser zoom produces fractions on every
+screen, and for an `em` breakpoint "+1" has no unit at all.
+
+Say it in words: **`over 888px, up to 1300px`**, and `up to 450px` for the
+narrowest. Those are the ruler's own words, and one function (`band()`) writes
+them for both.
+
 ### Two `Text` elements side by side are one paragraph
 
 Not a wrapping question but found by the same audit, and worse than any widow.
