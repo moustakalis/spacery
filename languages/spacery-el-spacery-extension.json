@@ -202,6 +202,18 @@
 			"From: %s": [
 				"Από: %s"
 			],
+			"When you delete Spacery": [
+				"Όταν διαγράψετε το Spacery"
+			],
+			"Delete my Spacery settings when the plugin is deleted": [
+				"Να διαγραφούν οι ρυθμίσεις μου του Spacery όταν διαγραφεί το πρόσθετο"
+			],
+			"Your breakpoints will be removed. Spacing already set on blocks stays in your content, but it will resolve against whatever breakpoints a future install has — which may not be these.": [
+				"Τα σημεία διακοπής σας θα αφαιρεθούν. Τα κενά που έχουν ήδη οριστεί στα μπλοκ παραμένουν στο περιεχόμενό σας, αλλά θα υπολογίζονται με βάση όποια σημεία διακοπής έχει μια μελλοντική εγκατάσταση — που μπορεί να μην είναι αυτά."
+			],
+			"Your breakpoints are kept, so deleting and reinstalling Spacery leaves your spacing exactly as it is. Nothing is written into your posts either way.": [
+				"Τα σημεία διακοπής σας διατηρούνται, οπότε αν διαγράψετε και εγκαταστήσετε ξανά το Spacery, τα κενά σας μένουν ακριβώς όπως είναι. Σε κάθε περίπτωση, τίποτα δεν γράφεται μέσα στο περιεχόμενό σας."
+			],
 			"Save changes": [
 				"Αποθήκευση αλλαγών"
 			],
@@ -309,6 +321,9 @@
 			],
 			"Unsaved change to the breakpoint source.": [
 				"Μη αποθηκευμένη αλλαγή στην πηγή σημείων διακοπής."
+			],
+			"Unsaved change to what happens on deletion.": [
+				"Μη αποθηκευμένη αλλαγή στο τι συμβαίνει κατά τη διαγραφή."
 			],
 			"No changes to save.": [
 				"Δεν υπάρχουν αλλαγές προς αποθήκευση."
