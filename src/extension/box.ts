@@ -74,9 +74,17 @@ export function applyEdit({
  * - **Into custom**, everything is kept exactly as it is. Every length is
  *   already a valid CSS value, so this direction loses nothing and clearing
  *   would only destroy work.
- * - **Out of custom**, everything is cleared. `calc(100% - 2rem)` has no number
- *   to put in a number field, and keeping the parseable ones while dropping the
- *   rest would make the outcome depend on what each side happened to hold.
+ * - **Out of custom**, each side is kept if it parses and cleared if it does
+ *   not. `calc(100% - 2rem)` has no number to put in a number field and has to
+ *   go; `8px` beside it does, and used to be destroyed with it. The original
+ *   rule cleared the whole box, on the argument that keeping some sides and not
+ *   others makes the outcome depend on what each side happened to hold. That is
+ *   true and it is the lesser problem: which sides emptied is *visible* in the
+ *   four fields, where four values vanishing at once is not. What changed the
+ *   balance is the pencil (D29) -- leaving custom used to mean deliberately
+ *   opening the unit list and naming a unit, which reads as "re-express these",
+ *   and is now one press of a toggle labelled `Use a number and a unit`, which
+ *   does not read as "and discard everything".
  *
  * @param sides  Sides the block supports.
  * @param values What the box currently holds.
@@ -100,16 +108,23 @@ export function switchUnit(
 		return kept;
 	}
 
-	if (CUSTOM === from) {
-		return clearBox(sides);
-	}
-
 	const next: BoxValues = {};
 
 	for (const side of sides) {
 		const parsed = parseLength(values[side]);
 
-		next[side] = parsed ? formatLength(parsed.value, to) : values[side];
+		if (parsed) {
+			next[side] = formatLength(parsed.value, to);
+			continue;
+		}
+
+		/*
+		 * Out of custom a value no number field can hold is dropped; between
+		 * real units it is left alone, because it got there without a number
+		 * in the first place -- a core preset, say -- and re-labelling was
+		 * never going to touch it.
+		 */
+		next[side] = CUSTOM === from ? undefined : values[side];
 	}
 
 	return next;

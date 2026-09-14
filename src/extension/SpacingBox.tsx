@@ -70,6 +70,25 @@ const RESET = (
 	</svg>
 );
 
+/**
+ * Custom mode, which used to be the last entry in the unit list.
+ *
+ * A pencil rather than the word, for the reason the list was the wrong place
+ * for it: `custom` is not a unit. Every other entry says what the numbers in
+ * the fields mean; `custom` said what the fields *are*, and a `<select>` cannot
+ * show that difference. It also sized the picker -- a `<select>` takes its
+ * width from its widest option, so the rarest choice was setting the geometry
+ * of the row it sat in.
+ */
+const EDIT = (
+	<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+		<path
+			fill="currentColor"
+			d="M4 20l1.2-4.2 9.3-9.3 3 3-9.3 9.3L4 20Zm12.4-11.6 1.8-1.8a1.2 1.2 0 0 0 0-1.7l-1.3-1.3a1.2 1.2 0 0 0-1.7 0l-1.8 1.8 3 3Z"
+		/>
+	</svg>
+);
+
 interface SpacingBoxProps {
 	/** Identifies this box's remembered preferences. From `boxKey()`. */
 	stateKey: string;
@@ -136,10 +155,6 @@ export function SpacingBox({
 	};
 
 	const allowed = units.map((unit) => unit.value);
-	const options = [
-		...units,
-		{ value: CUSTOM, label: __('custom', 'spacery') },
-	];
 
 	/**
 	 * Which unit the box is in.
@@ -171,6 +186,34 @@ export function SpacingBox({
 	};
 
 	const unit = resolveUnit();
+
+	/**
+	 * The unit this box would be in if it were not in custom mode.
+	 *
+	 * What the picker shows while custom is on, and where the pencil returns
+	 * to. It cannot just be `unit`, which is `custom` then, and it cannot be
+	 * `unitFor()` alone: that reports `custom` for a value no number field can
+	 * hold (D22), which is exactly the box most likely to be in custom mode.
+	 * So a real unit is always chosen, falling back to the first the theme
+	 * allows.
+	 *
+	 * @return An allowed unit, never `CUSTOM`.
+	 */
+	const lengthUnit = (): string => {
+		if (chosen && allowed.includes(chosen)) {
+			return chosen;
+		}
+
+		const stored = sides.map((side) => values[side]);
+		const read = unitFor(
+			stored.some((value) => value)
+				? stored
+				: sides.map((side) => placeholders[side]),
+			allowed
+		);
+
+		return allowed.includes(read) ? read : (allowed[0] ?? 'px');
+	};
 
 	/**
 	 * Applies one field's new number.
@@ -214,21 +257,56 @@ export function SpacingBox({
 								 * default-sized picker stood taller than
 								 * everything it sat beside.
 								 *
-								 * Width is pinned because a `<select>` sizes
-								 * to its widest option, which is `custom` --
-								 * so the rarest choice was setting the
-								 * geometry of the whole row.
+								 * Width is still pinned -- a `<select>` sizes
+								 * to its widest option -- but that option is
+								 * now `rem` rather than `custom`, which is
+								 * what moving custom to the pencil bought
+								 * back.
+								 *
+								 * In custom mode this shows the unit the box
+								 * would otherwise be in, and choosing one here
+								 * leaves custom mode. That is the second way
+								 * out, and the one an author reaches for when
+								 * they know which unit they want rather than
+								 * only that they are done with CSS values.
 								 */}
-								<div style={{ width: '4.5rem' }}>
+								<div style={{ width: '3.5rem' }}>
 									<SelectControl
 										hideLabelFromVision
 										label={__('Unit', 'spacery')}
 										size="compact"
-										value={unit}
-										options={options}
+										value={
+											CUSTOM === unit
+												? lengthUnit()
+												: unit
+										}
+										options={units}
 										onChange={changeUnit}
 									/>
 								</div>
+							</FlexItem>
+
+							<FlexItem>
+								<Button
+									size="small"
+									icon={EDIT}
+									isPressed={CUSTOM === unit}
+									label={
+										CUSTOM === unit
+											? __(
+													'Use a number and a unit',
+													'spacery'
+												)
+											: __('Enter a CSS value', 'spacery')
+									}
+									onClick={() =>
+										changeUnit(
+											CUSTOM === unit
+												? lengthUnit()
+												: CUSTOM
+										)
+									}
+								/>
 							</FlexItem>
 
 							<FlexItem>

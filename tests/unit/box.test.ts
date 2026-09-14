@@ -172,7 +172,15 @@ describe('switchUnit', () => {
 		});
 	});
 
-	it('clears everything on the way out of custom', () => {
+	/**
+	 * Was "clears everything", and the pencil (D29) is why it is not.
+	 *
+	 * Leaving custom used to take deliberately opening the unit list and naming
+	 * a unit. It is now one press of a toggle labelled `Use a number and a
+	 * unit`, so destroying the sides that *do* have a number stopped being a
+	 * defensible reading of what was asked for.
+	 */
+	it('keeps what parses on the way out of custom, and drops what does not', () => {
 		expect(
 			switchUnit(
 				ALL,
@@ -184,8 +192,34 @@ describe('switchUnit', () => {
 			top: undefined,
 			right: undefined,
 			bottom: undefined,
-			left: undefined,
+			left: '8px',
 		});
+	});
+
+	it('re-labels on the way out of custom, like any other unit change', () => {
+		expect(
+			switchUnit(ALL, { top: '16px', left: '8px' }, CUSTOM, 'rem')
+		).toEqual({
+			top: '16rem',
+			right: undefined,
+			bottom: undefined,
+			left: '8rem',
+		});
+	});
+
+	/**
+	 * A preset is not a number, so it survives a change between real units --
+	 * re-labelling was never going to touch it -- and does not survive leaving
+	 * custom, where the field it is going into cannot show it.
+	 */
+	it('drops a preset leaving custom but keeps it between units', () => {
+		expect(
+			switchUnit(['top'], { top: 'var:preset|spacing|40' }, CUSTOM, 'px')
+		).toEqual({ top: undefined });
+
+		expect(
+			switchUnit(['top'], { top: 'var:preset|spacing|40' }, 'px', 'rem')
+		).toEqual({ top: 'var:preset|spacing|40' });
 	});
 });
 
