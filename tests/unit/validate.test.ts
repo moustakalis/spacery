@@ -48,7 +48,7 @@ describe('validate', () => {
 		expect(problemFor(rows, 0)).toStrictEqual({
 			field: 'label',
 			severity: 'incomplete',
-			message: 'Needs a name — this is what authors pick in the editor.',
+			message: 'Needs a name — this is what you pick in the editor.',
 		});
 	});
 
@@ -93,7 +93,7 @@ describe('validate', () => {
 			field: 'slug',
 			severity: 'conflict',
 			message:
-				'Already used by Laptop. Slugs are stored in block attributes, so two rows cannot share one.',
+				'Already used by Laptop. Two breakpoints cannot share a slug.',
 		});
 	});
 

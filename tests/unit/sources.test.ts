@@ -143,9 +143,7 @@ describe('fallbackNotice', () => {
 				'custom',
 				info({ effectiveSource: 'custom', resolvedSource: 'spacery' })
 			)
-		).toBe(
-			"You chose your own breakpoints but have not defined any yet, so Spacery's own set is in use until you add one."
-		);
+		).toBe("You have not defined any yet, so Spacery's own set is in use.");
 	});
 
 	it('explains a theme that declares nothing usable', () => {
@@ -155,7 +153,7 @@ describe('fallbackNotice', () => {
 				info({ effectiveSource: 'theme', resolvedSource: 'spacery' })
 			)
 		).toBe(
-			"You chose your theme's breakpoints, but it declares none Spacery can use, so Spacery's own set is in use."
+			"Your theme declares none Spacery can use, so Spacery's own set is in use."
 		);
 	});
 
@@ -202,7 +200,7 @@ describe('fallbackNotice', () => {
 				info({ effectiveSource: 'custom', resolvedSource: 'filter' })
 			)
 		).toBe(
-			'A spacery_breakpoints filter on this site replaces the set, so the breakpoints above are stored but not in use.'
+			'A spacery_breakpoints filter replaces the set, so these are stored but not in use.'
 		);
 	});
 
@@ -214,7 +212,7 @@ describe('fallbackNotice', () => {
 				info({ effectiveSource: 'spacery', resolvedSource: 'filter' })
 			)
 		).toBe(
-			'A spacery_breakpoints filter on this site replaces the set, so the breakpoints above are stored but not in use.'
+			'A spacery_breakpoints filter replaces the set, so these are stored but not in use.'
 		);
 	});
 });

@@ -63,6 +63,32 @@ for f in json.load(open('/tmp/eslint.json')):
 "
 ```
 
+## `test:unit` has the same platform problem, and no in-place workaround
+
+A `node_modules` installed for another platform breaks `vitest` the same way it
+breaks `lint:js`, but harder: rolldown's native binding is missing, so the
+runner dies at startup with `Cannot find module
+'@rolldown/binding-wasm32-wasi'` and **nothing runs at all**. There is no
+equivalent of the ESLint recipe above, because the failure is in the bundler
+rather than in one plugin.
+
+**Do not take a clean `typecheck` and a passing grep as a run.** Eight stale
+assertions reached CI in one push that way: strings had been rewritten, the
+tests naming them were updated by search, and four more tests asserting the same
+strings in other files were never found. `tsc` cannot see a string literal that
+no longer matches, and neither can a grep for the new wording.
+
+Run it on a machine whose `node_modules` matches, or copy `src/`, `tests/`,
+`vitest.config.ts` and `tsconfig.json` into a scratch directory with its **own**
+two-line `package.json` and `npm i vitest jsdom` there. Two traps in that
+second route, both cost a run to find:
+
+- Installing vitest inside a copy of the repo fails on this project's own peer
+  ranges (`@wordpress/e2e-test-utils-playwright`). The scratch directory must
+  not carry this `package.json`.
+- Symlinking `src` and `tests` into it makes vite resolve every test through
+  `/@fs/...` and report `Cannot find module` for all 17 files. Copy them.
+
 ## The E2E suite can run somewhere other than `wp-env`
 
 `WP_BASE_URL` chooses the site and `WP_USERNAME` / `WP_PASSWORD` choose the

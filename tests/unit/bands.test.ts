@@ -243,8 +243,8 @@ describe('coverage', () => {
 
 		const found = coverage(rows, RULES);
 
-		expect(found[rows[0]!.id]?.text).toBe('480px – 782px');
-		expect(found[rows[1]!.id]?.text).toBe('782px – 1280px');
+		expect(found[rows[0]!.id]?.text).toBe('over 480px, up to 782px');
+		expect(found[rows[1]!.id]?.text).toBe('over 782px, up to 1280px');
 		expect(found[rows[2]!.id]?.text).toBe('up to 480px');
 	});
 
@@ -315,7 +315,9 @@ describe('coverage', () => {
 			{ slug: 'narrow', label: 'Narrow', max: '30em' },
 		]);
 
-		expect(coverage(rows, RULES)[rows[0]!.id]?.text).toBe('30em – 60rem');
+		expect(coverage(rows, RULES)[rows[0]!.id]?.text).toBe(
+			'over 30em, up to 60rem'
+		);
 	});
 });
 
