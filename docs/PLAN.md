@@ -307,7 +307,28 @@ Spacery's CSS correctly for both theme types, without Spacery re-deriving the ru
 | Theme | Why the CSS ends up in the head |
 |---|---|
 | Block | `template-canvas.php` renders the whole template into a variable *before* `wp_head()` — its own comment reads "This needs to run before `<head>` so that blocks can add scripts and styles in `wp_head()`." Every block has rendered by the time core reads the store on `wp_enqueue_scripts`. |
-| Classic | Content renders during `the_content`, after the head is gone, so core reads the store on `wp_footer`. Since WordPress 6.9, `wp_hoist_late_printed_styles()` output-buffers the template and lifts footer-printed styles into the head. |
+| Classic | Content renders during `the_content`, after the head is gone, so core reads the store on `wp_footer`. Since WordPress 6.9, `wp_hoist_late_printed_styles()` output-buffers the template and lifts footer-printed styles into the head — **but only sometimes; see the correction below.** |
+
+> **⚠ The classic-theme row overstates it. Measured 14 September 2026** on
+> WordPress 7.1 with Twenty Twenty-One, running `MANUAL-TESTING.md` §5.
+> `wp_hoist_late_printed_styles()` exists, but it is registered only inside
+> `wp_load_classic_theme_block_styles_on_demand()`, behind two gates — and on a
+> stock install both are shut: `wp_should_load_separate_core_block_assets()` and
+> `wp_should_load_block_assets_on_demand()` both return **false**, the action is
+> **not** hooked, and `wp_should_output_buffer_template_for_enhancement()` is
+> false so no buffer starts anyway. No plugin was interfering; the callback
+> lists on both filters were empty.
+>
+> So on that site Spacery's stylesheet is printed in the **body**, not the head.
+> **D14 still holds** — and this is the evidence for it rather than against it:
+> Spacery's tag sits immediately after `core-block-supports-inline-css`, which
+> is *also* in the body. Core places Spacery's CSS exactly where it places its
+> own. The plugin is not choosing, which was the entire point.
+>
+> The real consequence is one of expectation: on such a site, spacing CSS
+> arrives after first paint. Core's own block-support spacing does the same on
+> the same page, so Spacery is no worse than the platform — but this section and
+> D14 both stated head placement as settled, and it is conditional.
 
 The classic half works only for styles left in the footer **queue**, because the hoist
 captures `wp_styles()->do_footer_items()`. Printing directly with `wp_print_styles()`
@@ -315,13 +336,47 @@ marks the handle done before the capture runs and strands the CSS in the footer.
 first implementation did exactly that, and the investigation into "should this be in the
 head?" is what found it.
 
-**Editor — same rules, injected into the iframe.**
+**Editor — same rules, injected into the iframe. NOT BUILT — see the warning below.**
 Since 7.1 the post editor is *always* iframed regardless of block API version, so styles
 must land in the iframe document. Start simple: render a `<style>` element from the
 `editor.BlockListBlock` HOC alongside the block. Because the block renders inside the
 iframe, the style element lands there automatically, and content-addressed classes make
 duplicates idempotent. Optimize to a single portal-injected stylesheet in the iframe head
 only if profiling on a large post says it matters.
+
+> **⚠ This paragraph describes work that was never done, and this document has
+> been claiming otherwise.** Found 14 September 2026 while running
+> `MANUAL-TESTING.md` §2. `src/extension/register.tsx` registers exactly two
+> filters — `blocks.registerBlockType` for the attribute and `editor.BlockEdit`
+> for the panel. There is no `editor.BlockListBlock` filter, no portal, no
+> `useStyleOverride`, and PHP enqueues only the editor scripts. Checked in the
+> live editor: no `spy-` class and no Spacery `<style>` exists anywhere in the
+> canvas iframe, and a block's `30rem` value appears nowhere in that document.
+> **Setting responsive spacing changes nothing the author can see until they
+> preview or publish.**
+>
+> The *spacer block* is unaffected and does preview correctly — `edit.tsx`
+> resolves `heightAt()` for the canvas tier and applies it through
+> `useBlockProps`. That asymmetry is why this survived: the half with a preview
+> is the half `spacer.spec.ts` tests.
+>
+> **Spiked, same day — see [`preview-spike.md`](preview-spike.md).** The reason
+> it was never built (CSS generation in JS means two sources of truth) turns out
+> to hold for one 49-line function rather than for the pipeline:
+> `@wordpress/style-engine` is available in the editor as the registered handle
+> `wp-style-engine` and is the *same* engine, resolving
+> `var:preset|spacing|50` identically; `effectiveAt()` in
+> `src/attribute/tiers.ts` already does D13's materialization and is already
+> tested; and the band list is already published to JS. The one genuine
+> duplicate is `Generator::is_value()`, because the JS engine passes
+> `10px;color:red` straight through exactly as the PHP one did — and D19 already
+> settled that case (reimplement the shape in TS, assert against the same table,
+> here `GeneratorTest`'s 38 cases). Core previews its own responsive spacing by
+> injecting `@media (480px < width <= 782px)` into the canvas, measured, so the
+> §3.3 mechanism above is what the platform itself does and the media query
+> evaluates against the canvas width for free. **Recommendation: build it before
+> submitting.** Nothing else in the design depends on the answer — the data
+> model, the generator and the front-end cascade are all unaffected.
 
 ### 3.3a Coexisting with core's responsive styles
 
@@ -347,6 +402,16 @@ rule. Ugly, but it is what the platform does, and diverging would be worse.
 Spacery's stylesheet is enqueued after global styles — but emitting both is confusing to
 anyone reading the CSS. It is resolved in the inspector rather than the stylesheet: see the
 takeover flow in §3.5.
+
+*Verified on a real page, 14 September 2026.* Both rules land on
+`(width <= 480px)`, both `!important`, both at one class of specificity, so
+source order is what decides — and `wp-style-engine-spacery-inline-css` is
+emitted immediately after core's, so Spacery wins. One correction to the
+sentence above: the rule that actually competes comes from
+`core-block-supports-inline-css`, **not** `global-styles-inline-css`. Both
+precede Spacery's, so the conclusion stands, but they are filled by different
+code paths and could move independently of each other, so the guarantee rests on
+two orderings rather than the one this section named.
 
 *Spike for 1.1 (do not block 1.0):* rewrite the wrapper's inline `style` with
 `WP_HTML_Tag_Processor` to `padding-top: var(--spy-pt, 3rem)` and set `--spy-pt` per tier
@@ -573,6 +638,11 @@ selector for when `responsiveEditingEnabled` is false.
 *Exit:* dragging the canvas to 900px puts Spacery on the `laptop` tier while core's badge
 still reads Desktop, and the panel says so unambiguously. The preview matches the frontend
 at every tier, verified by an E2E test that screenshots both.
+*Not actually met, discovered 14 September 2026.* The tier-naming half is real and
+`spacer.spec.ts` tests it. The preview half was never built for the spacing extension and
+no E2E test screenshots anything — `extension.spec.ts` covers the panel's presence, a
+block without spacing support, deactivation safety and the takeover. See the warning in
+§3.3.
 
 **M5 — Spacing extension**
 Attribute injection filter and inspector integration for **any block declaring
@@ -701,16 +771,17 @@ premise changes.
 | D11 | **Spacery owns every tier in its own namespace; core's values are imported by explicit takeover** | Considered letting core keep tablet/mobile and adding only wider tiers, and considered writing into core's own `style.@tablet`. Both give a tidier steady state and both break under configurations Spacery must support — a custom breakpoint set that does not align with core's values, or `responsiveEditingEnabled => false`. Owning the data unconditionally is the only option stable across all of them. The duplication that creates is resolved in the inspector, not the stylesheet: see the takeover flow in §3.5. |
 | D12 | **No Spacery viewport switcher; follow core's editing viewport** | Core 7.1 makes responsive editing a mode driven by canvas width ([PR #75121](https://github.com/WordPress/gutenberg/pull/75121)), so a second switcher would compete with it. Following it means core's resizable canvas becomes Spacery's N-tier selector for free. The exception is `responsiveEditingEnabled => false`, where core shows no viewport UI and Spacery supplies its own. |
 | D13 | **Tiers are disjoint bands in CSS, a cascade in authoring** | Discovered while implementing: core's tiers are *not* a cascade. `WP_Theme_JSON::get_viewport_media_queries()` emits `@media (480px < width <= 782px)` for `@tablet`, so a core tablet value never applies at mobile widths. Plain descending `max-width` rules would have been pleasant to author but would partially overlap core's bands — a Spacery `tablet` value (≤782px) would silently override a core `@mobile` value at 400px, which is exactly the mess D10 removed. Spacery therefore emits bands identical in shape to core's, and materializes an authored value into every narrower band at generation time. `responsive-state`'s `pick( …, { fallbackDirection: 'down' } )` is that materialization function. Cost: one authored value can emit up to N declarations; content-addressed hashing limits the damage, and M2's 200-block fixture measures it. |
-| D14 | **Spacery never places its own CSS; it fills a Style Engine store and core places it** | Investigating M2's open delivery question found the seam: `wp_enqueue_stored_styles()` explicitly iterates third-party stores, and core already solves both theme types — block themes render the entire template before `wp_head()`, and WordPress 6.9 added `wp_hoist_late_printed_styles()` to lift classic themes' footer styles into the head. Choosing placement inside the plugin would mean re-deriving that logic and drifting from it as core evolves. This deleted the placement code rather than fixing it. |
+| D14 | **Spacery never places its own CSS; it fills a Style Engine store and core places it** | Investigating M2's open delivery question found the seam: `wp_enqueue_stored_styles()` explicitly iterates third-party stores, and core already solves both theme types — block themes render the entire template before `wp_head()`, and WordPress 6.9 added `wp_hoist_late_printed_styles()` to lift classic themes' footer styles into the head. Choosing placement inside the plugin would mean re-deriving that logic and drifting from it as core evolves. This deleted the placement code rather than fixing it. **Confirmed by measurement on 14 September 2026, in the case that looked like a counter-example:** on Twenty Twenty-One the hoist does not run at all (both its gates are shut on a stock install) and Spacery's CSS is printed in the body — immediately after `core-block-supports-inline-css`, which is in the body too. The decision is doing its job; what was wrong was §3.3's claim that the head placement is unconditional. See the warning there. |
 | D15 | **No v1 migration path** | v1 never built and never shipped. Its `block.json` pointed at a `build/` directory nothing generated, so the block could not register even locally, and the code lived on Bitbucket rather than WP.org. A `deprecated` entry exists to keep *existing content* valid; there is no existing content. Writing one would mean maintaining a parser for a save format no post has ever contained, and testing it against fixtures invented for the purpose. D9 already reached the same conclusion from the other direction when it numbered the first public release `1.0.0`: the 2023 code is a reference, not a predecessor. |
 | D16 | **Top-level admin menu, not Settings → Spacery** | The handbook's advice to put a single settings screen under an existing menu assumes the screen is configuration a site owner visits once. Spacery's is not: the breakpoint set is the thing the whole plugin is about, it is edited while designing rather than while installing, and every tier control in the editor refers back to it. Burying it three clicks deep under Settings made it read as an afterthought. Placed just below Appearance (position `60.8`, a float so a colliding integer cannot silently displace another plugin's menu), it sits with the design tools it belongs to. The cost is one more top-level item on sites that install many plugins, and a reviewer may say so; the answer is that the screen is the product's control surface, not its settings page. Decided before 1.0.0 shipped, so no bookmark or documented URL breaks. |
-| D17 | **A tier selector inside the panel, revising D12's "no switcher"** | D12 read core correctly and drew one conclusion too many. Its real argument was against a *competing viewport switcher* — two controls announcing different device names for the same canvas. A selector that changes only which tier the fields edit, and leaves the canvas alone, does not compete: the canvas still selects a tier when the preview moves, and the panel says so in words when the two have diverged. What D12 missed is that following the canvas is the only way to reach a tier, and most tiers have no device preset behind them — filling in four tiers meant four canvas drags, two of them by hand to an unmarked width. The tier being edited and the width being previewed are separate questions, and this makes them separately answerable. Rendered as `ToggleGroupControl` up to five tiers and a dropdown beyond, because a segmented control does not wrap and twelve labels in a 250px column is not a design. |
+| D17 | **A tier selector inside the panel, revising D12's "no switcher"** | D12 read core correctly and drew one conclusion too many. Its real argument was against a *competing viewport switcher* — two controls announcing different device names for the same canvas. A selector that changes only which tier the fields edit, and leaves the canvas alone, does not compete: the canvas still selects a tier when the preview moves, and the panel says so in words when the two have diverged. What D12 missed is that following the canvas is the only way to reach a tier, and most tiers have no device preset behind them — filling in four tiers meant four canvas drags, two of them by hand to an unmarked width. The tier being edited and the width being previewed are separate questions, and this makes them separately answerable. Rendered as `ToggleGroupControl` up to four tiers *and* only while their labels fit a 36-character budget, a dropdown past either, because a segmented control does not wrap — it divides. Five was the original figure here and counting tiers alone was the bug: `Sm`/`Md`/`Lg`/`Xl` and `Widescreen`/`Desktop`/`Laptop`/`Handheld` are both four labels and only one of them fits a 250px inspector column, so the budget is what actually runs out (`segments.ts`, Group C). |
 | D18 | **An admin design system of WordPress's own values, and one mark used twice per screen** | Settled by the design review in `docs/ui-review.md` and written up in `docs/design-system.md`. Spacery's admin is WordPress's admin: every value is one WordPress already uses, colour *roles* are prescriptive while the sampled values are reference only, and borrowed `@wordpress/components` metrics are descriptive — hand-setting a component's height to match the document breaks the next time WordPress changes it. Only the six components Spacery adds, and its own brand palette, are prescribed. On identity: one mark at every size, drawn from `brand/mark.svg` at the authored 8/6/4 weights — a reduced two-bar variant for small sizes was proposed and rejected, because a mark that drops a bar to fit is a second mark. It appears twice per screen at interface scale, on screens Spacery owns, and nowhere else. The same review settled two product calls: the spacing box stays linked by default with scenario C accepted knowingly, and `ToolsPanel` is not the remedy for the panel's collapsed-state problem — three cheaper additions are. |
 | D19 | **The sanitiser's rules are shipped to the screen, not mirrored in TypeScript** | The server refuses an invalid breakpoint set *whole* and hands back the previous one, so a rule the screen does not know about reads to the author as a save that succeeded and changed nothing. The screen therefore has to refuse exactly what the server refuses — and a TypeScript copy of a regex with a comment asking someone to keep it in step is the two-sources-of-truth bug this project rejects everywhere else. `Breakpoint::SLUG_PATTERN` and `LENGTH_PATTERN` are public constants stored **without PCRE delimiters**, PHP adds them at the point of use, and `spacery/v1/breakpoints` hands the raw patterns plus `PIXELS_PER_EM` to the settings screen, which feeds them straight to `RegExp`. `BreakpointPatternsTest` guards that seam by asserting each pattern agrees with the validator applying it. What cannot be shipped is the *shape* of a set — unique slugs, strictly descending widths, a maximum count — so that is reimplemented in `validate.ts` and asserted against the same table of cases the PHP suite uses. |
 | D20 | **Keep `load_plugin_textdomain()`, and keep Spacery's own `languages/`** | Plugin Check warns the call has been discouraged since WordPress 4.6, and for the plugin it was written about — directory-hosted, translations arriving in `WP_LANG_DIR/plugins` from translate.wordpress.org — it is right. Read against 7.1, it is wrong for this one. `_load_textdomain_just_in_time()` asks `WP_Textdomain_Registry`; its `get_path_from_lang_dir()` searches the standard `WP_LANG_DIR` plugin and theme directories and then falls back to a **custom path**, and `load_plugin_textdomain()` is the only thing that sets one. Spacery ships its own Greek `.mo` and `.json` inside the plugin, so without the call nothing would ever look there and the translations would be dead weight in the zip. Two consequences worth keeping: the call runs on `init` **priority 0** — after `after_setup_theme`, so it cannot trigger the 6.7 `_doing_it_wrong`, and before anything that registers a block on `init`, because `block.json` titles are translated at registration; and because the registry prefers the standard locations, a language pack from translate.wordpress.org will win automatically once one exists, leaving the bundled files as the fallback they should be. The warning is informational and does not block review; it stays. |
 | D21 | **Every value Spacery emits is checked against an allowlist, in `Generator::prune()`** | Found by running `docs/MANUAL-TESTING.md` §2, which had assumed core's `safecss_filter_attr()` was in the path. It is not: a spacing value goes from the block attribute straight to `wp_style_engine_get_styles()`, which takes a string for a length and passes it through, and the stylesheet is then built by joining `property:value` with semicolons. So `10px;color:red` typed into a padding field shipped as `padding-right:10px; color:red !important` — arbitrary CSS, written by anyone who can edit a post, in a stylesheet served to every visitor. `Generator::is_value()` now allows only what this plugin has business emitting: a core preset reference (`var:preset|spacing|40`), a number with an optional unit including a bare `0`, one of `calc`/`min`/`max`/`clamp`/`var` with nesting checked, and `auto` plus the global keywords. A denylist of dangerous characters would have had to be right about every future way of ending a declaration; an allowlist has to be right about what a length looks like, which is written down. The check runs **before** the class hash and before materialization, so a refused value neither addresses a class nor inherits into narrower bands. The side effect is that a value with no meaning as spacing — `red` in a padding field — is dropped rather than emitted as dead CSS, which §2 asked for in the same breath. |
 | D22 | **A spacing box opens in the mode that shows everything it holds** | One rule replacing two orderings, after §2's preset checkbox failed twice over. A value no number field can hold puts the whole box into custom mode — whoever supplied it: the author, a wider tier, or core's own spacing control. Previously `unitFor()` looked for a usable unit *first*, so a box holding `var:preset|spacing|50` on one side and `10px` on another opened in `px` and rendered the preset as an empty field: invisible to the author, still applied on the front end, and overwritten by the next linked edit — which its own docblock described as the thing the check prevents. That mixture is what the D11 takeover produces from a block whose author set one side from core's preset list and typed the other. And a box with nothing stored is described by what it *inherits*, which is how `var:preset|spacing|60` came to sit inside an `input[type=number]`. The cost is that `2rem` is shown as `2rem` rather than `2`; the benefit is that the `calc()` beside it is shown at all. A unit test asserted the old order and was reversed — it carried no reasoning, and the test directly above it states the principle it violated. |
 | D23 | **A `spacery_breakpoints` filter is an attribution, not a silence** | `Registry::resolved_source()` recorded attribution *before* the filter ran, on the argument that no honest answer exists for a set somebody else supplied. Running §1 showed the alternative was not silence but a falsehood: the ruler drew the filter's bands and the screen said `From: the breakpoints you defined` above them, crediting the author's own stored rows with a set they had never seen — the same defect E4 was about, reached from the other direction. `Registry::SOURCE_FILTER` is now recorded after `apply_filters`, and only when the filter actually **changed** the set, compared by value: almost every real filter reads `$source` and hands `$set` straight back, and crediting it for a set it did not touch would trade one wrong answer for another. On the screen, `ResolvedSource` is its own type (`EffectiveSource \| 'filter'`) so nothing can put a filter in a radio button, and `fallbackNotice()` answers it before the fallback sentences, because a filter is an *override* — every source worked and then code on the site replaced the result. |
+| D24 | **Spacery's data survives deletion unless the site opts out, and the opt-in is a checkbox on the settings screen** | §9 of `MANUAL-TESTING.md` asked the question and left it open: there is no `uninstall.php`, so `spacery_breakpoint_source` and `spacery_custom_breakpoints` outlive the plugin. Deleting them looked like ordinary tidiness and is not. The stored breakpoint set is the **key every stored block value resolves through** — `Generator::normalize()` walks the *current* set and silently skips slugs it does not know — so a site that loses its breakpoints and later reinstalls falls back to Spacery's preset, whose slugs are `desktop`/`laptop`/`tablet`/`mobile`. A custom set that used those names keeps resolving *at different widths*; one that used any other names has its values pruned. Both are silent, and both are the damage `rename-spike.md` refuses to risk for a rename — the reasoning does not change because the trigger is a deletion instead. Equally, a plugin that leaves rows behind with no way to say otherwise is its own small discourtesy, and "we kept your data because we decided you wanted it" is not a defence. So: a third registered option, `spacery_delete_data`, **off by default**, surfaced as one checkbox under *When you delete Spacery*, whose help text states the cost of each answer rather than describing the control. `uninstall.php` reads that option and nothing else — no autoloader, no plugin classes, literal option names, because it runs against files that are about to disappear; `OptionsTest` guards that seam the way `BreakpointPatternsTest` guards D19's. Two things were found while building it and are worth keeping: the checkbox rides the screen's existing save cycle rather than writing on click, because a screen with two save models is one where nobody knows which half is committed — and `saveHint()` had to learn about it, having briefly lit a primary Save button beside the words "No changes to save." The option stores `'1'`/`'0'` rather than a boolean because WordPress writes boolean false into a varchar column as `''`, which `rest_is_boolean()` rejects, so `/wp/v2/settings` answered `null` for exactly the site that had opted out — measured, then fixed. Post content is never touched, by design (§3.1). |
 
 ### Deferred to 1.1+
 

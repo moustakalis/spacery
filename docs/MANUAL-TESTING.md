@@ -8,45 +8,58 @@ up.
 
 ## Where this pass stopped
 
-**Read this first on a cold start.** The pass was run on 12 September 2026
-against the MAMP playground and stopped part-way through §2, with 21 boxes
-ticked and 28 to go. `[x]` means checked on a real screen; `[~]` means partly.
+**Read this first on a cold start.** The pass was begun on 12 September 2026
+against the MAMP playground and continued on 14 September. **46 boxes ticked,
+3 partial, 1 to go** — and the one left is a decision, not a test. `[x]` means
+checked on a real screen; `[~]` means partly, and all three are blocked on
+something rather than unfinished:
+
+- §2's two cascade boxes — front-end halves pass; the editor-preview halves have
+  nothing to look at until the preview is built (`preview-spike.md`).
+- §8's site-editor box — the widgets half passes; the site editor and template
+  parts need a block theme, and Twenty Twenty-One is active for §5.
+
 Every box that found something says what it found, in place — those notes are
 the most useful thing in this file.
 
-**Done:** §1 entirely. §2 down to and including the preset item, plus the
-refused-value item. Three items of §5 (the tag in `<head>` on a block theme, two
-blocks sharing one rule, and a page with no Spacery values emitting nothing) and
-half of the disjoint-bands item.
+**Done:** every section. §1 through §9 have been run.
 
-**Next, in order:**
+**Next:**
 
-1. §2's remaining items — the `>5 tiers` dropdown and the icons-vs-names
-   fallback (both D17 claims, both needing a different breakpoint set saved),
-   the widest/narrower and middle-tier cascade checks, and the whole reset and
-   undo/redo group.
-2. §3, which is one mu-plugin and two checks.
-3. **§4, the takeover.** The largest untested thing in the plugin, the only
-   feature that rewrites the author's content, and the one that produces the
-   mixed preset/length values D22 is about. Do this before anything below it.
-4. §5's classic-theme check, which needs Twenty Twenty-One installed first.
-5. §6 through §9.
+1. **Settle the `uninstall.php` question** (§9) — a decision, not a test.
+2. **Build the editor preview** (`preview-spike.md`), then clear §2's two `[~]`
+   boxes. Their front-end halves already pass.
+3. **Switch back to a block theme** and clear §8's site-editor half.
 
-**The pass has found four defects in code and four false claims in
-documentation.** That rate is the argument for finishing it before submitting:
+**§4, the takeover, is done** — it was the largest untested thing in the plugin
+and the only feature that rewrites the author's content. It behaved correctly in
+every case tried, including the one this playground is set up for (no movable
+values at all, because the stored widths do not match core's). Read its boxes
+before re-running anything there: they now carry the two-phase recipe.
+
+**The pass has found five defects in code, one specified-but-unbuilt feature,
+and five false claims in documentation.** That rate is the argument for finishing it before submitting:
 each one was invisible to CI, and three of the four code defects were in
 behaviour no test could reach — a CSS specificity loss, an attribution, a value
 that escaped its declaration, and a box mode. See D21, D22 and D23 in
-`PLAN.md` §8.
+`PLAN.md` §8. **The fifth false claim is a warning about this document
+itself**: the segmented-control box said "five or fewer tiers" where the code
+says four plus a character budget, so running the box as written would have
+manufactured a defect that is not there. When a box fails, check the box against
+the code before believing it.
 
 **State left on the playground**, which the next session can reuse rather than
 rebuild:
 
 - A draft page, **"Spacery manual pass (scratch)"** (`post=45`), holding two
   Groups and a Columns block. Group A carries a preset, a `var()` and a `2rem`
-  at `desktop`; Group B carries the same four values as A once did, so the two
-  share one class; the inner Column carries a **core** `style.spacing.padding`
-  with `var:preset|spacing|60` on top — which is the fixture §4 wants.
+  at `desktop`; Group B carries `0`, `30rem`, `1vw` and `calc(100% - 2rem)` at
+  `desktop`; the inner Column carries a **core** `style.spacing.padding` with
+  `var:preset|spacing|60` on top and `24px` underneath — the mixed
+  preset-and-length box D22 is about. **The page was published briefly on
+  14 September to read its front-end CSS and has been put back to draft**, and
+  the Column was restored to exactly the two values above after §4 —
+  so the fixture is as described, not as §4 left it.
 - `wp-content/mu-plugins/spacery-dev-reset.php`, as this document prescribes.
   Nothing else: the `spacery_breakpoints` filter experiment, the probe and the
   child theme were all removed, and Twenty Twenty-Five is active again.
@@ -54,6 +67,17 @@ rebuild:
   `laptop 1300px`, `tablet 888px`, `mobile 450px`. The `11920px` is a
   deliberate typo kept from before the pass — it is what triggers the
   wider-than-any-screen caution, so it is worth leaving.
+- **Changed on 14 September, and it matters for the next session:**
+  **Twenty Twenty-One is the active theme** (installed for §5's classic-theme
+  check) and **Stackable is installed and active**. A classic theme has no site
+  editor, which is what leaves §8's box at `[~]`, and it also switches
+  `settings.spacing.margin` off — so a panel showing PADDING and no MARGIN is
+  the theme talking, not a bug. Switch back to Twenty Twenty-Five before
+  judging anything about the site editor or margin controls.
+- `mu-plugins/` holds **only** `spacery-dev-reset.php`. Four temporary
+  mu-plugins were written during §3 and §7 — a responsive-editing filter, a
+  third-party block, a spacing-off filter and a deny-list — and all four were
+  deleted. The §7 recipes are worth re-reading before re-running that section.
 
 **Two things that make the pass faster**, both learned the hard way:
 
@@ -264,9 +288,26 @@ Any block with spacing support — Group, Cover, Columns, a Paragraph.
       previewing (D17).
 - [x] Change the preview viewport again. The selector re-points at the matching
       tier, discarding the manual choice — that is the intended precedence.
-- [ ] With five or fewer tiers the selector is segmented; switch the source to a
-      set with more and confirm it becomes a dropdown rather than twelve
-      unreadable segments.
+- [x] The selector is segmented up to **four** tiers, and only while the labels
+      fit a 36-character budget; past either it becomes a dropdown rather than
+      twelve unreadable segments. **This box said "five or fewer" until 12
+      September and was wrong** — `segments.ts` moved to four plus a budget in
+      Group C (`00731bd`), because counting tiers alone was the bug:
+      `Sm`/`Md`/`Lg`/`Xl` and `Widescreen`/`Desktop`/`Laptop`/`Handheld` are
+      both four labels and only one of them fits an inspector column. Provoke
+      both halves: five short tiers (the count), and four long ones (the
+      budget, 39 characters). The playground's own four spend 33, so segments
+      are what you see by default. **Proved three ways on 14 September**, each
+      needing its own editor reload because the settings are published once per
+      page load: five tiers labelled `A`–`E` (16 characters, far under budget)
+      render a **dropdown**, so the count alone decides; four tiers labelled
+      `Widescreen`/`Desktop`/`Laptop`/`Handheld` (39 characters) render a
+      **dropdown**; and the *same four widths* relabelled `Sm`/`Md`/`Lg`/`Xl`
+      (16 characters) render **segments**, which isolates the budget from the
+      widths. Note the icon branch never enters any of these: the icon key comes
+      from width floors (1200/992/600), so `1400px` and `1250px` both read as
+      "desktop", `iconsAreDistinct()` is false, and the control uses labels.
+      A marked tier reads `Md •` on screen and announces `Md (has values)`.
 - [x] All four sides of padding and margin are editable at once, linked by
       default. Type once and confirm the four fields move together; unlink and
       confirm they part company again.
@@ -324,20 +365,93 @@ Any block with spacing support — Group, Cover, Columns, a Paragraph.
 
       A test asserted the old order and had to be reversed. It carried no
       reason, and the test directly above it states the principle it violated.
-- [ ] On a set whose tiers land on distinct device widths the selector shows
+- [x] On a set whose tiers land on distinct device widths the selector shows
       icons; on one where two tiers would share an icon it falls back to names.
-      Hovering an icon must still name its tier.
-- [ ] Set a value at the widest tier, then a different one at a narrower tier.
+      Hovering an icon must still name its tier. Both halves seen on 14
+      September without setting anything up: Spacery's own preset
+      (1280/1024/782/480) renders four `<svg>` segments carrying no text, and
+      the playground's own custom set (11920/1300/888/450) renders the four
+      names instead — `iconsAreDistinct()` is what switches them. Each icon
+      segment's accessible name is its tier (`Desktop`, `Laptop`, `Tablet`,
+      `Mobile`), read off `aria-label`; the visible tooltip comes from the same
+      `label` prop but was confirmed as the accessible name rather than by
+      hovering for a screenshot.
+- [~] Set a value at the widest tier, then a different one at a narrower tier.
       The narrower one must win in the editor preview *and* on the front end.
-- [ ] Set a value at a middle tier only. Narrower tiers should inherit it; wider
-      ones should not.
-- [ ] Reset one box. Only that property clears, and its fields fall back to the
-      inherited values rather than to zero.
-- [ ] A box with nothing set at this tier shows no reset button at all.
-- [ ] "Reset all" appears only once *both* padding and margin hold values at the
+      **Front end: passes.** With `widescreen 1400`/`desktop 1250`/`laptop
+      1000`/`handheld 500` and a block carrying `widescreen: 10px` and
+      `laptop: 40px`, the emitted bands are `(1250 < w <= 1400) => 10px`,
+      `(1000 < w <= 1250) => 10px`, `(500 < w <= 1000) => 40px`,
+      `(w <= 500) => 40px`. The narrower value wins in its own band and
+      inherits downward; it never reaches the wider ones.
+      **Editor preview: cannot pass — there is no preview.** See the note below.
+- [~] Set a value at a middle tier only. Narrower tiers should inherit it; wider
+      ones should not. **Front end: passes.** A block carrying only
+      `laptop: 20px` emits `(500 < w <= 1000) => 20px` and `(w <= 500) => 20px`
+      and *nothing at all* in the two wider bands. Confirmed a second time by
+      Group A, whose `desktop`-only preset value starts at the desktop band and
+      is absent from `widescreen`. **Editor preview: same blocker.**
+
+> **⚠ The spacing extension has no editor preview at all.** Found on
+> 14 September while trying to check the "editor preview" half of the two boxes
+> above. Setting a Spacery value changes nothing in the canvas: there is no
+> `spy-` class and no Spacery `<style>` anywhere in the editor iframe, and
+> `Group B`'s `30rem` appears nowhere in that document. The cause is not a bug
+> in built code — **the code was never written.** `src/extension/register.tsx`
+> registers exactly two filters, `blocks.registerBlockType` (the attribute) and
+> `editor.BlockEdit` (the panel). There is no `editor.BlockListBlock` filter, no
+> portal, no `useStyleOverride`, and PHP enqueues only the editor *scripts*.
+> `PLAN.md` §3.3 specifies exactly this ("render a `<style>` element from the
+> `editor.BlockListBlock` HOC alongside the block") and M4's exit criterion
+> claims "the preview matches the frontend at every tier, verified by an E2E
+> test that screenshots both" — `extension.spec.ts` has no such test.
+>
+> **Why it went unnoticed:** the *spacer block* does preview. Its `edit.tsx`
+> calls `useCanvasBreakpoint()`, resolves `heightAt()` for the canvas tier and
+> puts the result on `useBlockProps` as an inline height, and `spacer.spec.ts`
+> tests it. So the half of the plugin with a preview is the half that is tested,
+> and the half without one is the half nothing looks at.
+>
+> This is a release-scope decision, not a checkbox: ship 1.0 with the panel as
+> a values editor and say so plainly, or build the injection first. Until it is
+> settled, both boxes above stay `[~]`.
+- [x] Reset one box. Only that property clears, and its fields fall back to the
+      inherited values rather than to zero. On a Group at `tablet` holding
+      `padding.top` and `margin.top`, clicking **Reset Padding** left
+      `{margin:{top:'7px'}}` and removed padding alone; the `desktop` tier was
+      untouched; and the four padding fields came back showing their *inherited*
+      placeholders per side — `var:preset|spacing|50`,
+      `var(--wp--preset--spacing--40)`, `2rem`, and an empty Left because
+      `desktop` sets none — with empty values, not zeros. "Reset all"
+      disappeared in the same moment, the gate closing in both directions.
+- [x] A box with nothing set at this tier shows no reset button at all. At a
+      tier with nothing authored the panel offers **no** reset controls of any
+      kind — `isAuthored(sides, values)` gates the per-box button and
+      `authoredBoxes > 1` gates the tier one.
+- [x] "Reset all" appears only once *both* padding and margin hold values at the
       tier — on a block supporting one of them it must stay hidden, or it
-      duplicates the box's own reset.
-- [ ] Undo/redo across a takeover and a reset. Nothing half-applied.
+      duplicates the box's own reset. Padding alone at a tier gives
+      `["Reset Padding"]`; adding margin gives
+      `["Reset all","Reset Padding","Reset Margin"]`. On a **Column** — which
+      declares `padding` and `blockGap` but not `margin`, so only one box can
+      ever be authored — two authored padding sides still give
+      `["Reset Padding"]` and no "Reset all" at all.
+- [x] Undo/redo across a takeover and a reset. Nothing half-applied. Both
+      checked after a save, so the undo level had a clean boundary — **without
+      one, a programmatic edit and the click that follows it coalesce into a
+      single level and the test reads as a failure that is not one.**
+
+      *Reset:* a tier holding `top` and `bottom` reset to nothing; undo brought
+      **both sides back together**; redo removed both again.
+
+      *Takeover:* the real thing this box is about, because two attributes move
+      at once. Before, `style['@tablet']` held `top` and `bottom` and `spacery`
+      was empty. After one click, `style['@tablet']` was gone and
+      `spacery.tablet` held both. Undo restored `@tablet` **and** emptied
+      `spacery` in the same step; redo moved both again. At no point did the
+      value sit in both places or in neither — which is exactly what the single
+      `setAttributes()` in `TakeoverNotice` exists to guarantee, and the first
+      time it has been observed rather than reasoned about.
 
 ## 3. Editor, responsive editing off
 
@@ -351,24 +465,99 @@ add_filter( 'block_editor_settings_all', function ( $settings ) {
 } );
 ```
 
-- [ ] The tier selector still works, with a line saying the canvas does not
-      follow along.
-- [ ] Values set through it land in the same places and render identically.
+- [x] The tier selector still works, with a line saying the canvas does not
+      follow along. **This section found a defect, and the defect was that the
+      section could not run at all.** With the mu-plugin in place the panel
+      behaved exactly as though responsive editing were still on: no notice, and
+      the "canvas is still previewing X" line shown as usual — a line that is
+      false when the canvas follows nothing.
+
+      The mu-plugin was loading (proved with a marker in `admin_footer`) and the
+      filter was running. The cause was hook ordering inside
+      `includes/Editor/Settings.php`. `capture_settings()` reads core's flag on
+      `block_editor_settings_all` at priority 999; the payload was encoded and
+      attached on `enqueue_block_editor_assets` at priority 20. **Measured on
+      this 7.1 install, `enqueue_block_editor_assets` fires *first*** — a probe
+      recording both hooks printed `enqueue_block_editor_assets THEN
+      block_editor_settings_all`. So `wp_json_encode()` ran while
+      `$responsive_editing` still held its initialised `true`, and
+      `responsiveEditingEnabled` was published as `true` on every site,
+      whatever the site said. The comment on the filter — "Late, so anything
+      else that filters the value has already run" — was right about the
+      *priority* and wrong about the *hook*.
+
+      What made it invisible: the value was correct in `$settings['spacery']`,
+      which `capture_settings()` also writes and which JavaScript cannot read
+      (the editor's allow-list drops it), and stale in the global, which it can.
+
+      Fixed by attaching the payload from inside `capture_settings()` itself,
+      guarded by an `$attached` flag because the filter can run more than once.
+      Proved safe in both directions before changing anything: a probe attaching
+      an inline script from inside that filter *did* reach the page, because the
+      block editor prints its scripts in the footer, and the handles are already
+      registered by then. After the fix, on the real screen: "Responsive editing
+      is switched off for this site, so the canvas does not follow along." —
+      and the "still previewing" line correctly gone.
+- [x] Values set through it land in the same places and render identically.
+      Selected `tablet` in the selector with responsive editing off and typed
+      into the field: the value landed at `spacery.tablet.spacing.padding` as
+      always (all four sides, the box being linked by default per D18), and the
+      front end emitted `(450px < width <= 888px) => 17px` and
+      `(width <= 450px) => 17px` with the base value still inline and
+      un-`!important`ed. Identical to the responsive-editing-on path.
 
 Delete the file afterwards; it changes every later section if left in place, and
-a stale mu-plugin is invisible in the admin.
+a stale mu-plugin is invisible in the admin. **Deleted on 14 September** —
+`mu-plugins/` holds only `spacery-dev-reset.php` again.
+
+`tests/php/SettingsTest.php` now covers this, firing the two hooks in the order
+WordPress really fires them. Against the pre-fix arrangement it fails two of its
+six assertions — the payload carrying a filtered `false`, and nothing being
+attached on the asset hook alone — while the other four pass either way,
+including the one showing the server-side mirror was right all along. Three
+stubs were added to `tests/php/bootstrap.php` for it: `wp_add_inline_script()`,
+`wp_script_is()` and a minimal `WP_Block_Type_Registry`.
 
 ## 4. Takeover (D11)
 
 Give a block a core `@tablet` padding through the editor's own responsive
 control.
 
-- [ ] The notice counts the values correctly and singular/plural reads right.
-- [ ] "Manage these in Spacery" moves them, and afterwards exactly one rule sets
+- [x] The notice counts the values correctly and singular/plural reads right.
+      One core `@tablet` value gives "WordPress already sets 1 value here for
+      narrower screens."; three give "3 values". **One thing that looks like an
+      undercount and is not:** a core `@mobile` *margin* on a Column is not
+      counted and its viewport is not named, because `core/column` supports
+      `padding` and `blockGap` but not `margin`, so margin is not among the
+      paths `coreOverrides()` is given. Spacery counts only what it offers a
+      control for. Re-run with a padding value and the viewport appears.
+- [x] "Manage these in Spacery" moves them, and afterwards exactly one rule sets
       that property at that width — check the front-end CSS, not just the panel.
-- [ ] With a custom set whose widths do **not** match core's, the notice must say
+      Checked on the front end, not the panel: before, `style` held
+      `@tablet {padding top/bottom}` and `@mobile {padding left}`; after one
+      click `style` held only the base `spacing.padding` — **both viewport keys
+      gone with no husk of empty objects** (`clearPath()` prunes ancestors) —
+      and `spacery` held `tablet` and `mobile` with the same values. On the
+      page, enumerating every rule in every stylesheet that matches the block
+      and sets `padding-top`: at `(480px < width <= 782px)` there is **exactly
+      one**, `.spy-74a5ab171955 { padding-top: 2rem !important }`, and core
+      emits nothing at that width at all. The base value stays where it was, as
+      an inline `padding-top: var(--wp--preset--spacing--60)` with no
+      `!important` — §3.3a's rule that only media-query overrides get it.
+      The tablet value also materializes into `(width <= 480px)` per D13, which
+      is the widening the notice warns about above the button and is a
+      different width, so the box's claim still holds.
+- [x] With a custom set whose widths do **not** match core's, the notice must say
       which viewports it is leaving alone and why, rather than offering a move it
-      cannot make.
+      cannot make. **This is the default state of this playground**, which is
+      worth knowing before you start: the stored set is
+      `tablet 888px`/`mobile 450px` and core's are 782/480, so *nothing* is
+      movable and the button never renders. Seen: "Leaving Tablet to WordPress:
+      no Spacery breakpoint covers the same widths." — and with two viewports
+      carrying values, "Leaving Tablet, Mobile to WordPress: …". To reach the
+      two boxes above you must switch the source to Spacery's own preset, whose
+      `tablet 782px` and `mobile 480px` match core by design; switch back
+      afterwards.
 
 ## 5. Front-end CSS (D13, D14)
 
@@ -377,36 +566,98 @@ View source. Spacery's declarations belong in
 
 - [x] **Block theme** (Twenty Twenty-Five / -Four / -Three, all three installed):
       the tag is in `<head>`.
-- [ ] **Classic theme** — none is installed on this site, so install one first:
-      Appearance → Themes → Add New → **Twenty Twenty-One**, activate. The tag
-      must still be in `<head>`, lifted there by core's
-      `wp_hoist_late_printed_styles()`.
-      Spacery must not be printing it anywhere itself; this is the only place
-      that claim gets tested.
-- [~] Bands are disjoint (`480px < width <= 782px`), widest first, and never
-      overlap a core `@mobile` value. **Half done.** Disjoint and widest-first
-      confirmed on a real page — `(1300px < width <= 11920px)`,
-      `(888px < width <= 1300px)`, `(450px < width <= 888px)`,
-      `(width <= 450px)`, in that order, every declaration `!important` per
-      §3.3a. The core `@mobile` half needs a block carrying a core responsive
-      value, which is §4.
+- [x] **Classic theme** — Twenty Twenty-One installed and activated on
+      14 September. **The claim this box makes is wrong, and the code is right.**
+      The tag is **not** in `<head>`: it is a direct child of `<body>`, twelfth
+      of fifty-one children — sitting *immediately after*
+      `core-block-supports-inline-css`, **which is not in the head either**.
+
+      Core's own late styles are in the body on this site, so Spacery is being
+      placed exactly where core places its own, which is precisely what D14
+      asked for. **The half of this box that actually tests Spacery — "must not
+      be printing it anywhere itself" — passes**, and the position beside core's
+      own tag is the evidence: a handle Spacery had printed directly would not
+      land there.
+
+      Why the hoist does not run, probed rather than reasoned:
+      `wp_hoist_late_printed_styles()` exists in 7.1 but is registered only
+      inside `wp_load_classic_theme_block_styles_on_demand()`, behind two gates.
+      On this site both are shut — `wp_should_load_separate_core_block_assets()`
+      and `wp_should_load_block_assets_on_demand()` are both **false**,
+      `has_action( 'wp_template_enhancement_output_buffer_started',
+      'wp_hoist_late_printed_styles' )` is **no**, and
+      `wp_should_output_buffer_template_for_enhancement()` is **false** so no
+      buffer would start regardless. No plugin is interfering: the callback
+      lists on both `should_load_*` filters are empty.
+
+      **What this means for 1.0, and it is not nothing.** On a classic theme
+      where that path is off, Spacery's spacing CSS is printed in the body,
+      after first paint. Core's block-support spacing has the same behaviour on
+      the same page, so Spacery is no worse than the platform — but §3.3a and
+      D14 both state the head placement as a settled fact, and it is
+      conditional. Corrected in `PLAN.md`.
+- [x] Bands are disjoint (`480px < width <= 782px`), widest first, and never
+      overlap a core `@mobile` value. Disjoint and widest-first confirmed on a
+      real page — `(1300px < width <= 11920px)`, `(888px < width <= 1300px)`,
+      `(450px < width <= 888px)`, `(width <= 450px)`, in that order, every
+      declaration `!important` per §3.3a. **The core `@mobile` half, finished on
+      14 September** with a block carrying a Spacery `tablet` value *and* a core
+      `@mobile` padding at once. No partial overlap: at
+      `(480px < width <= 782px)` only Spacery's rule exists, and core's
+      `@mobile` rule is confined to `(width <= 480px)` — the bands are identical
+      in shape, which is what D13 bought. Where both *do* land on
+      `(width <= 480px)` (Spacery's materialized tablet value against core's
+      own), both are `!important` at one class of specificity, so **source order
+      decides** — and Spacery's tag is emitted immediately after core's, so
+      Spacery wins. Worth noting the competing rule comes from
+      `core-block-supports-inline-css`, not the `global-styles-inline-css` that
+      §3.3a names; both precede Spacery's, so the conclusion holds, but they are
+      different code paths and could drift apart.
 - [x] Two blocks with identical spacing share one rule.
 - [x] A page with no Spacery values emits no Spacery stylesheet at all.
 
 ## 6. The Spacer block
 
-- [ ] Insert **Spacery**, set a different height per tier, check the front end at
+- [x] Insert **Spacery**, set a different height per tier, check the front end at
       each width. The block's panel carries the same tier selector as the
       spacing panel — stepping through tiers there must not move the canvas.
-- [ ] With a tier selected that the canvas is not previewing, the block's own
+      With `desktop: 300px` and `tablet: 40px` against the playground's four
+      tiers, the page emits `(1300px < width <= 11920px) => 300px`,
+      `(888px < width <= 1300px) => 300px`, `(450px < width <= 888px) => 40px`,
+      `(width <= 450px) => 40px` — each authored value in its own band and
+      inherited into the narrower one — with the base `100px` left as an inline
+      height. Clicking a tier left the canvas at 1222px, unmoved.
+- [x] With a tier selected that the canvas is not previewing, the block's own
       preview height must still be the canvas's, not the selected tier's.
       Selecting a tier says which value you are writing, never what the page
-      looks like.
-- [ ] Its own margin controls still work alongside the height.
-- [ ] It never appears in the Spacery inspector panel — the block is excluded
+      looks like. **The clearest demonstration in the whole pass.** Canvas at
+      1222px — the `laptop` band, which has no authored height and inherits
+      `desktop`'s `300px`. Selecting `tablet` (`40px`): the header became
+      `tablet · ≤888px`, the line read "The canvas is still previewing laptop.",
+      the height field showed `40` — and the block in the canvas stayed
+      **300px**. Editing one tier while previewing another, said in three places
+      at once and contradicted in none.
+- [x] Its own margin controls still work alongside the height. `margin
+      11px/22px` set through core's own control sits as an inline style on the
+      wrapper and is unaffected by the per-tier heights, in the editor and on
+      the page. The block declares `supports.spacing.margin` for top and bottom
+      only, so those are the two controls offered.
+- [x] It never appears in the Spacery inspector panel — the block is excluded
       from the extension, but still renders its own CSS. Those are two separate
       lists in `Blocks\Supported`, and conflating them once already broke the
-      block's own output.
+      block's own output. Verified from both sides at once:
+      `spacerySettings.excludedBlocks` is exactly `["spacery/spacer"]`, the
+      selected block's inspector holds **zero** "Responsive spacing" panels
+      (its own `Height`, per-tier and `Set at` panels instead), and the same
+      block on the page carries a `spy-` class with four height bands. Excluded
+      from the panel, included in the styling.
+
+**Worth recording alongside the §3 finding:** this section is the half of the
+plugin that *does* preview. `edit.tsx` resolves `heightAt()` for the canvas tier
+and puts it on `useBlockProps`, which is why the 300px above is correct and
+live. The spacing extension has no equivalent — see the warning in §2 and
+[`preview-spike.md`](preview-spike.md). Running §6 immediately after §2 is the
+clearest way to see the asymmetry.
 
 ## 7. Third-party blocks and the deny-list (D6)
 
@@ -414,31 +665,162 @@ The site has Elementor and WP Book Bar, but Elementor is a page builder rather
 than a block library, so install something that actually registers blocks with
 `supports.spacing` — Kadence Blocks or Stackable will do.
 
-- [ ] Its blocks get the panel with no work on Spacery's part.
-- [ ] Deny one with `spacery_denied_blocks` in a mu-plugin. The panel disappears
-      **and** no CSS is generated for it.
-- [ ] A block whose theme has spacing switched off shows the explanatory message,
-      not an empty panel.
-- [ ] Activate Elementor and edit an Elementor page. Spacery should be inert
-      there rather than noisy.
+> **⚠ Stackable will not do, and this was worth finding.** Installed and
+> activated on 14 September: 47 blocks, every one of which declares
+> `supports: { spacing: true }` — a bare boolean. Core reads `spacing.padding`
+> and `spacing.margin` out of that as **false** (`hasBlockSupport()` confirms
+> both), so core gives those blocks no spacing controls either; Stackable ships
+> its own spacing UI instead. Of **48 non-core blocks registered on this site,
+> exactly one uses core's spacing supports — Spacery's own spacer.**
+>
+> So a real library may or may not exercise D6, and picking one by name in this
+> document is a coin toss. The boxes below were run against a purpose-built
+> third-party block registered from a mu-plugin — `manualpass/probe`, declaring
+> `supports: { spacing: { padding: true, margin: true } }` — which is exactly
+> what M5's exit criterion asks for ("one third-party block that was never
+> explicitly supported") and is deterministic where a plugin is not. Keep the
+> recipe; it is faster than installing anything.
+
+- [x] Its blocks get the panel with no work on Spacery's part. `manualpass/probe`
+      — registered in a mu-plugin, named nowhere in Spacery — came back with
+      `attributes.spacery` present and the full "Responsive spacing" panel:
+      tier selector, tier heading, padding box. Nothing was added to Spacery to
+      make that happen, which is D6.
+
+      A detail worth keeping: under Twenty Twenty-One the panel showed
+      **PADDING but not MARGIN**, because that theme sets
+      `settings.spacing.margin` to `false` while leaving padding alone. The
+      double gate — block supports *and* theme settings, per feature — visible
+      in one screenshot.
+- [x] Deny one with `spacery_denied_blocks` in a mu-plugin. The panel disappears
+      **and** no CSS is generated for it. Measured against a baseline, which is
+      the only way the second half means anything: **before** denying, the
+      probe's `66px` was in the emitted stylesheet and the page carried three
+      `spy-` classes; **after**, `66px` was gone, two classes remained, the
+      block still rendered normally and carried no `spy-` class at all. In the
+      editor `excludedBlocks` grew to `["spacery/spacer","manualpass/probe"]`
+      and the panel was gone — while a core Group on the same page kept its
+      panel, so the deny-list is narrow rather than a switch.
+
+      As with deactivation, the denied block's stored values are still in its
+      delimiter but no longer parsed, because the attribute is not registered.
+      Inert, not destroyed — the same property §3.1 relies on.
+- [x] A block whose theme has spacing switched off shows the explanatory message,
+      not an empty panel. With `wp_theme_json_data_theme` filtered to set both
+      `spacing.padding` and `spacing.margin` to `false`, the panel contained
+      exactly two lines — "Responsive spacing" and **"This theme has spacing
+      controls switched off for this block."** — and **zero** input elements.
+      Not an empty box, not a box of dead controls.
+- [x] Activate Elementor and edit an Elementor page. Spacery should be inert
+      there rather than noisy. Opened a throwaway page with
+      `post.php?post=N&action=elementor`: `window.spacerySettings` is
+      **undefined**, and there is not one Spacery `<script>` or `<style>` tag on
+      the page. Spacery enqueues on `enqueue_block_editor_assets`, which
+      Elementor's editor never fires, so there is nothing present to be noisy
+      with. The throwaway page was deleted afterwards.
 
 ## 8. Editor stress
 
-- [ ] A post with ~200 blocks carrying values: editor responsiveness, and how big
-      the emitted stylesheet actually is.
-- [ ] Site editor, template parts, and the widgets screen — the panel should
-      appear in all of them.
-- [ ] Reusable block / pattern containing Spacery values, inserted twice.
+- [x] A post with ~200 blocks carrying values: editor responsiveness, and how big
+      the emitted stylesheet actually is. **This is M2's exit criterion, and it
+      is met exactly.** 200 paragraphs cycling three spacing recipes: the page
+      carries 200 elements with a `spy-` class, **three** distinct classes in
+      the markup and **three** rule groups in the stylesheet. Nine media queries
+      in **951 bytes** — 4.8 bytes per block. Content-addressed hashing is doing
+      precisely what D14 and the M2 fixture predicted.
+
+      Editor, same post, all 200 blocks carrying values: page load 2.6s, DOM
+      interactive 1.5s, and an attribute edit round-tripping in ~210ms.
+      Selecting a block and opening its panel are each roughly a second of work
+      on top. Usable rather than fast, on a local MAMP install — and the risk
+      register's "editor performance with N tiers × many blocks" is not where
+      this plugin will fall over.
+- [~] Site editor, template parts, and the widgets screen — the panel should
+      appear in all of them. **Widgets screen: passes.** `spacerySettings` is
+      published there with all four tiers, and a paragraph inserted into a
+      widget area gets the full "Responsive spacing" panel — which is the case
+      `Editor\Settings`' class comment is about, since `core/editor` is not
+      registered on that screen and an allow-listed editor setting would never
+      have arrived. **Site editor and template parts: not testable while a
+      classic theme is active**, and Twenty Twenty-One was activated for §5.
+      Switch back to a block theme and re-run these two.
+- [x] Reusable block / pattern containing Spacery values, inserted twice. A
+      `wp_block` holding a paragraph with `tablet: padding-top 77px`, referenced
+      twice from one page: both instances render, both carry the **same**
+      `spy-` class, and the stylesheet holds **one** rule group (206 bytes, two
+      media queries — the authored band and its materialization). Content
+      addressing survives the reusable-block indirection, which is not obvious:
+      the two instances are separate blocks resolved from one stored post.
 
 ## 9. Housekeeping
 
-- [ ] Deactivate and reactivate. No notices, no orphaned CSS.
-- [ ] Note that there is no `uninstall.php` — `spacery_breakpoint_source` and
+- [x] Deactivate and reactivate. No notices, no orphaned CSS. Done from the
+      Plugins screen: "Plugin deactivated." then "Plugin activated.", no PHP
+      warning, notice, deprecation or fatal on either screen. **With Spacery
+      off**, the scratch page opened with all 7 blocks valid — zero invalid,
+      zero `core/missing` — the `spacerySettings` global gone and no panel
+      anywhere. **Reactivated**, both Groups' `spacery` attributes came back
+      intact out of the block delimiters, `calc()` and preset reference and
+      all, and the stored breakpoint set was untouched. That is §3.1's central
+      promise — no markup is written, so there is nothing to orphan —
+      demonstrated end to end rather than argued.
+
+      **One caveat worth knowing, inherent to the design rather than a defect:**
+      while the plugin is deactivated the attribute is not *registered*, so the
+      editor does not parse it and a **save in that state would re-serialize the
+      block without it**. The JSON survives being *read*; it does not survive
+      being *rewritten*. Nothing was saved during this check, deliberately.
+- [x] Note that there is no `uninstall.php` — `spacery_breakpoint_source` and
       `spacery_custom_breakpoints` survive deletion. Decide whether that is what
-      you want before submitting.
-- [ ] Check `wp-content/debug.log` at the end, not only the screen. Any
+      you want before submitting. **Decided, and built: D24.** There is an
+      `uninstall.php` now, and it does nothing unless the site asked. A third
+      option, `spacery_delete_data`, off by default, is offered as one checkbox
+      under *When you delete Spacery* on the settings screen.
+
+      The reasoning is the one this box was really asking about: deleting the
+      breakpoints is not neutral cleanup, because they are the key every stored
+      block value resolves through. Lose them and a reinstall falls back to the
+      preset — the same four slugs at different widths — and the spacing quietly
+      changes, or vanishes if the slugs differed. Same damage `rename-spike.md`
+      refuses to risk for a rename.
+
+      Three things found while building it, each already fixed:
+
+      - The checkbox rides the screen's existing save cycle rather than writing
+        on click. A screen with two save models is one where nobody knows which
+        half of it Discard undoes.
+      - `saveHint()` did not know about it, so ticking the box lit a **primary,
+        enabled Save button beside the words "No changes to save."** The control
+        and its own caption disagreeing is worse than either being absent.
+        `validate.test.ts` now covers it.
+      - The option stores `'1'`/`'0'`, not a boolean. WordPress writes boolean
+        `false` into a varchar column and it reads back as `''`, which
+        `rest_is_boolean()` rejects — so `/wp/v2/settings` answered **`null` for
+        exactly the site that had opted out**, contradicting its own schema.
+        Measured on the live screen (`raw: ""`, `is_rest_bool: false`), fixed,
+        and re-measured (`raw: "0"`, `is_rest_bool: true`, endpoint returns
+        `false`).
+
+      Checked on the real screen, both ways round: tick → Save enables with the
+      right sentence → saves → survives reload; untick → Discard restores the
+      stored value. `uninstall.php` itself cannot be exercised without deleting
+      the plugin, so what is asserted instead is that it names the three options
+      the code registers, loads no plugin code, and guards
+      `WP_UNINSTALL_PLUGIN` — `OptionsTest`.
+- [x] Check `wp-content/debug.log` at the end, not only the screen. Any
       `_doing_it_wrong`, deprecation or PHP notice is a finding, including ones
-      core raises about translation timing.
+      core raises about translation timing. **Zero Spacery entries in the whole
+      file** — `grep -ic spacery` returns 0 — across two sessions of editor,
+      settings-screen, front-end, takeover, deactivation and reactivation work.
+      Nothing was appended on 14 September at all. In particular no
+      `_doing_it_wrong` about translation timing, which is the one D20 accepted
+      a risk on by keeping `load_plugin_textdomain()`.
+
+      The file is not empty, and none of it is ours: 5 fatals and 5 warnings are
+      an unrelated plugin (`folderfolio`) failing to load its autoloader on
+      11 September, and 66 more are `mysqli_real_connect()` failing because
+      MAMP was not running. Worth knowing so the counts do not alarm the next
+      reader.
 
 ## Recording what you find
 
