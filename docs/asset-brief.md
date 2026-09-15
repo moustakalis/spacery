@@ -162,62 +162,17 @@ Constraints that matter more than they look:
   ages badly and the directory frowns on it.
 - The 2× file must be the same design at exactly double, not a different crop.
 
-### 3.3 Screenshots — outstanding, the real work
+### 3.3 Screenshots — briefed separately
 
-Named `screenshot-1.png`, `screenshot-2.png`, … in `assets/`. Their **order must
-match** a `== Screenshots ==` list in `readme.txt`, which is deliberately absent
-right now: a section pointing at files that do not exist renders as broken
-images on the plugin page. Add the section in the same order when the files
-exist.
+**[`screenshot-brief.md`](screenshot-brief.md) is the brief.** What stood here
+described the panel under its old name, in the tab it no longer lives in, above
+a canvas that showed nothing — it was written before D33, D34 and D36 — and it
+numbered the three shots in an order that disagreed with the captions actually
+written for `readme.txt`. Since captions are matched to files by *position*,
+leaving two orders in the repository was leaving a wrong one to be followed.
 
-Capture on a clean WordPress 7.1 site with Twenty Twenty-Five, the plugin
-active, at a **1280px-wide viewport**, in light mode, with the admin colour
-scheme left at default. Crop to the relevant region rather than shipping a full
-desktop screenshot — the directory renders these fairly small.
-
-**Screenshot 1 — the panel doing its job.** A Group block selected in the post
-editor, inspector open, the **Spacery** panel expanded. The canvas
-should be narrow enough that the panel header names a tier and its boundary —
-it reads `Laptop · ≤1024px` or similar. At least one padding field filled in, at
-least one left blank so the inherited placeholder shows. This is the one
-screenshot that has to be right; it is the product.
-
-Caption: *Padding and margin per breakpoint, on any block that supports spacing.*
-
-**Screenshot 2 — where breakpoints come from.** The Spacery admin screen, showing the
-four source options and the **In use now** panel beneath, with its resolved
-tiers and their bands (`over 782px, up to 1024px`, `up to 480px`). Choose
-**Spacery's own** so four tiers are listed rather than the theme's two.
-
-Caption: *Choose one source of breakpoints — your theme, Spacery's preset, or
-your own. They are never mixed.*
-
-**Screenshot 3 — the spacer.** The `spacery/spacer` block selected with the
-Height panel open, showing a height set at one breakpoint and inherited at
-another, so the *Inherited from Laptop* provenance line is visible.
-
-Caption: *A spacer whose height changes at every breakpoint — which the core
-Spacer block still cannot do.*
-
-Optional fourth, only if it photographs well: the takeover notice, on a block
-where WordPress already sets a tablet padding, reading *WordPress already sets 1
-value here for narrower screens* with the **Manage these in Spacery** button.
-
----
-
-## 4. How to run the site for screenshots
-
-```bash
-pnpm install
-pnpm run build
-pnpm run env:start     # WordPress 7.1 on PHP 8.2, needs Docker
-```
-
-Then `http://localhost:8888/wp-admin`, user `admin`, password `password`.
-Activate Spacery under Plugins if it is not already.
-
-For screenshot 2, the Spacery screen in the admin menu. For 1 and 3, create a post and insert a
-Group or a Spacery block.
+Sections 1, 2 and 3.1–3.2 above are still accurate: they describe the design
+system, and the icon and banner that were delivered from it.
 
 ---
 
@@ -227,8 +182,8 @@ Group or a Spacery block.
       actual size
 - [ ] `banner-772x250.png` and `banner-1544x500.png` present, the second exactly
       double the first
-- [ ] `screenshot-1.png` … `screenshot-N.png` present
-- [ ] `== Screenshots ==` added to `readme.txt`, captions in file order
+- [ ] Screenshots — see [`screenshot-brief.md`](screenshot-brief.md), which
+      carries its own done-when list
 - [ ] Section 2 of this brief updated if the palette, mark or type changed, and
       all four raster files re-exported together
 - [ ] `python3 bin/check-release.py` still passes

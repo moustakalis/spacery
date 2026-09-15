@@ -5,6 +5,10 @@ weights) selected. Everything below is generated from that geometry.
 
 ## Copy into `assets/`
 
+The icon and the banner. **The screenshots are not here**: the ones this
+document used to list were never produced, and
+[`screenshot-brief.md`](screenshot-brief.md) is where they are specified now.
+
 | From | To | Size |
 |---|---|---|
 | `out/icon-128x128.png` | `assets/icon-128x128.png` | 128 × 128 |
@@ -12,9 +16,6 @@ weights) selected. Everything below is generated from that geometry.
 | `out/icon.svg` | `assets/icon.svg` | vector |
 | `out/banner-772x250.png` | `assets/banner-772x250.png` | 772 × 250 |
 | `out/banner-1544x500.png` | `assets/banner-1544x500.png` | 1544 × 500 |
-| `out/screenshot-1.png` | `assets/screenshot-1.png` | 1000 × 580 |
-| `out/screenshot-2.png` | `assets/screenshot-2.png` | 900 × 640 |
-| `out/screenshot-3.png` | `assets/screenshot-3.png` | 1120 × 485 |
 
 ## No generator
 
@@ -83,18 +84,20 @@ A tagline much longer than this one would run out of room rather than re-centre:
 at 772 the lockup cannot exceed about 500px without the margins dropping below
 the mark's own width. Measure a candidate before adopting it.
 
-## readme.txt — paste after `== Description ==`
+## readme.txt, and what is in each screenshot
 
-```
-== Screenshots ==
+**Both moved to [`screenshot-brief.md`](screenshot-brief.md).**
 
-1. Padding and margin per breakpoint, on any block that supports spacing.
-2. A spacer whose height changes at every breakpoint — which the core Spacer block still cannot do.
-```
+What stood here was a caption block with **two** entries under a sentence saying
+there were **three**, beside a description of three screenshots that were HTML
+recreations of the editor rather than captures of it, and which were never
+shipped. `readme.txt` still has no `== Screenshots ==` section, correctly — a
+section pointing at files that do not exist renders as broken images.
 
-Three screenshots. Formerly two: the admin-screen shot from the brief was not part of
-this round. They are numbered 1 and 2 so the sequence stays contiguous —
-`readme.txt` numbering is positional and a gap renders as a broken image.
+The sizes those files were specified at are kept, because the new set inherits
+them: **1000 × 580**, **900 × 640**, **1120 × 485**.
+
+---
 
 ## The mark
 
@@ -140,52 +143,14 @@ upper half, the 256 icon can read as a list or text-alignment glyph rather than
 a box. Both are inherent to 7a rather than bugs. If either bothers you, the fix
 is to raise the weights to 0.104 / 0.088 / 0.070, or to drop to two accent bars.
 
-## What is in each screenshot
-
-**screenshot-1** — Group block selected in the post editor, Block tab, Styles
-sub-tab, `Dimensions` collapsed, `Spacery` expanded. Tier selector on
-Laptop, rendered as icons because the preset's four tiers map to four distinct
-glyphs — the selected segment is a white fill with a dark border, matching
-WordPress's `ToggleGroupControl`, not a solid fill. Header `Laptop · ≤1024px`.
-Padding box: `px`, unlinked (broken-link glyph, unpressed), top and bottom
-authored at 32, right and left blank showing the inherited 24 as placeholders,
-reset button present because the box is authored. Margin box: two sides only,
-per `core/group`'s `supports.spacing.margin`, linked and pressed, unauthored so
-no reset. No `Reset all` — only one box is authored, which is the condition the
-source guards on.
-
-The chrome was corrected against a live capture of the real panel: the unit
-picker and the icon buttons are 36px against 32px fields (see finding 7 in
-`docs/ui-review.md`), and the side labels sit flush left under their fields
-rather than centred, which is what `labelPosition="bottom"` actually does.
-
-**screenshot-2** — `spacery/spacer` selected, block card title `Spacery`.
-`Height` open with `Default` at 100px and its help line. `Tablet · ≤782px`
-open, selector on Tablet, field blank with 80 as the placeholder, provenance
-reading `Inherited from Laptop`. `Set at` open: Desktop —, Laptop 80px, Tablet
-(editing) —, Mobile 32px.
-
-Tier labels and boundaries are `Registry::PRESET` — Desktop 1280, Laptop 1024,
-Tablet 782, Mobile 480.
-
-## Caveat worth acting on
-
-The screenshots are HTML recreations built from the component source, not
-captures of a running site. Every string, control and state matches
-`SpacingPanel.tsx`, `SpacingBox.tsx`, `TierSelector.tsx` and
-`blocks/spacer/edit.tsx`. The surrounding chrome follows WordPress admin
-conventions but was drawn from them, not measured off WordPress 7.1.
-
-If you capture the same two states yourself at a 1280px viewport and drop the
-files into the project, I will crop, size, name and finish them, and rewrite the
-readme block against the real files.
-
 ## Source files
 
-- `Spacery Screenshots.dc.html` — both editor states, live
+- `Spacery Screenshots.dc.html` — the two editor states, live. **Superseded:**
+  it is the source of the HTML recreations, which are not what ships; see
+  [`screenshot-brief.md`](screenshot-brief.md)
 - `Spacery Banner.dc.html` — the banner at 772 × 250, captured at 1× and 2×
 - `Spacery Mark.dc.html` — the three directions, with 1b as chosen
 
 ## Still outstanding
 
-- [ ] Admin-screen screenshot (the brief's shot 2)
+- [ ] The three screenshots — [`screenshot-brief.md`](screenshot-brief.md)

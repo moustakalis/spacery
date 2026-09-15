@@ -109,6 +109,19 @@ Identical for all three, or they will not read as a set.
   heading. Nothing that draws the eye away from the panel.
 - No browser chrome, no macOS window frame, no cursor.
 
+A clean site to capture on, from the repository (this recipe moved here from
+`asset-brief.md` §4, which no longer instructs):
+
+```bash
+pnpm install
+pnpm run build
+pnpm run env:start     # WordPress 7.1 on PHP 8.2, needs Docker
+```
+
+Then `http://localhost:8888/wp-admin`, user `admin`, password `password`.
+Activate Spacery under Plugins if it is not already, and set the breakpoint
+source to **Spacery's own** on the Spacery screen before capturing anything.
+
 ---
 
 ## 4. The three shots
