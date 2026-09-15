@@ -294,7 +294,11 @@ export function SpacingBox({
 				 * component whose source is not in `node_modules` to check --
 				 * so the row carries a plain wrapper instead.
 				 */}
-				<div className="spacery-sides">
+				<div
+					className={`spacery-sides${
+						CUSTOM === unit ? ' spacery-sides--css' : ''
+					}`}
+				>
 					<Flex gap={1} align="flex-start">
 						{sides.map((side) => (
 							<FlexBlock key={side}>

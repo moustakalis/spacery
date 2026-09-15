@@ -133,6 +133,14 @@ Three weights of rule, meaning three different things: card boundary, section
 division, row separation. Depth is almost absent — only the sticky bar lifts,
 because it overlaps content.
 
+**Motion is rarer still: there is exactly one.** In the inspector's `css` mode
+the focused field grows, 150ms `ease-out`, because four 59px fields cannot show
+`calc(100% - 2rem)` and widening all four for the one being typed in is worse.
+Nothing else in this plugin moves, and the bar for a second is the same: motion
+buys room or it does not ship. Anything animated gives its tween up under
+`prefers-reduced-motion: reduce` while keeping its end state — the width is the
+point, the animation is not.
+
 ---
 
 ## 4 · Borrowed components
@@ -234,6 +242,7 @@ slot is WordPress's and every plugin fills it.
 | Provenance | One line per box, 12px muted. Omit when nothing is inherited rather than naming a source that does not exist. |
 | Side labels | 10px caps — §2's one exception, and the only rule in `extension/style.scss`. Needs `!important` against the emotion class. |
 | Number fields | `spinControls="native"`. Core's `custom` renders a 60px suffix, which leaves 12px of a 59px field. `min={0}` on padding only: margin may be negative, padding may not. |
+| Focused field in `css` mode | Grows to `flex-grow: 2.7` — 112px against three of 41px — over 150ms. Elementor's own proportion for the same gesture. `BOTTOM` clips to its ellipsis at 41px while a sibling is focused, which is accepted and reverts on blur. |
 | Custom mode | The `css` entry **inside** the unit picker — not the word `custom`, which sized the `<select>` to its own label (72px against 56px), and not a toggle beside it, which left the picker asserting a unit the fields were not in. Three characters, like `rem`. |
 
 ---
