@@ -26,5 +26,13 @@ wp-env/
 .DS_Store
 Thumbs.db
 
+# Scratch written into the repo root during assistant sessions.
+#
+# Never part of the plugin: `package.json#files` is an allow-list so it cannot
+# reach the zip, and it is untracked so it cannot reach SVN. Ignored anyway
+# because the space in its name is what Plugin Check fails a distributable on,
+# and one `git add .` is the whole distance between harmless and fatal.
+Claude outputs/
+
 # Logs
 *.log
