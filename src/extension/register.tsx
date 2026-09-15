@@ -106,7 +106,24 @@ function SpaceryPanel(props: BlockEditProps): React.ReactElement {
 	const hasValues = 0 < marked.length;
 
 	return (
-		<InspectorControls>
+		/*
+		 * `styles`, not the default `settings` group.
+		 *
+		 * A bare `InspectorControls` fills the Settings tab, which put Spacery
+		 * one tab away from `Dimensions` -- the panel that holds the very
+		 * values these fields override, and whose value is the placeholder
+		 * shown in the widest tier's inputs (`inheritedValue()` ends on
+		 * `attributes.style`). Core also edits its own responsive values
+		 * through those same Dimensions fields, so the takeover notice was
+		 * describing a control the author could not see without switching
+		 * tabs. Padding and margin are styles; this is where WordPress keeps
+		 * them.
+		 *
+		 * Not `group="dimensions"`, which would fill core's own `ToolsPanel`:
+		 * that slot expects `ToolsPanelItem` children, and Spacery's panel is
+		 * a `PanelBody` with a tier selector of its own.
+		 */
+		<InspectorControls group="styles">
 			<PanelBody
 				title={__('Spacery', 'spacery')}
 				initialOpen={false}

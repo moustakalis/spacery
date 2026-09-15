@@ -8,7 +8,12 @@
  * leaving a competing rule behind.
  */
 
-import { expect, test } from '@wordpress/e2e-test-utils-playwright';
+import type { Page } from '@playwright/test';
+import {
+	expect,
+	test,
+	type Editor,
+} from '@wordpress/e2e-test-utils-playwright';
 
 /** Panel title, and the accessible name of the button that expands it. */
 const PANEL = 'Spacery';
@@ -33,6 +38,34 @@ const PLUGIN = 'spacery';
  * so it is the one that catches a panel which only works inside layout blocks.
  */
 const SUPPORTED = ['core/group', 'core/columns', 'core/cover', 'core/heading'];
+
+/**
+ * Opens the inspector and brings Spacery's panel into view.
+ *
+ * The panel fills `InspectorControls group="styles"` (D34), so on a block
+ * whose inspector is split in two it sits behind the `Styles` tab. Most blocks
+ * have no split: core draws the tabs only when something fills the settings
+ * group, and on a Group the only thing that ever did was Spacery itself, so
+ * moving it collapsed the inspector to a single list. `core/image` still has
+ * tabs, because core fills its settings group with `Media`.
+ *
+ * The conditional click cannot hide a failure. If the tab is there and this
+ * misses it, the panel does not render and every assertion below fails -- the
+ * opposite of the `shownTier()` locator, which returned a wrong answer quietly
+ * because nothing downstream depended on it.
+ *
+ * @param editor The editor utilities.
+ * @param page   The page under test.
+ */
+async function openInspector(editor: Editor, page: Page): Promise<void> {
+	await editor.openDocumentSettingsSidebar();
+
+	const styles = page.getByRole('tab', { name: 'Styles' });
+
+	if (await styles.isVisible()) {
+		await styles.click();
+	}
+}
 
 /**
  * The block's own padding, and the value WordPress sets for tablets.
@@ -67,7 +100,7 @@ test.describe('spacing extension', () => {
 	for (const name of SUPPORTED) {
 		test(`adds the panel to ${name}`, async ({ editor, page }) => {
 			await editor.insertBlock({ name });
-			await editor.openDocumentSettingsSidebar();
+			await openInspector(editor, page);
 
 			const heading = page.getByRole('button', { name: PANEL });
 
@@ -105,7 +138,7 @@ test.describe('spacing extension', () => {
 		page,
 	}) => {
 		await editor.insertBlock({ name: 'core/html' });
-		await editor.openDocumentSettingsSidebar();
+		await openInspector(editor, page);
 
 		await expect(page.getByRole('button', { name: PANEL })).toBeHidden();
 	});
@@ -181,7 +214,7 @@ test.describe('spacing extension', () => {
 			},
 		});
 
-		await editor.openDocumentSettingsSidebar();
+		await openInspector(editor, page);
 		await page.getByRole('button', { name: PANEL }).click();
 
 		await page

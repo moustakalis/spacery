@@ -146,8 +146,17 @@ declare module '@wordpress/block-editor' {
 	 * @return One value per requested path, in order.
 	 */
 	export function useSettings(...paths: string[]): unknown[];
+	/**
+	 * `group` picks which inspector tab the fill lands in.
+	 *
+	 * Typed as the groups this plugin uses rather than as `string`: core
+	 * accepts more of them, and an unknown one renders nowhere at all with no
+	 * error, which is the kind of silence a hand-written declaration should
+	 * not be helping along. Omitted means `settings`.
+	 */
 	export const InspectorControls: React.ComponentType<{
 		children?: React.ReactNode;
+		group?: 'settings' | 'styles' | 'advanced';
 	}>;
 
 	/** The block editor data store. */

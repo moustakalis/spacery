@@ -142,8 +142,8 @@ is to raise the weights to 0.104 / 0.088 / 0.070, or to drop to two accent bars.
 
 ## What is in each screenshot
 
-**screenshot-1** — Group block selected in the post editor, Block tab, Settings
-sub-tab, `Layout` collapsed, `Spacery` expanded. Tier selector on
+**screenshot-1** — Group block selected in the post editor, Block tab, Styles
+sub-tab, `Dimensions` collapsed, `Spacery` expanded. Tier selector on
 Laptop, rendered as icons because the preset's four tiers map to four distinct
 glyphs — the selected segment is a white fill with a dark border, matching
 WordPress's `ToggleGroupControl`, not a solid fill. Header `Laptop · ≤1024px`.
