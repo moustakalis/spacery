@@ -59,6 +59,12 @@ your values.
 3. Open Spacery in the admin menu and choose where your breakpoints come from.
 4. Responsive controls appear in the block inspector under Spacery.
 
+== Screenshots ==
+
+1. Padding and margin per breakpoint, on any block that supports spacing.
+2. A spacer whose height changes at every breakpoint — which the core Spacer block still cannot do.
+3. Name your own breakpoints and set where each one stops, on Spacery's settings screen.
+
 == Frequently Asked Questions ==
 
 = Does this replace the WordPress 7.1 responsive styles? =

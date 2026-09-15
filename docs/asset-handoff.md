@@ -153,4 +153,7 @@ is to raise the weights to 0.104 / 0.088 / 0.070, or to drop to two accent bars.
 
 ## Still outstanding
 
-- [ ] The three screenshots — [`screenshot-brief.md`](screenshot-brief.md)
+Nothing. The three screenshots were captured on 15 September and are in
+`assets/` as `screenshot-1.png`, `-2` and `-3`, with the `== Screenshots ==`
+block in `readme.txt`. How they were made, and the two things this handoff got
+wrong about them, are in [`screenshot-brief.md`](screenshot-brief.md).

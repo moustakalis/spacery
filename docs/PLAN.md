@@ -708,14 +708,15 @@ one did not.
 Banner and icon assets, readme.txt final pass, a WordPress.org account and slug, and a
 release workflow deploying on tag.
 *Exit:* live on WP.org, release workflow deploying on tag.
-*State at 9 September 2026:* the mark, the icons and the banners are drawn and the release
-metadata agrees with itself, but no tag has been pushed, so `release.yml` has never run and
-nothing has reached the directory. Four things are outstanding: the three screenshots
-`readme.txt` now declares do not exist in `assets/`, and a positional gap renders as a
-broken image; `readme.txt` still sends people to `Settings > Spacery`, which D16 moved;
-`Settings/Screen.php` still passes a stock dashicon where `docs/brand/menu-icon.php` is
-waiting; and the WP.org account and slug are still unconfirmed. The current-state snapshot
-lives in `spacery-status.md`.
+*State at 15 September 2026:* every asset is in `assets/` — the mark, the icons, the two
+banners and, as of today, the three screenshots, captured from the running plugin and
+declared by a `== Screenshots ==` block in `readme.txt` that matches them by position
+(`docs/screenshot-brief.md` records how, and what the earlier brief got wrong). The three
+other items this paragraph used to list are closed: `readme.txt` sends people to the
+Spacery screen in the admin menu, and `Settings/Screen.php` passes Spacery's own mark as a
+data URI rather than a dashicon. What remains is not asset work: **the WP.org account and
+slug are still unconfirmed, and no tag has been pushed**, so `release.yml` has never run and
+nothing has reached the directory. The current-state snapshot lives in `spacery-status.md`.
 
 ---
 
