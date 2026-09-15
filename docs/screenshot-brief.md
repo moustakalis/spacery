@@ -97,6 +97,27 @@ when the files exist, in this order, one line per file, no gaps.
 
 ## 3. Capture environment
 
+**Not the MAMP playground.** Tried on 15 September and abandoned: that site has
+**Elementor, Stackable, FileBird and wpbookbar** installed, which put *Edit with
+Elementor*, *Design Library* and a Stackable icon in the editor's top toolbar and
+two extra items in the admin menu. Some of it crops out; the toolbar sits exactly
+where shot 1's frame wants to be, and third-party plugins may also inject block
+styles that quietly change the canvas. A screenshot of Spacery should contain
+nothing but WordPress and Spacery.
+
+**Use the `wp-env` instance**, which is a clean WordPress 7.1 with only Spacery
+active, and which is why this recipe exists:
+
+```bash
+pnpm install
+pnpm run build
+pnpm run env:start     # WordPress 7.1 on PHP 8.2, needs Docker
+```
+
+Then `http://localhost:8888/wp-admin`, user `admin`, password `password`.
+Activate Spacery under Plugins if it is not already, and set the breakpoint
+source to **Spacery's own** on the Spacery screen before capturing anything.
+
 Identical for all three, or they will not read as a set.
 
 - WordPress **7.1**, **Twenty Twenty-Five**, Spacery active, no other plugins
@@ -109,18 +130,10 @@ Identical for all three, or they will not read as a set.
   heading. Nothing that draws the eye away from the panel.
 - No browser chrome, no macOS window frame, no cursor.
 
-A clean site to capture on, from the repository (this recipe moved here from
-`asset-brief.md` §4, which no longer instructs):
-
-```bash
-pnpm install
-pnpm run build
-pnpm run env:start     # WordPress 7.1 on PHP 8.2, needs Docker
-```
-
-Then `http://localhost:8888/wp-admin`, user `admin`, password `password`.
-Activate Spacery under Plugins if it is not already, and set the breakpoint
-source to **Spacery's own** on the Spacery screen before capturing anything.
+**On the viewport:** driving the browser from a tool, `resize_window` reported
+success and changed nothing — `innerWidth` stayed at whatever the window already
+was. Set the window by hand and **assert `window.innerWidth` before capturing**,
+rather than trusting the resize.
 
 ---
 
