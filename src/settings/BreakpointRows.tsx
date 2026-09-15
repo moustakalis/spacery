@@ -281,48 +281,50 @@ export function BreakpointRows({
 			})}
 
 			<FlexItem>
-				<Flex justify="space-between" align="flex-start" gap={4}>
-					<FlexItem>
-						<Button
-							variant="secondary"
-							disabled={rows.length >= max}
-							onClick={() => onChange([...rows, blankRow()])}
-						>
-							{__('Add breakpoint', 'spacery')}
-						</Button>
-					</FlexItem>
+				<div className="spacery-table__foot">
+					<Flex justify="space-between" align="flex-start" gap={4}>
+						<FlexItem>
+							<Button
+								variant="secondary"
+								disabled={rows.length >= max}
+								onClick={() => onChange([...rows, blankRow()])}
+							>
+								{__('Add breakpoint', 'spacery')}
+							</Button>
+						</FlexItem>
 
-					{/*
-					 * The guidance, once, for the whole table -- and the two
-					 * facts an author needs are which column the editor shows
-					 * and which one the content is stored under.
-					 */}
-					<FlexItem>
-						<div
-							style={{
-								textAlign: 'right',
-								maxWidth: '420px',
-								textWrap: 'balance',
-							}}
-						>
-							<Text variant="muted" size={12}>
-								{rows.length >= max
-									? sprintf(
-											/* translators: %d: maximum number of breakpoints. */
-											__(
-												'%d breakpoints is the maximum.',
+						{/*
+						 * The guidance, once, for the whole table -- and the two
+						 * facts an author needs are which column the editor shows
+						 * and which one the content is stored under.
+						 */}
+						<FlexItem>
+							<div
+								style={{
+									textAlign: 'right',
+									maxWidth: '420px',
+									textWrap: 'balance',
+								}}
+							>
+								<Text variant="muted" size={12}>
+									{rows.length >= max
+										? sprintf(
+												/* translators: %d: maximum number of breakpoints. */
+												__(
+													'%d breakpoints is the maximum.',
+													'spacery'
+												),
+												max
+											)
+										: __(
+												'Name appears in the editor. Slug is stored on your blocks and follows the name until you edit it.',
 												'spacery'
-											),
-											max
-										)
-									: __(
-											'Name appears in the editor. Slug is stored on your blocks and follows the name until you edit it.',
-											'spacery'
-										)}
-							</Text>
-						</div>
-					</FlexItem>
-				</Flex>
+											)}
+								</Text>
+							</div>
+						</FlexItem>
+					</Flex>
+				</div>
 			</FlexItem>
 		</Flex>
 	);

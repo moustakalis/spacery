@@ -108,17 +108,27 @@ ones), not a type one.
 
 ## 3 · Space, edges, depth
 
-| Spacing | Value |
-| --- | --- |
-| Card padding | 16px |
-| Card header | 12px / 16px |
-| Table row | 9px / 16px |
-| Column gap | 12px |
-| Between cards | 20px |
-| Page top | 24px |
+Measured on the built screen, not taken from the proposal. Three of these were
+wrong in this document until the spacing audit checked them one at a time — the
+numbers below are what renders.
 
-A 4px grid, but only these six values are in use. Reach for one before
-inventing a seventh.
+| Spacing | Value | |
+| --- | --- | --- |
+| Card padding | **16px / 24px** | `CardBody`'s own; borrowed, so descriptive (§4) |
+| Card header | **16px / 24px** | `CardHeader`'s own, and the same as the body |
+| Table head | **8px** | Spacery's |
+| Table row | **12px / 8px** | Spacery's. The 8px inset keeps a tinted row's fields off its edge |
+| Table footer | **16px above, 8px inset** | Clears the closing rule and joins the columns |
+| Column gap | 12px | |
+| Between cards | 20px | |
+
+A 4px grid, and these are the values in use. Reach for one before inventing
+another.
+
+**Every card is symmetric 16px top and bottom inside its body, and every card's
+content starts on one left edge** — the audit checked all five and found no
+exception. The table is the only thing that sits 8px inside that edge, and its
+head, rows and footer all do so together.
 
 | Edge / depth | Value |
 | --- | --- |

@@ -76,6 +76,31 @@ $caution-text: #8a6616;
 		justify-content: flex-end;
 		padding-top: 4px;
 	}
+
+	/*
+	 * The row that is not a row.
+	 *
+	 * Two faults, one cause, both measured on the live screen. *Add breakpoint*
+	 * began at **exactly** the last row's bottom edge -- 0px -- so the button
+	 * sat on the closing rule with nothing between them. And it started at the
+	 * card's content edge (206px) while every column in the table above starts
+	 * at 214px, because a row carries `padding: 12px 8px` and this footer
+	 * carried none: the button hung 8px to the left of the column it belongs
+	 * under, and the guidance beside it ran 8px past the remove column's right
+	 * edge.
+	 *
+	 * The inset is matched rather than removed from the rows. A conflicted row
+	 * is tinted across the card's full width and its fields need to sit inside
+	 * that, not flush against its edge -- so the table keeps its 8px and the
+	 * footer joins it.
+	 *
+	 * 16px above, which is the card's own padding and what the header already
+	 * uses to clear the table on the other side.
+	 */
+	&__foot {
+		margin-top: 16px;
+		padding: 0 8px;
+	}
 }
 
 /*
