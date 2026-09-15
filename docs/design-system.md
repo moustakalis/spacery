@@ -234,7 +234,7 @@ slot is WordPress's and every plugin fills it.
 | Provenance | One line per box, 12px muted. Omit when nothing is inherited rather than naming a source that does not exist. |
 | Side labels | 10px caps — §2's one exception, and the only rule in `extension/style.scss`. Needs `!important` against the emotion class. |
 | Number fields | `spinControls="native"`. Core's `custom` renders a 60px suffix, which leaves 12px of a 59px field. `min={0}` on padding only: margin may be negative, padding may not. |
-| Custom mode | A pencil toggle beside the unit picker, never an entry inside it — `custom` is not a unit, and as an option it sized the `<select>` to its own label (72px against 56px). The picker keeps showing the unit the box would otherwise be in. |
+| Custom mode | The `css` entry **inside** the unit picker — not the word `custom`, which sized the `<select>` to its own label (72px against 56px), and not a toggle beside it, which left the picker asserting a unit the fields were not in. Three characters, like `rem`. |
 
 ---
 

@@ -79,12 +79,11 @@ export function applyEdit({
  *   go; `8px` beside it does, and used to be destroyed with it. The original
  *   rule cleared the whole box, on the argument that keeping some sides and not
  *   others makes the outcome depend on what each side happened to hold. That is
- *   true and it is the lesser problem: which sides emptied is *visible* in the
- *   four fields, where four values vanishing at once is not. What changed the
- *   balance is the pencil (D29) -- leaving custom used to mean deliberately
- *   opening the unit list and naming a unit, which reads as "re-express these",
- *   and is now one press of a toggle labelled `Use a number and a unit`, which
- *   does not read as "and discard everything".
+ *   true and it is the lesser problem: **four re-labelable values destroyed to
+ *   avoid an inconsistent-looking outcome is the larger one**, and which sides
+ *   emptied is *visible* in the four fields, where four values vanishing at
+ *   once is not. It also makes leaving custom behave like every other unit
+ *   change in this function, which re-labels rather than clears (D29).
  *
  * @param sides  Sides the block supports.
  * @param values What the box currently holds.

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-14T22:16:35+00:00\n"
+"POT-Creation-Date: 2026-09-15T07:03:17+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: spacery\n"
@@ -209,33 +209,30 @@ msgstr ""
 msgid "Responsive spacing — this block has responsive values"
 msgstr ""
 
-#: src/extension/SpacingBox.js:148
+#. translators: a unit-picker entry; the fields then take whole CSS values.
+#: src/extension/SpacingBox.js:83
+msgid "css"
+msgstr ""
+
+#: src/extension/SpacingBox.js:127
 msgid "Unit"
 msgstr ""
 
-#: src/extension/SpacingBox.js:151
-msgid "Use a number and a unit"
-msgstr ""
-
-#: src/extension/SpacingBox.js:152
-msgid "Enter a CSS value"
-msgstr ""
-
-#: src/extension/SpacingBox.js:155
+#: src/extension/SpacingBox.js:128
 msgid "Unlink sides"
 msgstr ""
 
-#: src/extension/SpacingBox.js:156
+#: src/extension/SpacingBox.js:129
 msgid "Link sides — one value for all four"
 msgstr ""
 
 #. translators: %s: a spacing property, e.g. "Padding".
-#: src/extension/SpacingBox.js:158
+#: src/extension/SpacingBox.js:131
 #, js-format
 msgid "Reset %s"
 msgstr ""
 
-#: src/extension/SpacingBox.js:173
+#: src/extension/SpacingBox.js:146
 msgid "A length, calc() or a preset, one per side. Anything else is dropped."
 msgstr ""
 

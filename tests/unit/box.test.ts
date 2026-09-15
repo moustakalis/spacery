@@ -173,12 +173,13 @@ describe('switchUnit', () => {
 	});
 
 	/**
-	 * Was "clears everything", and the pencil (D29) is why it is not.
+	 * Was "clears everything" (D29).
 	 *
-	 * Leaving custom used to take deliberately opening the unit list and naming
-	 * a unit. It is now one press of a toggle labelled `Use a number and a
-	 * unit`, so destroying the sides that *do* have a number stopped being a
-	 * defensible reading of what was asked for.
+	 * Clearing the whole box avoided an outcome that depends on what each side
+	 * held, at the price of destroying every side that *does* have a number.
+	 * That is the worse trade: which sides emptied is visible in the four
+	 * fields, and it makes leaving custom behave like every other unit change
+	 * here, which re-labels rather than clears.
 	 */
 	it('keeps what parses on the way out of custom, and drops what does not', () => {
 		expect(

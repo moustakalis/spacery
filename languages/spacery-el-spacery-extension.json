@@ -87,14 +87,11 @@
 			"Add your first breakpoint": [
 				"Προσθέστε το πρώτο σας σημείο διακοπής"
 			],
+			"css": [
+				"css"
+			],
 			"Unit": [
 				"Μονάδα"
-			],
-			"Use a number and a unit": [
-				"Χρήση αριθμού και μονάδας"
-			],
-			"Enter a CSS value": [
-				"Εισαγωγή τιμής CSS"
 			],
 			"Unlink sides": [
 				"Αποσύνδεση πλευρών"
