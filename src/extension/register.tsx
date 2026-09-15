@@ -108,16 +108,16 @@ function SpaceryPanel(props: BlockEditProps): React.ReactElement {
 	return (
 		<InspectorControls>
 			<PanelBody
-				title={__('Responsive spacing', 'spacery')}
+				title={__('Spacery', 'spacery')}
 				initialOpen={false}
 				{...(hasValues ? { icon: DOT } : {})}
 				buttonProps={{
 					'aria-label': hasValues
 						? __(
-								'Responsive spacing — this block has responsive values',
+								'Spacery — this block has responsive values',
 								'spacery'
 							)
-						: __('Responsive spacing', 'spacery'),
+						: __('Spacery', 'spacery'),
 				}}
 			>
 				<SpacingPanel

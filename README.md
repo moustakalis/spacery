@@ -1,7 +1,7 @@
 # Spacery
 
-Responsive spacing for the WordPress block editor — unlimited, theme-defined breakpoints
-for any block.
+Responsive block controls for the WordPress block editor — unlimited, theme-defined
+breakpoints for any block.
 
 > **Status: 1.0.0, awaiting WordPress.org review.** Everything the plugin does is
 > built and tested; what remains is the directory submission itself, which needs

@@ -260,7 +260,7 @@ export function App(): React.ReactElement {
 				<Masthead />
 				<Text variant="muted">
 					{__(
-						'Responsive padding and margin for any block that supports spacing.',
+						'Responsive block controls, at the breakpoints you choose.',
 						'spacery'
 					)}
 				</Text>
@@ -419,11 +419,11 @@ export function App(): React.ReactElement {
 								help={
 									deleteData
 										? __(
-												'Your breakpoints go too. Spacing on your blocks stays, but a future install may apply it at different widths.',
+												'Your breakpoints go too. Values on your blocks stay, but a future install may apply them at different widths.',
 												'spacery'
 											)
 										: __(
-												'Your breakpoints are kept, so reinstalling leaves your spacing exactly as it is.',
+												'Your breakpoints are kept, so reinstalling leaves your values exactly as they are.',
 												'spacery'
 											)
 								}

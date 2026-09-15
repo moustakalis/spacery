@@ -219,7 +219,7 @@ export function BreakpointRows({
 										{sprintf(
 											/* translators: %s: the slug the breakpoint was saved under. */
 											__(
-												'Spacing saved under %s will stop applying. To rename it, change the name and leave the slug alone.',
+												'Values saved under %s will stop applying. To rename it, change the name and leave the slug alone.',
 												'spacery'
 											),
 											row.storedSlug ?? ''

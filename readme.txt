@@ -8,7 +8,7 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Responsive spacing for the block editor: unlimited, theme-defined breakpoints for any block.
+Responsive block controls: unlimited, theme-defined breakpoints for any block.
 
 == Description ==
 
@@ -25,7 +25,7 @@ Spacery fills both gaps.
   breakpoint values as core's own responsive styles, so the two never disagree.
 * **A responsive spacer block.** A height per breakpoint, which the core Spacer block
   still does not offer.
-* **Responsive spacing on any block.** Padding and margin per breakpoint on any block that
+* **Responsive controls on any block.** Padding and margin per breakpoint on any block that
   supports spacing, including blocks from other plugins.
 
 = You choose where breakpoints come from =
@@ -49,7 +49,7 @@ produce a set nobody designed. Developers can override the result entirely with 
 
 Spacery stores its values as block attributes, not as markup. Deactivate the plugin and
 your posts stay valid: nothing breaks, nothing needs repairing, and reactivating restores
-your spacing.
+your values.
 
 == Installation ==
 
@@ -57,7 +57,7 @@ your spacing.
    screen.
 2. Activate it through the Plugins screen.
 3. Open Spacery in the admin menu and choose where your breakpoints come from.
-4. Spacing controls appear in the block inspector under Responsive spacing.
+4. Responsive controls appear in the block inspector under Spacery.
 
 == Frequently Asked Questions ==
 
@@ -100,11 +100,11 @@ They are kept, unless you ask for them to be removed. There is a checkbox at the
 the Spacery screen, off by default.
 
 Keeping them is the safe default, and not just tidiness. Your breakpoints are what the
-spacing on your blocks is measured against: a value saved at "tablet" means whatever your
+values on your blocks are measured against: a value saved at "tablet" means whatever your
 tablet breakpoint says it means. Remove the breakpoints and a later reinstall starts from
 Spacery's own set, so that value would apply at a different width - or, if you had renamed
 your breakpoints, stop applying at all. Nothing would warn you, because nothing is broken;
-the spacing would just be different.
+the values would just be different.
 
 So the choice is yours and it is off until you make it. Either way Spacery never writes
 anything into your posts, and never removes anything from them.

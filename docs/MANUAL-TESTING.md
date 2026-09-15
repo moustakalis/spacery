@@ -647,7 +647,7 @@ View source. Spacery's declarations belong in
       lists in `Blocks\Supported`, and conflating them once already broke the
       block's own output. Verified from both sides at once:
       `spacerySettings.excludedBlocks` is exactly `["spacery/spacer"]`, the
-      selected block's inspector holds **zero** "Responsive spacing" panels
+      selected block's inspector holds **zero** "Spacery" panels
       (its own `Height`, per-tier and `Set at` panels instead), and the same
       block on the page carries a `spy-` class with four height bands. Excluded
       from the panel, included in the styling.
@@ -683,7 +683,7 @@ than a block library, so install something that actually registers blocks with
 
 - [x] Its blocks get the panel with no work on Spacery's part. `manualpass/probe`
       — registered in a mu-plugin, named nowhere in Spacery — came back with
-      `attributes.spacery` present and the full "Responsive spacing" panel:
+      `attributes.spacery` present and the full "Spacery" panel:
       tier selector, tier heading, padding box. Nothing was added to Spacery to
       make that happen, which is D6.
 
@@ -708,7 +708,7 @@ than a block library, so install something that actually registers blocks with
 - [x] A block whose theme has spacing switched off shows the explanatory message,
       not an empty panel. With `wp_theme_json_data_theme` filtered to set both
       `spacing.padding` and `spacing.margin` to `false`, the panel contained
-      exactly two lines — "Responsive spacing" and **"This theme has spacing
+      exactly two lines — "Spacery" and **"This theme has spacing
       controls switched off for this block."** — and **zero** input elements.
       Not an empty box, not a box of dead controls.
 - [x] Activate Elementor and edit an Elementor page. Spacery should be inert
@@ -738,7 +738,7 @@ than a block library, so install something that actually registers blocks with
 - [~] Site editor, template parts, and the widgets screen — the panel should
       appear in all of them. **Widgets screen: passes.** `spacerySettings` is
       published there with all four tiers, and a paragraph inserted into a
-      widget area gets the full "Responsive spacing" panel — which is the case
+      widget area gets the full "Spacery" panel — which is the case
       `Editor\Settings`' class comment is about, since `core/editor` is not
       registered on that screen and an allow-listed editor setting would never
       have arrived. **Site editor and template parts: not testable while a

@@ -151,7 +151,7 @@ test.describe('settings screen', () => {
 		// And the one thing on that card an author may have to act on.
 		await expect(
 			app.getByText(
-				'Screens wider than 1280px match no breakpoint, so blocks use their ordinary spacing.',
+				'Screens wider than 1280px match no breakpoint, so blocks use their ordinary values.',
 				{ exact: false }
 			)
 		).toBeVisible();

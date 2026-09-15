@@ -11,7 +11,7 @@
 import { expect, test } from '@wordpress/e2e-test-utils-playwright';
 
 /** Panel title, and the accessible name of the button that expands it. */
-const PANEL = 'Responsive spacing';
+const PANEL = 'Spacery';
 
 /**
  * How `RequestUtils` names Spacery.

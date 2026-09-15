@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "spacery/spacer",
-	"title": "Spacery",
+	"title": "Responsive Spacer",
 	"category": "design",
 	"icon": "image-flip-vertical",
 	"description": "Vertical space whose height can change at every breakpoint.",
@@ -11,7 +11,8 @@
 		"space",
 		"responsive",
 		"gap",
-		"breakpoint"
+		"breakpoint",
+		"spacery"
 	],
 	"textdomain": "spacery",
 	"attributes": {

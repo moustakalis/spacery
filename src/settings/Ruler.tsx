@@ -343,7 +343,7 @@ export function Ruler({
 								: emphasise(
 										/* translators: %s: a CSS length, e.g. "1280px". */
 										__(
-											'Screens wider than %s match no breakpoint, so blocks use their ordinary spacing. Raise the widest breakpoint to cover them.',
+											'Screens wider than %s match no breakpoint, so blocks use their ordinary values. Raise the widest breakpoint to cover them.',
 											'spacery'
 										),
 										widest.max

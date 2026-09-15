@@ -8,7 +8,7 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Responsive spacing for the block editor: unlimited, theme-defined breakpoints for any block.
+Responsive block controls: unlimited, theme-defined breakpoints for any block.
 
 == Description ==
 
@@ -25,7 +25,7 @@ Spacery fills both gaps.
   breakpoint values as core's own responsive styles, so the two never disagree.
 * **A responsive spacer block.** A height per breakpoint, which the core Spacer block
   still does not offer.
-* **Responsive spacing on any block.** Padding and margin per breakpoint on any block that
+* **Responsive controls on any block.** Padding and margin per breakpoint on any block that
   supports spacing, including blocks from other plugins.
 
 = You choose where breakpoints come from =
@@ -56,7 +56,7 @@ your spacing.
    screen.
 2. Activate it through the Plugins screen.
 3. Open Spacery in the admin menu and choose where your breakpoints come from.
-4. Spacing controls appear in the block inspector under Responsive spacing.
+4. Responsive controls appear in the block inspector under Spacery.
 
 == Screenshots ==
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spacery 1.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/moustakalis/spacery/issues\n"
-"POT-Creation-Date: 2026-09-15T07:03:17+00:00\n"
+"POT-Creation-Date: 2026-09-15T10:15:59+00:00\n"
 "PO-Revision-Date: 2026-09-12T15:17:59+00:00\n"
 "Last-Translator: Nickos Moustakas\n"
 "Language-Team: Greek\n"
@@ -15,7 +15,8 @@ msgstr ""
 
 #. Plugin Name of the plugin
 #: spacery.php includes/Settings/Screen.php:115
-#: includes/Settings/Screen.php:116 src/settings/Brand.js:65
+#: includes/Settings/Screen.php:116 src/extension/register.js:77
+#: src/extension/register.js:80 src/settings/Brand.js:65
 msgid "Spacery"
 msgstr ""
 
@@ -27,10 +28,10 @@ msgstr ""
 #. Description of the plugin
 #: spacery.php
 msgid ""
-"Responsive spacing for the block editor — unlimited, theme-defined "
-"breakpoints for any block."
+"Responsive block controls — unlimited, theme-defined breakpoints for any "
+"block."
 msgstr ""
-"Αποκρίσιμα κενά για τον επεξεργαστή μπλοκ — απεριόριστα σημεία διακοπής, "
+"Αποκρίσιμα στοιχεία ελέγχου μπλοκ — απεριόριστα σημεία διακοπής, "
 "ορισμένα από το θέμα, για κάθε μπλοκ."
 
 #. Author of the plugin
@@ -208,13 +209,9 @@ msgstr "Κληρονομείται από %1$s και %2$s"
 msgid "Inherited from %d different places"
 msgstr "Κληρονομείται από %d διαφορετικά σημεία"
 
-#: src/extension/register.js:77 src/extension/register.js:80
-msgid "Responsive spacing"
-msgstr "Αποκρίσιμα κενά"
-
 #: src/extension/register.js:79
-msgid "Responsive spacing — this block has responsive values"
-msgstr "Αποκρίσιμα κενά — αυτό το μπλοκ έχει αποκρίσιμες τιμές"
+msgid "Spacery — this block has responsive values"
+msgstr "Spacery — αυτό το μπλοκ έχει αποκρίσιμες τιμές"
 
 #. translators: a unit-picker entry; the fields then take whole CSS values.
 #: src/extension/SpacingBox.js:83
@@ -313,10 +310,9 @@ msgid "Loading your breakpoints…"
 msgstr "Φόρτωση των σημείων διακοπής σας…"
 
 #: src/settings/App.js:175
-msgid "Responsive padding and margin for any block that supports spacing."
+msgid "Responsive block controls, at the breakpoints you choose."
 msgstr ""
-"Αποκρίσιμο εσωτερικό και εξωτερικό περιθώριο για κάθε μπλοκ που υποστηρίζει "
-"κενά."
+"Αποκρίσιμα στοιχεία ελέγχου μπλοκ, στα σημεία διακοπής που επιλέγετε."
 
 #: src/settings/App.js:189
 msgid "Only one source applies at a time — Spacery never merges two sets."
@@ -350,19 +346,19 @@ msgstr "Να διαγραφούν οι ρυθμίσεις μου όταν δια
 
 #: src/settings/App.js:194
 msgid ""
-"Your breakpoints go too. Spacing on your blocks stays, but a future install "
-"may apply it at different widths."
+"Your breakpoints go too. Values on your blocks stay, but a future install "
+"may apply them at different widths."
 msgstr ""
-"Φεύγουν και τα σημεία διακοπής σας. Τα κενά στα μπλοκ σας παραμένουν, αλλά "
-"μια μελλοντική εγκατάσταση μπορεί να τα εφαρμόσει σε άλλα πλάτη."
+"Φεύγουν και τα σημεία διακοπής σας. Οι τιμές στα μπλοκ σας παραμένουν, "
+"αλλά μια μελλοντική εγκατάσταση μπορεί να τις εφαρμόσει σε άλλα πλάτη."
 
 #: src/settings/App.js:195
 msgid ""
-"Your breakpoints are kept, so reinstalling leaves your spacing exactly as it "
-"is."
+"Your breakpoints are kept, so reinstalling leaves your values exactly as "
+"they are."
 msgstr ""
-"Τα σημεία διακοπής σας διατηρούνται, οπότε μια επανεγκατάσταση αφήνει τα "
-"κενά σας ακριβώς όπως είναι."
+"Τα σημεία διακοπής σας διατηρούνται, οπότε μια επανεγκατάσταση αφήνει τις "
+"τιμές σας ακριβώς όπως είναι."
 
 #: src/settings/App.js:199
 msgid "Save changes"
@@ -456,10 +452,10 @@ msgstr "Καλύπτει"
 #. translators: %s: the slug the breakpoint was saved under.
 #: src/settings/BreakpointRows.js:107
 msgid ""
-"Spacing saved under %s will stop applying. To rename it, change the name and "
+"Values saved under %s will stop applying. To rename it, change the name and "
 "leave the slug alone."
 msgstr ""
-"Τα κενά που αποθηκεύτηκαν με το %s θα πάψουν να ισχύουν. Για μετονομασία, "
+"Οι τιμές που αποθηκεύτηκαν με το %s θα πάψουν να ισχύουν. Για μετονομασία, "
 "αλλάξτε το όνομα και αφήστε το slug ως έχει."
 
 #. translators: %s: breakpoint name.
@@ -510,19 +506,19 @@ msgid "%1$s, %2$s."
 msgstr "%1$s, %2$s."
 
 #. translators: %s: a CSS length, e.g. "11920px".
-#: src/settings/Ruler.js:186
+#: src/settings/Ruler.js:218
 msgid "The widest band runs to %s and is cut short here."
 msgstr "Η πλατύτερη ζώνη φτάνει έως %s και κόβεται εδώ."
 
 #. translators: %s: a CSS length, e.g. "1280px".
-#: src/settings/Ruler.js:189
+#: src/settings/Ruler.js:221
 msgid ""
 "Screens wider than %s match no breakpoint, so blocks use their ordinary "
-"spacing. Raise the widest breakpoint to cover them."
+"values. Raise the widest breakpoint to cover them."
 msgstr ""
 "Οθόνες πλατύτερες από %s δεν αντιστοιχούν σε κανένα σημείο διακοπής, οπότε "
-"τα μπλοκ χρησιμοποιούν τα συνηθισμένα τους κενά. Αυξήστε το πλατύτερο σημείο "
-"διακοπής για να τις καλύψετε."
+"τα μπλοκ χρησιμοποιούν τις συνηθισμένες τους τιμές. Αυξήστε το "
+"πλατύτερο σημείο διακοπής για να τις καλύψετε."
 
 #. translators: 1: comma-separated breakpoint names. 2: how many further breakpoints there are.
 #: src/settings/sources.js:49
@@ -668,8 +664,8 @@ msgstr "Πολύ πλατύ για τον χάρακα."
 
 #: src/blocks/spacer/block.json
 msgctxt "block title"
-msgid "Spacery"
-msgstr ""
+msgid "Responsive Spacer"
+msgstr "Αποκρίσιμο Κενό"
 
 #: src/blocks/spacer/block.json
 msgctxt "block description"
@@ -701,3 +697,8 @@ msgstr "απόσταση"
 msgctxt "block keyword"
 msgid "breakpoint"
 msgstr "σημείο διακοπής"
+
+#: src/blocks/spacer/block.json
+msgctxt "block keyword"
+msgid "spacery"
+msgstr ""

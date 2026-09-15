@@ -12,8 +12,8 @@ WordPress, which no generator can supply.
 
 ## 1. What Spacery is
 
-A WordPress plugin that adds **responsive spacing** — padding and margin that
-change at breakpoints — to any block in the editor.
+A WordPress plugin that adds **responsive block controls** — padding and margin
+that change at breakpoints — to any block in the editor.
 
 WordPress 7.1 added responsive block styles with exactly two breakpoints, mobile
 and tablet. Spacery gives a site as many as its design system has, from its
@@ -53,7 +53,7 @@ Poppins — Bold for the wordmark, Light for the tagline. Geometric, close to th
 editor's own feel without imitating it. Any humanist geometric sans is an
 acceptable substitute; the wordmark is set in title case as **Spacery**.
 
-Tagline: *Responsive spacing for every block*
+Tagline: *Responsive controls for every block*
 
 ### The mark
 
@@ -176,7 +176,7 @@ scheme left at default. Crop to the relevant region rather than shipping a full
 desktop screenshot — the directory renders these fairly small.
 
 **Screenshot 1 — the panel doing its job.** A Group block selected in the post
-editor, inspector open, the **Responsive spacing** panel expanded. The canvas
+editor, inspector open, the **Spacery** panel expanded. The canvas
 should be narrow enough that the panel header names a tier and its boundary —
 it reads `Laptop · ≤1024px` or similar. At least one padding field filled in, at
 least one left blank so the inherited placeholder shows. This is the one

@@ -63,8 +63,8 @@
 			"Covers": [
 				"Καλύπτει"
 			],
-			"Spacing saved under %s will stop applying. To rename it, change the name and leave the slug alone.": [
-				"Τα κενά που αποθηκεύτηκαν με το %s θα πάψουν να ισχύουν. Για μετονομασία, αλλάξτε το όνομα και αφήστε το slug ως έχει."
+			"Values saved under %s will stop applying. To rename it, change the name and leave the slug alone.": [
+				"Οι τιμές που αποθηκεύτηκαν με το %s θα πάψουν να ισχύουν. Για μετονομασία, αλλάξτε το όνομα και αφήστε το slug ως έχει."
 			],
 			"Remove %s": [
 				"Αφαίρεση %s"
@@ -181,8 +181,8 @@
 			"Loading your breakpoints…": [
 				"Φόρτωση των σημείων διακοπής σας…"
 			],
-			"Responsive padding and margin for any block that supports spacing.": [
-				"Αποκρίσιμο εσωτερικό και εξωτερικό περιθώριο για κάθε μπλοκ που υποστηρίζει κενά."
+			"Responsive block controls, at the breakpoints you choose.": [
+				"Αποκρίσιμα στοιχεία ελέγχου μπλοκ, στα σημεία διακοπής που επιλέγετε."
 			],
 			"Only one source applies at a time — Spacery never merges two sets.": [
 				"Ισχύει μία πηγή κάθε φορά — το Spacery δεν συγχωνεύει ποτέ δύο σύνολα."
@@ -205,11 +205,11 @@
 			"Delete my settings when Spacery is deleted": [
 				"Να διαγραφούν οι ρυθμίσεις μου όταν διαγραφεί το Spacery"
 			],
-			"Your breakpoints go too. Spacing on your blocks stays, but a future install may apply it at different widths.": [
-				"Φεύγουν και τα σημεία διακοπής σας. Τα κενά στα μπλοκ σας παραμένουν, αλλά μια μελλοντική εγκατάσταση μπορεί να τα εφαρμόσει σε άλλα πλάτη."
+			"Your breakpoints go too. Values on your blocks stay, but a future install may apply them at different widths.": [
+				"Φεύγουν και τα σημεία διακοπής σας. Οι τιμές στα μπλοκ σας παραμένουν, αλλά μια μελλοντική εγκατάσταση μπορεί να τις εφαρμόσει σε άλλα πλάτη."
 			],
-			"Your breakpoints are kept, so reinstalling leaves your spacing exactly as it is.": [
-				"Τα σημεία διακοπής σας διατηρούνται, οπότε μια επανεγκατάσταση αφήνει τα κενά σας ακριβώς όπως είναι."
+			"Your breakpoints are kept, so reinstalling leaves your values exactly as they are.": [
+				"Τα σημεία διακοπής σας διατηρούνται, οπότε μια επανεγκατάσταση αφήνει τις τιμές σας ακριβώς όπως είναι."
 			],
 			"Save changes": [
 				"Αποθήκευση αλλαγών"
@@ -248,11 +248,8 @@
 			"Leaving %s to WordPress: no Spacery breakpoint covers the same widths.": [
 				"Το %s παραμένει στο WordPress: κανένα σημείο διακοπής του Spacery δεν καλύπτει τα ίδια πλάτη."
 			],
-			"Responsive spacing": [
-				"Αποκρίσιμα κενά"
-			],
-			"Responsive spacing — this block has responsive values": [
-				"Αποκρίσιμα κενά — αυτό το μπλοκ έχει αποκρίσιμες τιμές"
+			"Spacery — this block has responsive values": [
+				"Spacery — αυτό το μπλοκ έχει αποκρίσιμες τιμές"
 			],
 			"this block's own spacing": [
 				"τα ίδια τα κενά αυτού του μπλοκ"
@@ -275,8 +272,8 @@
 			"The widest band runs to %s and is cut short here.": [
 				"Η πλατύτερη ζώνη φτάνει έως %s και κόβεται εδώ."
 			],
-			"Screens wider than %s match no breakpoint, so blocks use their ordinary spacing. Raise the widest breakpoint to cover them.": [
-				"Οθόνες πλατύτερες από %s δεν αντιστοιχούν σε κανένα σημείο διακοπής, οπότε τα μπλοκ χρησιμοποιούν τα συνηθισμένα τους κενά. Αυξήστε το πλατύτερο σημείο διακοπής για να τις καλύψετε."
+			"Screens wider than %s match no breakpoint, so blocks use their ordinary values. Raise the widest breakpoint to cover them.": [
+				"Οθόνες πλατύτερες από %s δεν αντιστοιχούν σε κανένα σημείο διακοπής, οπότε τα μπλοκ χρησιμοποιούν τις συνηθισμένες τους τιμές. Αυξήστε το πλατύτερο σημείο διακοπής για να τις καλύψετε."
 			],
 			"%1$s · ≤%2$s": [
 				"%1$s · ≤%2$s"
