@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spacery 1.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/moustakalis/spacery/issues\n"
-"POT-Creation-Date: 2026-09-15T12:01:36+00:00\n"
+"POT-Creation-Date: 2026-09-15T12:17:58+00:00\n"
 "PO-Revision-Date: 2026-09-12T15:17:59+00:00\n"
 "Last-Translator: Nickos Moustakas\n"
 "Language-Team: Greek\n"
@@ -16,7 +16,7 @@ msgstr ""
 #. Plugin Name of the plugin
 #: spacery.php includes/Settings/Screen.php:115
 #: includes/Settings/Screen.php:116 src/extension/register.js:77
-#: src/extension/register.js:80 src/settings/Brand.js:65
+#: src/extension/register.js:80 src/settings/Brand.js:89
 msgid "Spacery"
 msgstr ""
 
@@ -309,10 +309,6 @@ msgstr ""
 msgid "Loading your breakpoints…"
 msgstr "Φόρτωση των σημείων διακοπής σας…"
 
-#: src/settings/App.js:175
-msgid "Responsive controls at your breakpoints"
-msgstr "Αποκρίσιμα στοιχεία ελέγχου στα σημεία διακοπής σας"
-
 #: src/settings/App.js:189
 msgid "Only one source applies at a time — Spacery never merges two sets."
 msgstr "Ισχύει μία πηγή κάθε φορά — το Spacery δεν συγχωνεύει ποτέ δύο σύνολα."
@@ -420,15 +416,15 @@ msgid "Nothing — no screens left"
 msgstr "Τίποτα — δεν μένει καμία οθόνη"
 
 #. translators: %s: the plugin version.
-#: src/settings/Brand.js:89
+#: src/settings/Brand.js:113
 msgid "Spacery %s"
 msgstr "Spacery %s"
 
-#: src/settings/Brand.js:89
+#: src/settings/Brand.js:113
 msgid "Documentation"
 msgstr "Τεκμηρίωση"
 
-#: src/settings/Brand.js:89
+#: src/settings/Brand.js:113
 msgid "Support"
 msgstr "Υποστήριξη"
 

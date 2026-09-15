@@ -20,7 +20,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from 'react';
 
 import { coverage } from './bands';
-import { Footer, Masthead } from './Brand';
+import { Footer, Masthead, Tagline } from './Brand';
 import { BreakpointRows } from './BreakpointRows';
 import { Ruler } from './Ruler';
 import { fetchInfo, fetchSettings, saveSettings, wasAccepted } from './data';
@@ -258,12 +258,7 @@ export function App(): React.ReactElement {
 		<Flex direction="column" gap={5}>
 			<FlexItem>
 				<Masthead />
-				<Text variant="muted">
-					{__(
-						'Responsive controls at your breakpoints',
-						'spacery'
-					)}
-				</Text>
+				<Tagline />
 			</FlexItem>
 
 			<StatusNotice

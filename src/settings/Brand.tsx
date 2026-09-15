@@ -1,11 +1,14 @@
 /**
- * Spacery's mark, and the two places the settings screen wears it.
+ * Spacery's mark, the two places the settings screen wears it, and the tagline.
  *
  * Twice per screen, both at interface scale (design system §5.5). The header
  * tile is the page's only dark surface, which is the ground the accent was
  * drawn for; the footer is one flat tone, because at 18px a second value reads
  * as blur rather than depth. Nothing else on the screen is branded, and nothing
  * on a screen Spacery does not own is branded at all.
+ *
+ * The tagline is here rather than in `App` because it is brand, not copy, and
+ * the one string on this screen that does not go through `__()`.
  */
 
 import {
@@ -90,6 +93,28 @@ export function Mark({
  *
  * @return The masthead.
  */
+/**
+ * The tagline. Deliberately **not** translatable.
+ *
+ * The WP.org banners carry this same line as artwork, where no translator can
+ * reach it. Translate it here and the screen disagrees with the picture of
+ * itself in the directory. A tagline is part of the mark, like the name, and a
+ * mark is one thing in every language.
+ *
+ * So it is a bare literal, not an `__()` call, and that is the enforcement:
+ * anything in the POT reaches translate.wordpress.org, where it will be
+ * translated by someone acting in good faith and cannot be asked back. Keeping
+ * it out of the POT is the only way to mean this.
+ *
+ * `readme.txt` states the exception, because the FAQ next to it promises every
+ * string is translatable.
+ *
+ * @return The line under the masthead.
+ */
+export function Tagline(): React.ReactElement {
+	return <Text variant="muted">Responsive controls at your breakpoints</Text>;
+}
+
 export function Masthead(): React.ReactElement {
 	const { version } = getScreenData();
 

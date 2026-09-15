@@ -85,8 +85,10 @@ second implementation would drift from the first.
 
 = Is it translated? =
 
-Spacery ships a Greek translation and a POT file. Every string in the plugin, including
-those in the editor, is translatable.
+Spacery ships a Greek translation and a POT file. Every string in the plugin is
+translatable, in the editor as well as on the settings screen. There is one exception:
+the tagline under the plugin's name is part of the brand, like the name itself, and stays
+as it is in every language — the same line the banner carries, where it is artwork.
 
 = Where are my settings stored? =
 
