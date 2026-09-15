@@ -181,7 +181,16 @@ Ramp runs narrow → wide, dark → light: `#142269`, `#1f3399`, `#2c46c9`,
 than `#3858e9`**, which is 5.6:1 against white and the lightest step holding the
 4.5:1 floor for 12px white labels.
 
-- Segments separated by a 2px white gap, not a border.
+- Segments separated by a 2px white **border drawn inside the band**
+  (`border-box`), never a flex `gap`. A gap is added to the row on top of the
+  bands' widths: four of them made the strip 100% + 8px, flex shrank every band
+  to fit, and each boundary landed 1–3px left of the width it names. A ruler
+  whose bands are not proportional is not a ruler.
+- **The tick mark sits on the boundary; the label centres under the mark.** The
+  tick's box is zero-width, so neither can be displaced by the length of its own
+  text. Centring the whole group instead puts the mark half a label-width early
+  — measured at 16.8px on a `480px` tick and 19.2px on `1280px`, which reads as
+  the coloured bar being bigger than the number naming it.
 - Uncovered region is hatched, never coloured, labelled `no tier`.
 - Positions are pixel-derived (em/rem × 16); labels keep the author's units.
 - Axis maximum is widest × 1.15, **clamped at 2560px**; beyond that draws as a

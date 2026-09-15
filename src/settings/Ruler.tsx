@@ -189,9 +189,6 @@ export function Ruler({
 					aria-label={described(tiers)}
 					style={{
 						display: 'flex',
-						// A white gap, not a border: a border would add width
-						// to every band and lie about the proportions.
-						gap: '2px',
 						height: `${HEIGHT}px`,
 						borderRadius: '2px',
 						overflow: 'hidden',
@@ -207,6 +204,22 @@ export function Ruler({
 								overflow: 'hidden',
 								whiteSpace: 'nowrap',
 								padding: '0 8px',
+								/*
+								 * The separator is drawn *inside* the band,
+								 * which is the whole point of `border-box`
+								 * here. `gap: 2px` was the previous answer and
+								 * its comment claimed a border "would add width
+								 * to every band and lie about the
+								 * proportions" -- the gap did exactly that.
+								 * Four gaps made the row 100% + 8px, flex shrank
+								 * every band to fit, and each boundary landed
+								 * 1 to 3px left of the width it names.
+								 * Measured before and after.
+								 */
+								borderRight:
+									index === segments.length - 1
+										? undefined
+										: '2px solid #ffffff',
 								boxSizing: 'border-box',
 								fontSize: '12px',
 								fontWeight: 600,
@@ -245,11 +258,28 @@ export function Ruler({
 								top: 0,
 								display: 'flex',
 								flexDirection: 'column',
-								alignItems: 'flex-start',
-								// The first mark starts the axis; the rest sit
-								// centred on the boundary they name.
-								transform:
-									0 === tick.at ? 'none' : 'translateX(-50%)',
+								/*
+								 * **Zero width, so the mark lands on the
+								 * boundary and the label centres under it.**
+								 *
+								 * This used to be a `translateX(-50%)` on the
+								 * whole group with the mark at its left edge,
+								 * which centres the *label* on the boundary and
+								 * puts the **mark half a label-width early**.
+								 * Measured: 16.8px at `480px`, 19.2px at
+								 * `1280px` -- always exactly half that tick's
+								 * label. The bar looked bigger than the number
+								 * it was named by, which is how it was
+								 * reported.
+								 *
+								 * A zero-width box cannot be moved by the
+								 * length of its own text, so both children
+								 * overflow it symmetrically and the 1px mark
+								 * sits on the boundary.
+								 */
+								width: 0,
+								alignItems:
+									0 === tick.at ? 'flex-start' : 'center',
 							}}
 						>
 							<div
@@ -264,6 +294,9 @@ export function Ruler({
 									fontSize: '11px',
 									color: '#646464',
 									marginTop: '2px',
+									// The box is 0 wide, so the label has to be
+									// told not to wrap into a column of glyphs.
+									whiteSpace: 'nowrap',
 								}}
 							>
 								{tick.label}
