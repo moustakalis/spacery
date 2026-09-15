@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spacery 1.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/moustakalis/spacery/issues\n"
-"POT-Creation-Date: 2026-09-15T13:50:20+00:00\n"
+"POT-Creation-Date: 2026-09-15T15:23:30+00:00\n"
 "PO-Revision-Date: 2026-09-12T15:17:59+00:00\n"
 "Last-Translator: Nickos Moustakas\n"
 "Language-Team: Greek\n"
@@ -15,8 +15,8 @@ msgstr ""
 
 #. Plugin Name of the plugin
 #: spacery.php includes/Settings/Screen.php:115
-#: includes/Settings/Screen.php:116 src/extension/register.js:77
-#: src/extension/register.js:80 src/settings/Brand.js:89
+#: includes/Settings/Screen.php:116 src/extension/register.js:79
+#: src/extension/register.js:82 src/settings/Brand.js:89
 msgid "Spacery"
 msgstr ""
 
@@ -209,7 +209,7 @@ msgstr "Κληρονομείται από %1$s και %2$s"
 msgid "Inherited from %d different places"
 msgstr "Κληρονομείται από %d διαφορετικά σημεία"
 
-#: src/extension/register.js:79
+#: src/extension/register.js:81
 msgid "Spacery — this block has responsive values"
 msgstr "Spacery — αυτό το μπλοκ έχει αποκρίσιμες τιμές"
 
