@@ -24,6 +24,40 @@ geometry and antialiasing — so it was removed rather than repaired. The files
 in the table are the artwork; `asset-brief.md` section 2 is the specification
 they answer to. Run `python3 bin/check-release.py` after copying them in.
 
+## The banner tagline, and how to change it again
+
+D33 changed the tagline to *Responsive controls for every block*, and the
+banners were the last surface still carrying the old one. **They were amended
+in place rather than redrawn**, because redrawing the mark is exactly what
+`make-assets.py` got wrong. The tagline band is the only part of either banner
+that changed — verified by comparing every pixel of the before and after:
+**zero differ outside the band.**
+
+The type was recovered by measurement rather than guessed, and it is written
+down here so the next change is cheap:
+
+| | |
+|---|---|
+| Face | Poppins, weight 300 (Light) |
+| Size / tracking | `21px` / `letter-spacing: 0.1px` |
+| Colour | `rgb(168, 163, 200)` |
+| Ink left edge | `x = 269` — flush with the `S` of the wordmark |
+| Ink top | `y = 151`; descenders reach 173 |
+| 1544 × 500 | **the same CSS**, captured at `deviceScaleFactor: 2` — not 42px at 1× |
+
+**The background needs no reconstruction.** Both banners are a pure vertical
+gradient: every row is one colour from edge to edge (checked at every 64th
+pixel across several rows), so masking the band means filling each row with the
+colour already at `x = 2` on that row.
+
+**Verify by reproducing the old line first.** Render the *previous* tagline with
+the settings above, composite it over the masked band, and compare with the
+untouched original — RMS **18.5** at 772 and **15.4** at 1544, against **44.4**
+and **45.3** for a band left blank. That is what pins the size and tracking;
+searching on RMS alone does not, and picked a 400 weight that is visibly heavier
+when the two are put side by side. **Look at the two lines at 3× before
+believing a number.**
+
 ## readme.txt — paste after `== Description ==`
 
 ```
