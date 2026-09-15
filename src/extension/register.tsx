@@ -9,13 +9,15 @@
  * attribute reach core's blocks at all.
  */
 
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useStyleOverride } from '@wordpress/block-editor';
 import { PanelBody } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
 import { extendsBlock, isExtendable } from './extendable';
+import { getSpacerySettings } from '../breakpoints/settings';
+import { previewCss } from './preview';
 import {
 	type ExtendedAttributes,
 	SpacingPanel,
@@ -165,8 +167,94 @@ const withSpacingPanel = createHigherOrderComponent(
 	'withSpacerySpacingPanel'
 );
 
+/** What `editor.BlockListBlock` hands a block in the canvas. */
+interface BlockListProps {
+	clientId: string;
+	name: string;
+	attributes: ExtendedAttributes;
+	className?: string;
+}
+
 /**
- * Registers both filters. Called once, from the bundle's entry point.
+ * The class the preview's rules are written against.
+ *
+ * Derived from the `clientId`, not from the content, and that is the one place
+ * this deliberately differs from the front end. `Generator` hashes the values
+ * so that many blocks sharing a recipe share one rule; here there is exactly
+ * one style override per block by construction, so there is nothing to dedupe
+ * and no reason to port `md5` into the editor. Client ids are regenerated on
+ * every editor load, which costs nothing for CSS that never leaves it.
+ *
+ * Twelve characters to match `Generator::HASH_LENGTH`, so the two read alike in
+ * devtools.
+ *
+ * @param clientId The block's client id.
+ * @return A class name.
+ */
+function previewClass(clientId: string): string {
+	return `spy-${clientId.replace(/-/g, '').slice(0, 12)}`;
+}
+
+/**
+ * Shows a block's responsive values in the canvas.
+ *
+ * **Without this the plugin appears not to work.** Core previews its own
+ * responsive spacing in the same canvas, so an author who sets a core `@tablet`
+ * value watches it take effect and then watches a Spacery value do nothing, on
+ * the same block in the same session. `PLAN.md` §3.3 specified this and M4
+ * recorded it as verified; neither was true until now.
+ *
+ * `useStyleOverride` is core's own mechanism and is public in 7.1. Measured on
+ * the live editor: the element lands in the canvas iframe's `<body>`
+ * immediately after core's own block-support style, so Spacery's rules win the
+ * source-order tie between two `!important` declarations at equal specificity
+ * -- the same way they win on the front end. Nothing here raises specificity,
+ * because nothing has to.
+ *
+ * The hook is called for **every** block, including the ones Spacery does not
+ * extend. That is the rules of hooks, and it is free: an empty `css` renders no
+ * element at all, measured.
+ */
+const withSpacingPreview = createHigherOrderComponent(
+	(BlockListBlock: React.ComponentType<BlockListProps>) =>
+		function SpaceryBlockListBlock(props: BlockListProps) {
+			const className = previewClass(props.clientId);
+
+			/*
+			 * `extendsBlock()` rather than a check for the attribute alone, so
+			 * the gate is the same one the panel uses. `spacery/spacer` carries
+			 * a `spacery` attribute of its own and previews its height through
+			 * its own `edit.tsx`; styling it here would give the one block that
+			 * already has a preview a second one.
+			 */
+			const css = extendsBlock(props.name)
+				? previewCss(
+						props.attributes?.spacery,
+						getSpacerySettings().breakpoints,
+						className
+					)
+				: '';
+
+			useStyleOverride({ id: `spacery-${props.clientId}`, css });
+
+			if ('' === css) {
+				return <BlockListBlock {...props} />;
+			}
+
+			return (
+				<BlockListBlock
+					{...props}
+					className={[props.className, className]
+						.filter(Boolean)
+						.join(' ')}
+				/>
+			);
+		},
+	'withSpacerySpacingPreview'
+);
+
+/**
+ * Registers the filters. Called once, from the bundle's entry point.
  */
 export function register(): void {
 	addFilter(
@@ -176,4 +264,10 @@ export function register(): void {
 	);
 
 	addFilter('editor.BlockEdit', `${NAMESPACE}/panel`, withSpacingPanel);
+
+	addFilter(
+		'editor.BlockListBlock',
+		`${NAMESPACE}/preview`,
+		withSpacingPreview
+	);
 }

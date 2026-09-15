@@ -291,6 +291,140 @@ test.describe('spacing extension', () => {
 				`@media (width <= 480px){.spy-HASH{padding-top:${TAKEN} !important;}}`
 		);
 	});
+
+	/**
+	 * M4's exit criterion, asserted for the first time.
+	 *
+	 * M4 has recorded the editor preview as "verified by an E2E test that
+	 * screenshots both" since it was written, and `preview-spike.md` found in
+	 * September that neither the preview nor the test existed. This is the test,
+	 * and it compares values rather than pixels: a screenshot of two canvases
+	 * proves they look alike, which is not the claim. The claim is that the rule
+	 * the author is shown is the rule the visitor gets.
+	 *
+	 * The canvas is narrowed by resizing `.block-editor-iframe__scale-container`
+	 * **and** the iframe. Setting the iframe's own width alone does nothing --
+	 * the container's computed width wins -- and the failure is silent, because
+	 * every measurement then reports the wide value as though it were the narrow
+	 * one. `contentWindow.innerWidth` is asserted before anything is read.
+	 */
+	test('shows in the canvas what the page will render', async ({
+		editor,
+		page,
+	}) => {
+		const TIER = 'tablet';
+		const AT_TIER = '44px';
+
+		await editor.insertBlock({
+			name: 'core/group',
+			attributes: {
+				style: { spacing: { padding: { top: BASE } } },
+				spacery: { [TIER]: { spacing: { padding: { top: AT_TIER } } } },
+			},
+		});
+
+		const canvas = page.frameLocator('[name="editor-canvas"]');
+		const block = canvas.locator('[data-type="core/group"]').first();
+
+		await expect(block).toBeVisible();
+
+		/* Above every band, the block keeps core's base value and nothing else. */
+		await expect
+			.poll(async () =>
+				block.evaluate((node) => getComputedStyle(node).paddingTop)
+			)
+			.toBe(BASE);
+
+		const narrowed = await page.evaluate(() => {
+			const iframe = document.querySelector<HTMLIFrameElement>(
+				'iframe[name="editor-canvas"]'
+			);
+
+			if (!iframe?.parentElement) {
+				return 0;
+			}
+
+			iframe.parentElement.style.setProperty(
+				'width',
+				'700px',
+				'important'
+			);
+			iframe.style.setProperty('width', '700px', 'important');
+
+			return iframe.contentWindow?.innerWidth ?? 0;
+		});
+
+		expect(narrowed).toBe(700);
+
+		/* Inside the band, Spacery's value -- beating core's inline base. */
+		await expect
+			.poll(async () =>
+				block.evaluate((node) => getComputedStyle(node).paddingTop)
+			)
+			.toBe(AT_TIER);
+
+		const postId = await editor.publishPost();
+
+		expect(postId).not.toBeNull();
+
+		await page.goto(`/?p=${postId}`);
+
+		const html = await page.content();
+		const sheets = styleSheets(html).filter((sheet) =>
+			sheet.css.includes(`padding-top:${AT_TIER}`)
+		);
+
+		/*
+		 * The same value, from the same plugin's stylesheet, in a band that covers
+		 * the width the canvas was showing. Two bands, because a value at `tablet`
+		 * reaches `mobile` too -- the cascade the server materializes, and the same
+		 * two bands the preview emitted.
+		 */
+		expect(sheets.map((sheet) => sheet.id)).toEqual([SPACERY_STYLESHEET]);
+		expect(sheets[0]!.css).toContain('width <= 782px');
+		expect(sheets[0]!.css).toContain('width <= 480px');
+	});
+
+	/**
+	 * The allowlist, from both ends at once.
+	 *
+	 * `wp.styleEngine.getCSSRules()` passes a string through exactly as
+	 * `wp_style_engine_get_styles()` does, so without `isValue()` the canvas would
+	 * show a value the page then drops -- the divergence a preview exists to
+	 * remove. Asserted in the canvas *and* on the page, because either half alone
+	 * would pass with the guard on only one side.
+	 */
+	test('refuses a value in the canvas that the page would refuse', async ({
+		editor,
+		page,
+	}) => {
+		await editor.insertBlock({
+			name: 'core/group',
+			attributes: {
+				style: { spacing: { padding: { top: BASE } } },
+				spacery: {
+					tablet: { spacing: { padding: { top: '10px;color:red' } } },
+				},
+			},
+		});
+
+		const canvas = page.frameLocator('[name="editor-canvas"]');
+		const block = canvas.locator('[data-type="core/group"]').first();
+
+		await expect(block).toBeVisible();
+
+		await expect
+			.poll(async () =>
+				block.evaluate((node) => getComputedStyle(node).color)
+			)
+			.not.toBe('rgb(255, 0, 0)');
+
+		const postId = await editor.publishPost();
+
+		await page.goto(`/?p=${postId}`);
+
+		expect(await page.content()).not.toContain('color:red');
+	});
 });
 
 /**

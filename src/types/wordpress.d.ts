@@ -159,6 +159,18 @@ declare module '@wordpress/block-editor' {
 		group?: 'settings' | 'styles' | 'advanced';
 	}>;
 
+	/**
+	 * Injects a stylesheet into the editor canvas, iframe and all.
+	 *
+	 * Public in 7.1, and the signature really is one destructured argument --
+	 * read off the shipped function rather than assumed. An empty `css`
+	 * renders no element, which is what lets it be called unconditionally.
+	 * @param style
+	 * @param style.id
+	 * @param style.css
+	 */
+	export function useStyleOverride(style: { id: string; css: string }): void;
+
 	/** The block editor data store. */
 	export const store: unknown;
 }
@@ -433,4 +445,43 @@ declare module '@wordpress/components' {
 		upperCase?: boolean;
 		children?: React.ReactNode;
 	}>;
+}
+
+/**
+ * `@wordpress/style-engine`, the JavaScript build of the engine
+ * `wp_style_engine_get_styles()` runs on the server.
+ *
+ * Declared here for the same reason everything else in this file is: the
+ * package is not in `node_modules`, it is a global the editor publishes
+ * (`wp.styleEngine`, script handle `wp-style-engine`). The extraction plugin
+ * maps the import to that global and adds the handle to
+ * `build/extension.asset.php`, so importing it is also how the dependency is
+ * declared.
+ *
+ * **`key` is camelCase.** `getCSSRules()` returns one entry per declaration
+ * with `paddingTop`, not `padding-top` -- written down because a camelCase
+ * property inside a stylesheet is silently ignored rather than reported, and
+ * this declaration is the only place a reader would find out. Measured against
+ * the shipped 7.1 build.
+ * @param style
+ * @param options
+ * @param options.selector
+ */
+declare module '@wordpress/style-engine' {
+	interface StyleRule {
+		selector: string;
+		/** The CSS property, camelCased. */
+		key: string;
+		value: string;
+	}
+
+	export function getCSSRules(
+		style: Record<string, unknown>,
+		options?: { selector?: string }
+	): StyleRule[];
+
+	export function compileCSS(
+		style: Record<string, unknown>,
+		options?: { selector?: string }
+	): string;
 }

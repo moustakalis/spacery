@@ -376,7 +376,7 @@ Any block with spacing support — Group, Cover, Columns, a Paragraph.
       `Mobile`), read off `aria-label`; the visible tooltip comes from the same
       `label` prop but was confirmed as the accessible name rather than by
       hovering for a screenshot.
-- [~] Set a value at the widest tier, then a different one at a narrower tier.
+- [x] Set a value at the widest tier, then a different one at a narrower tier.
       The narrower one must win in the editor preview *and* on the front end.
       **Front end: passes.** With `widescreen 1400`/`desktop 1250`/`laptop
       1000`/`handheld 500` and a block carrying `widescreen: 10px` and
@@ -384,37 +384,36 @@ Any block with spacing support — Group, Cover, Columns, a Paragraph.
       `(1000 < w <= 1250) => 10px`, `(500 < w <= 1000) => 40px`,
       `(w <= 500) => 40px`. The narrower value wins in its own band and
       inherits downward; it never reaches the wider ones.
-      **Editor preview: cannot pass — there is no preview.** See the note below.
-- [~] Set a value at a middle tier only. Narrower tiers should inherit it; wider
+      **Editor preview: passes, 15 September (D36).** Re-run against the site's
+      own eight-tier set with `br-11: 10px` and `br-7: 40px` over a base of
+      `5px`, reading the computed value in the canvas at four widths:
+      **1700px → 10px** (the `br-11` band), **900px → 40px** (the `br-7` band,
+      the narrower value winning), **600px → 40px** (inherited downward), and
+      **2200px → 5px** — the base, because `10px` never reaches a wider band.
+- [x] Set a value at a middle tier only. Narrower tiers should inherit it; wider
       ones should not. **Front end: passes.** A block carrying only
       `laptop: 20px` emits `(500 < w <= 1000) => 20px` and `(w <= 500) => 20px`
       and *nothing at all* in the two wider bands. Confirmed a second time by
       Group A, whose `desktop`-only preset value starts at the desktop band and
-      is absent from `widescreen`. **Editor preview: same blocker.**
+      is absent from `widescreen`. **Editor preview: passes, 15 September
+      (D36).** A Group carrying only `br-6: 44px` over a base of `11px` emits
+      exactly two bands in the canvas — `br-6` and `br-5` — and the computed
+      value reads `44px` at 700px and at 400px, `11px` at 1222px.
 
-> **⚠ The spacing extension has no editor preview at all.** Found on
-> 14 September while trying to check the "editor preview" half of the two boxes
-> above. Setting a Spacery value changes nothing in the canvas: there is no
-> `spy-` class and no Spacery `<style>` anywhere in the editor iframe, and
-> `Group B`'s `30rem` appears nowhere in that document. The cause is not a bug
-> in built code — **the code was never written.** `src/extension/register.tsx`
-> registers exactly two filters, `blocks.registerBlockType` (the attribute) and
-> `editor.BlockEdit` (the panel). There is no `editor.BlockListBlock` filter, no
-> portal, no `useStyleOverride`, and PHP enqueues only the editor *scripts*.
-> `PLAN.md` §3.3 specifies exactly this ("render a `<style>` element from the
-> `editor.BlockListBlock` HOC alongside the block") and M4's exit criterion
-> claims "the preview matches the frontend at every tier, verified by an E2E
-> test that screenshots both" — `extension.spec.ts` has no such test.
+> **The two boxes above were blocked for a day, and the blocker is worth
+> keeping.** On 14 September, trying to check their "editor preview" half found
+> that **there was no preview** — `register.tsx` had exactly two filters, and
+> `PLAN.md` §3.3 plus M4's exit criterion had both been claiming otherwise since
+> they were written. It was not a bug in built code; the code was never written.
 >
 > **Why it went unnoticed:** the *spacer block* does preview. Its `edit.tsx`
-> calls `useCanvasBreakpoint()`, resolves `heightAt()` for the canvas tier and
-> puts the result on `useBlockProps` as an inline height, and `spacer.spec.ts`
-> tests it. So the half of the plugin with a preview is the half that is tested,
-> and the half without one is the half nothing looks at.
+> resolves `heightAt()` for the canvas tier and applies it through
+> `useBlockProps`, and `spacer.spec.ts` tests it. The half of the plugin with a
+> preview was the half that was tested, and the half without one was the half
+> nothing looked at.
 >
-> This is a release-scope decision, not a checkbox: ship 1.0 with the panel as
-> a values editor and say so plainly, or build the injection first. Until it is
-> settled, both boxes above stay `[~]`.
+> Spiked the same day (`preview-spike.md`), built on 15 September (D36), and
+> both boxes now pass on both halves. The E2E test M4 claimed exists does now.
 - [x] Reset one box. Only that property clears, and its fields fall back to the
       inherited values rather than to zero. On a Group at `tablet` holding
       `padding.top` and `margin.top`, clicking **Reset Padding** left

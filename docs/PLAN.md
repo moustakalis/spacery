@@ -337,47 +337,24 @@ marks the handle done before the capture runs and strands the CSS in the footer.
 first implementation did exactly that, and the investigation into "should this be in the
 head?" is what found it.
 
-**Editor — same rules, injected into the iframe. NOT BUILT — see the warning below.**
+**Editor — the same rules, through core's own style override. BUILT, D36.**
 Since 7.1 the post editor is *always* iframed regardless of block API version, so styles
-must land in the iframe document. Start simple: render a `<style>` element from the
-`editor.BlockListBlock` HOC alongside the block. Because the block renders inside the
-iframe, the style element lands there automatically, and content-addressed classes make
-duplicates idempotent. Optimize to a single portal-injected stylesheet in the iframe head
-only if profiling on a large post says it matters.
+must land in the iframe document, and `useStyleOverride( { id, css } )` — public in 7.1 —
+is how core does that for its own block-support styles. The `editor.BlockListBlock` HOC
+calls it with the bands `preview.ts` builds, and adds a `clientId`-derived class to the
+block.
 
-> **⚠ This paragraph describes work that was never done, and this document has
-> been claiming otherwise.** Found 14 September 2026 while running
-> `MANUAL-TESTING.md` §2. `src/extension/register.tsx` registers exactly two
-> filters — `blocks.registerBlockType` for the attribute and `editor.BlockEdit`
-> for the panel. There is no `editor.BlockListBlock` filter, no portal, no
-> `useStyleOverride`, and PHP enqueues only the editor scripts. Checked in the
-> live editor: no `spy-` class and no Spacery `<style>` exists anywhere in the
-> canvas iframe, and a block's `30rem` value appears nowhere in that document.
-> **Setting responsive spacing changes nothing the author can see until they
-> preview or publish.**
->
-> The *spacer block* is unaffected and does preview correctly — `edit.tsx`
-> resolves `heightAt()` for the canvas tier and applies it through
-> `useBlockProps`. That asymmetry is why this survived: the half with a preview
-> is the half `spacer.spec.ts` tests.
->
-> **Spiked, same day — see [`preview-spike.md`](preview-spike.md).** The reason
-> it was never built (CSS generation in JS means two sources of truth) turns out
-> to hold for one 49-line function rather than for the pipeline:
-> `@wordpress/style-engine` is available in the editor as the registered handle
-> `wp-style-engine` and is the *same* engine, resolving
-> `var:preset|spacing|50` identically; `effectiveAt()` in
-> `src/attribute/tiers.ts` already does D13's materialization and is already
-> tested; and the band list is already published to JS. The one genuine
-> duplicate is `Generator::is_value()`, because the JS engine passes
-> `10px;color:red` straight through exactly as the PHP one did — and D19 already
-> settled that case (reimplement the shape in TS, assert against the same table,
-> here `GeneratorTest`'s 38 cases). Core previews its own responsive spacing by
-> injecting `@media (480px < width <= 782px)` into the canvas, measured, so the
-> §3.3 mechanism above is what the platform itself does and the media query
-> evaluates against the canvas width for free. **Recommendation: build it before
-> submitting.** Nothing else in the design depends on the answer — the data
-> model, the generator and the front-end cascade are all unaffected.
+The class is **not** content-addressed here, and that is the one deliberate difference
+from the front end: the hash exists on the server to share one rule between blocks with
+the same recipe, while the editor has one style override per block by construction and
+nothing to dedupe.
+
+Measured on the live editor rather than assumed: the override lands in the canvas iframe's
+`<body>` immediately after core's own block-support style, so between two `!important`
+declarations at equal specificity **source order gives it to Spacery** — the same way the
+front end wins. Nothing raises specificity, because nothing has to. An empty `css` renders
+no element, so the hook is called for every block, as the rules of hooks require, at no
+cost.
 
 ### 3.3a Coexisting with core's responsive styles
 
@@ -640,12 +617,14 @@ validation error. This is shippable as a standalone release if the toolkit slips
 selector for when `responsiveEditingEnabled` is false.
 *Exit:* dragging the canvas to 900px puts Spacery on the `laptop` tier while core's badge
 still reads Desktop, and the panel says so unambiguously. The preview matches the frontend
-at every tier, verified by an E2E test that screenshots both.
-*Not actually met, discovered 14 September 2026.* The tier-naming half is real and
-`spacer.spec.ts` tests it. The preview half was never built for the spacing extension and
-no E2E test screenshots anything — `extension.spec.ts` covers the panel's presence, a
-block without spacing support, deactivation safety and the takeover. See the warning in
-§3.3.
+at every tier, verified by an E2E test.
+*Met 15 September 2026, and the gap is worth recording.* This criterion claimed the
+preview was verified for four months while neither the preview nor the test existed —
+found by running `MANUAL-TESTING.md` §2, spiked in `preview-spike.md`, built in D36. The
+test compares **values**, not screenshots: it reads the computed value in the canvas at a
+narrowed viewport and the emitted rule on the published page, because two canvases that
+look alike is not the claim. The claim is that the rule the author is shown is the rule
+the visitor gets.
 
 **M5 — Spacing extension**
 Attribute injection filter and inspector integration for **any block declaring
@@ -795,6 +774,7 @@ premise changes.
 | D33 | **The category is "responsive block controls", and every surface that named it "responsive spacing" now says so — the inspector panel and the block included** | Asked for against a stated plan to add controls beyond spacing to other block types, the way Stackable does with Column Arrangement. The mechanism was never spacing-specific — a namespaced attribute and server-side CSS per tier — but every name on top of it was, and a name that has to be rewritten to ship the second feature is a name that costs more the longer it stands. **The panel is the substantive rename.** `Responsive spacing` described its one control; `Spacery` describes the container, and a container is what a second control type needs. It also stops the panel competing with core's own `Dimensions`, which is where spacing lives in the inspector. **The block took the freed name in the other direction:** its title was `Spacery`, which told an author nothing about what the block does, and is now `Responsive Spacer` — the brand goes to the panel that holds everything, the description goes to the block that does one thing. Its `name` is untouched: `spacery/spacer` is block identity in saved content, and renaming it would invalidate every post holding one. Nothing is released, so no deprecation is owed. **Stored-value copy moved from "spacing" to "values"** — *Your breakpoints are kept, so reinstalling leaves your values exactly as they are* — because a sentence promising what survives an uninstall has to stay true when what is stored stops being spacing. **Feature bullets kept their specifics.** `Padding and margin per breakpoint on any block that supports spacing` is what the plugin does today; generalising it would be the kind of claim this table exists to catch. Only the category noun above them moved. **The pass found this document lying about itself twice more, the eleventh and twelfth.** Deliverable B claimed it adds "per-breakpoint padding, margin and block gap" while D5, in the same file, records gap as spiked and deferred and `spacingFeatures()` declines it in code. And the paragraph headed *Spacery is absent at the default tier* quoted a hint — "Resize the canvas or switch device view to set responsive spacing" — that D17 deleted eighteen decisions ago, describing a panel that goes quiet above the widest band when `useSelectedTier()` falls back to the widest tier specifically so it never does. Both were written from a proposal and never re-read against the build, which is the same cause as §3's table in D31. |
 | D34 | **Spacery's panel fills `InspectorControls group="styles"`, beside `Dimensions`, not the Settings tab** | Asked as *should Spacery hide core's Dimensions panel when it is active* — and the answer to that is no, for three reasons worth keeping. **Dimensions is the default tier.** Spacery never edits it (D17): the panel always edits one of the breakpoints, so the value that applies above the widest one, and that every tier inherits downward from, is set only there. **Spacery already reads it** — `inheritedValue()` in `SpacingPanel.tsx` ends on `readPath(attributes.style, path)`, so core's value is the greyed placeholder in the widest tier's own fields; hiding Dimensions would hide the source of what Spacery displays. **And replacing it would mean writing `style.spacing`**, core's attribute, which is exactly what `readme.txt` promises Spacery never touches. There is no supported API for removing that panel in any case: the levers are stripping `supports.spacing` or switching it off in `theme.json`, both of which remove what `spacingFeatures()` reads to decide Spacery should appear at all, or CSS, which breaks on the next class rename. **What the question did surface is that the panel was in the wrong tab.** Read off the live inspector: core keeps padding and margin under **Styles**, and a bare `InspectorControls` fills **Settings** — a different tab from the values these fields override and from the Dimensions fields through which core's own responsive values are set, so D11's takeover notice was describing a control the author could not see. **The measurement that settled it:** on a Group, Settings held `Spacery` and nothing else, so the tab bar existed *because of Spacery* — authors were clicking into a tab that Spacery alone had created. Moving the fill collapses the inspector to one list on `core/group`, `core/columns`, `core/cover` and `core/heading`, with Spacery after `Dimensions` and `Border & Shadow`; `core/image` keeps its tabs, because core fills its settings group with `Media`, and there Spacery now lands in `Styles` where it belongs. **Not `group="dimensions"`**, which fills core's own `ToolsPanel`: that slot expects `ToolsPanelItem` children and Spacery's panel is a `PanelBody` carrying a tier selector. `src/types/wordpress.d.ts` gains the `group` prop, typed as the three groups this plugin uses rather than as `string`, because an unrecognised group renders nowhere with no error. **The deferred question:** D33 made the panel a container for controls beyond spacing, and a column arrangement is a setting, not a style. One branded panel cannot sit correctly in both tabs, and the same name twice in two tabs is worse than either. Decided now on what the panel holds today, with the split to be reconsidered when a non-style control actually exists rather than designed around a hypothetical one. |
 | D35 | **A row is wrong one field at a time, and each field claims its value independently of the rest of the row** | Reported from the screen: eight rows, two slugged `br-12`, **no conflict shown anywhere**. Two faults behind it, and the second is the one with teeth. **First, one message per row.** `validate()` was an `else if` chain writing a single `RowProblem` per row, so the second `br-12` — which also had no width yet — got `Needs a number and a unit` and never heard that its slug was taken. Every message was true; the author would have filled the width in and only then been told about the slug. `Problems.rows` is a list now, at most one entry per field, and the three fields are three places on screen already, so `noteFor()` needed only to search the list. **Second, and the actual defect: a row with any problem registered nothing.** `seenSlugs` and `seenWidths` were filled under `if (undefined === problems.rows[row.id])`, so an unfinished row never claimed its slug — and the **next** row to use that slug looked like the first one there and was reported as **fine**. Measured: rows `br-12 / (no width)` and `br-12 / 600px` produced exactly one problem, on the first row, about its width. The duplicate appeared nowhere, was absent from `Fix N problems above to save.`, and only the server would have caught it — which is the failure this whole module exists to prevent, per its own opening docblock. A slug is a slug whether or not the width beside it parses, so each field now claims its value when **that field** is sound. **A knock-on the fix made visible:** the first row to claim a slug can have a blank name, and `Already used by %s.` with an empty name reads `Already used by .` — so `nameOf()` falls back to the slug, which is on screen in the column the message points at, and then to `an unnamed breakpoint`. **`noteFor()` changed with it:** a refusal outranks a caution **on the same field** and nowhere else, where before any problem on a row suppressed a caution two columns away — two unrelated facts competing for one slot. Confirmed on the live screen in both shapes: the reported one now shows both messages with the row tinted and `Fix 2 problems above to save.`, and the hidden one now names the conflict on the row that has it. |
+| D36 | **The editor preview is built, through core's own `useStyleOverride`, and the one thing it duplicates is the value allowlist** | The last unbuilt thing the plan specified, and the reason it mattered: **core previews its own responsive spacing in the same canvas**, so an author set a core `@tablet` value, watched it take effect, set a Spacery value on the same block, and watched nothing happen. `preview-spike.md` settled the shape; the implementation settled four things that spike had left open, all measured on the live editor rather than assumed. **`useStyleOverride( { id, css } )` is a public export in 7.1** — signature read off the shipped function — so §3.3's instruction to render a `<style>` element from the HOC is obsolete: returning a fragment where the editor expects one block node would put its drag-and-drop at risk. **Source order already favours Spacery.** Spiked before building anything: the override lands in the canvas iframe's `<body>` at index 62 against core's block-support style at 61, and the computed value in-band is Spacery's, so between two `!important` declarations at equal specificity nothing needs raising and **`Generator.php` does not move**. Had it gone the other way the remedy was a doubled class mirrored on both sides, which is why it was measured first and not last. **An empty `css` renders no element**, so the hook is called for every block as the rules of hooks require, at no DOM cost. And **`wp-style-engine` needs no manual dependency**: `@wordpress/style-engine` is not in the extraction plugin's `BUNDLED_PACKAGES`, so importing it adds the handle to `extension.asset.php`, where `Extension.php` already reads from. **The class is `clientId`-derived, not the content hash** — the hash exists on the server to share one rule between blocks with the same recipe, and in the editor there is one override per block by construction. **The one genuine duplicate is `Generator::is_value()`**, ported to `isValue.ts` and asserted against `GeneratorTest`'s own two lists transcribed verbatim, because `wp.styleEngine.getCSSRules()` passes `10px;color:red` straight through exactly as `wp_style_engine_get_styles()` did — without the port the preview would show a value the page then drops, which is the divergence a preview exists to remove. D19 is the precedent: shapes are reimplemented and pinned by the PHP suite's table. **One API detail that fails silently:** `getCSSRules()` returns `{selector, key, value}` with **`key` in camelCase** — `paddingTop`, not `padding-top` — and a camelCased property inside a stylesheet is ignored rather than reported, so it is written down in the ambient declaration where a reader would look. Verified end to end on the live editor at four widths, and `MANUAL-TESTING.md` §2's two blocked boxes now pass on both halves. **M4's exit criterion is met for the first time since it was written**, by a test that compares values rather than screenshots: two canvases that look alike is not the claim, the claim is that the rule the author is shown is the rule the visitor gets. |
 
 
 ### Deferred to 1.1+

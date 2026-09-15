@@ -26,6 +26,10 @@ export default defineConfig({
 				process.cwd(),
 				'tests/unit/stubs/i18n.ts'
 			),
+			'@wordpress/style-engine': resolve(
+				process.cwd(),
+				'tests/unit/stubs/style-engine.ts'
+			),
 		},
 	},
 	test: {
