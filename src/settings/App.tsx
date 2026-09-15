@@ -260,7 +260,7 @@ export function App(): React.ReactElement {
 				<Masthead />
 				<Text variant="muted">
 					{__(
-						'Responsive block controls, at the breakpoints you choose.',
+						'Responsive controls at your breakpoints',
 						'spacery'
 					)}
 				</Text>

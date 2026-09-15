@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spacery 1.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/moustakalis/spacery/issues\n"
-"POT-Creation-Date: 2026-09-15T10:15:59+00:00\n"
+"POT-Creation-Date: 2026-09-15T12:01:36+00:00\n"
 "PO-Revision-Date: 2026-09-12T15:17:59+00:00\n"
 "Last-Translator: Nickos Moustakas\n"
 "Language-Team: Greek\n"
@@ -31,8 +31,8 @@ msgid ""
 "Responsive block controls — unlimited, theme-defined breakpoints for any "
 "block."
 msgstr ""
-"Αποκρίσιμα στοιχεία ελέγχου μπλοκ — απεριόριστα σημεία διακοπής, "
-"ορισμένα από το θέμα, για κάθε μπλοκ."
+"Αποκρίσιμα στοιχεία ελέγχου μπλοκ — απεριόριστα σημεία διακοπής, ορισμένα "
+"από το θέμα, για κάθε μπλοκ."
 
 #. Author of the plugin
 #: spacery.php
@@ -310,9 +310,8 @@ msgid "Loading your breakpoints…"
 msgstr "Φόρτωση των σημείων διακοπής σας…"
 
 #: src/settings/App.js:175
-msgid "Responsive block controls, at the breakpoints you choose."
-msgstr ""
-"Αποκρίσιμα στοιχεία ελέγχου μπλοκ, στα σημεία διακοπής που επιλέγετε."
+msgid "Responsive controls at your breakpoints"
+msgstr "Αποκρίσιμα στοιχεία ελέγχου στα σημεία διακοπής σας"
 
 #: src/settings/App.js:189
 msgid "Only one source applies at a time — Spacery never merges two sets."
@@ -349,8 +348,8 @@ msgid ""
 "Your breakpoints go too. Values on your blocks stay, but a future install "
 "may apply them at different widths."
 msgstr ""
-"Φεύγουν και τα σημεία διακοπής σας. Οι τιμές στα μπλοκ σας παραμένουν, "
-"αλλά μια μελλοντική εγκατάσταση μπορεί να τις εφαρμόσει σε άλλα πλάτη."
+"Φεύγουν και τα σημεία διακοπής σας. Οι τιμές στα μπλοκ σας παραμένουν, αλλά "
+"μια μελλοντική εγκατάσταση μπορεί να τις εφαρμόσει σε άλλα πλάτη."
 
 #: src/settings/App.js:195
 msgid ""
@@ -517,8 +516,8 @@ msgid ""
 "values. Raise the widest breakpoint to cover them."
 msgstr ""
 "Οθόνες πλατύτερες από %s δεν αντιστοιχούν σε κανένα σημείο διακοπής, οπότε "
-"τα μπλοκ χρησιμοποιούν τις συνηθισμένες τους τιμές. Αυξήστε το "
-"πλατύτερο σημείο διακοπής για να τις καλύψετε."
+"τα μπλοκ χρησιμοποιούν τις συνηθισμένες τους τιμές. Αυξήστε το πλατύτερο "
+"σημείο διακοπής για να τις καλύψετε."
 
 #. translators: 1: comma-separated breakpoint names. 2: how many further breakpoints there are.
 #: src/settings/sources.js:49

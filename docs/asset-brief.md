@@ -53,7 +53,7 @@ Poppins — Bold for the wordmark, Light for the tagline. Geometric, close to th
 editor's own feel without imitating it. Any humanist geometric sans is an
 acceptable substitute; the wordmark is set in title case as **Spacery**.
 
-Tagline: *Responsive controls for every block*
+Tagline: *Responsive controls at your breakpoints*
 
 ### The mark
 

@@ -26,12 +26,12 @@ they answer to. Run `python3 bin/check-release.py` after copying them in.
 
 ## The banner tagline, and how to change it again
 
-D33 changed the tagline to *Responsive controls for every block*, and the
+D33 changed the tagline to *Responsive controls at your breakpoints*, and the
 banners were the last surface still carrying the old one. **They were amended
-in place rather than redrawn**, because redrawing the mark is exactly what
-`make-assets.py` got wrong. The tagline band is the only part of either banner
-that changed — verified by comparing every pixel of the before and after:
-**zero differ outside the band.**
+rather than redrawn**, because redrawing the mark is exactly what
+`make-assets.py` got wrong. Nothing was re-drawn: the tagline was re-set, and
+the lockup was then translated — every pixel of the mark and the wordmark is
+bit-identical to before, checked, and only its `x` changed.
 
 The type was recovered by measurement rather than guessed, and it is written
 down here so the next change is cheap:
@@ -57,6 +57,31 @@ and **45.3** for a band left blank. That is what pins the size and tracking;
 searching on RMS alone does not, and picked a 400 weight that is visibly heavier
 when the two are put side by side. **Look at the two lines at 3× before
 believing a number.**
+
+### The lockup is centred, and a longer tagline moves it
+
+Not stated anywhere before, and it is a constraint, not a preference: the
+artwork as delivered put the whole lockup — mark, wordmark and tagline — at
+**137px from the left and 136px from the right** at 772, and **274 / 273** at
+1544. Exact to a pixel in both, at two sizes. That is a rule.
+
+So the tagline's length is the lockup's width, and a longer line does not simply
+extend to the right: it re-centres everything. *Responsive controls at your
+breakpoints* is 417px against the previous line's 367, which alone would have
+left margins of **137 / 86** — the lockup visibly shoved left. The mark and
+wordmark were therefore **translated 25px left at 772 and 50px at 1544**, giving
+**112 / 111** and **224 / 224**.
+
+**Translating is safe here, and the reason is the gradient.** Away from the
+lockup the background varies across a row by at most **2 / 255** (measured on
+every pixel of every row, not sampled), so a rectangle of artwork carries a
+background that matches wherever it lands. Cut the lockup's bounding box with a
+3px pad, refill the vacated span per row, paste at the new `x`. Verified after:
+**zero pixels differ inside the moved lockup.**
+
+A tagline much longer than this one would run out of room rather than re-centre:
+at 772 the lockup cannot exceed about 500px without the margins dropping below
+the mark's own width. Measure a candidate before adopting it.
 
 ## readme.txt — paste after `== Description ==`
 
