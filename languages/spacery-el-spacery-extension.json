@@ -319,6 +319,9 @@
 			"No changes to save.": [
 				"Δεν υπάρχουν αλλαγές προς αποθήκευση."
 			],
+			"an unnamed breakpoint": [
+				"ένα σημείο διακοπής χωρίς όνομα"
+			],
 			"Needs a name — this is what you pick in the editor.": [
 				"Χρειάζεται όνομα — αυτό επιλέγετε στον επεξεργαστή."
 			],

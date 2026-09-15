@@ -63,8 +63,8 @@ const CLOSE = (
 
 interface BreakpointRowsProps {
 	rows: Row[];
-	/** One problem per row that has one, keyed by the row's client id. */
-	problems: Record<string, RowProblem>;
+	/** Every problem a row has, keyed by the row's client id. */
+	problems: Record<string, RowProblem[]>;
 	/** Advisory cautions, which do not block a save. */
 	cautions: Record<string, RowProblem>;
 	/** What each row covers, derived from the widths as they are typed. */
@@ -80,7 +80,7 @@ interface BreakpointRowsProps {
  *
  * @param root0          Component props.
  * @param root0.rows     Current rows.
- * @param root0.problems One problem per row that has one.
+ * @param root0.problems Every problem a row has, keyed by row id.
  * @param root0.cautions Advisory cautions, which do not block a save.
  * @param root0.coverage What each row covers.
  * @param root0.max      Most breakpoints the server will accept.
@@ -110,10 +110,16 @@ export function BreakpointRows({
 	 * @return The message, or undefined when the field is fine.
 	 */
 	const noteFor = (row: Row, field: Field): RowProblem | undefined => {
-		// A refusal outranks a caution: one stops the save, the other advises.
-		const note = problems[row.id] ?? cautions[row.id];
+		/*
+		 * A refusal outranks a caution **on the same field** -- one stops the
+		 * save, the other advises -- and nowhere else. Outranking it across
+		 * the whole row hid an over-wide width behind an unfinished name two
+		 * columns away, which is two unrelated facts competing for one slot.
+		 */
+		const refusal = problems[row.id]?.find((one) => one.field === field);
+		const caution = cautions[row.id];
 
-		return note && note.field === field ? note : undefined;
+		return refusal ?? (caution?.field === field ? caution : undefined);
 	};
 
 	/**
@@ -162,7 +168,9 @@ export function BreakpointRows({
 
 			{rows.map((row, index) => {
 				const covers = coverage[row.id];
-				const conflicted = 'conflict' === problems[row.id]?.severity;
+				const conflicted = Boolean(
+					problems[row.id]?.some((one) => 'conflict' === one.severity)
+				);
 
 				return (
 					<FlexItem key={row.id}>

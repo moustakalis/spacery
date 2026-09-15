@@ -24,8 +24,18 @@ const RULES: ValidationRules = {
 const rowsOf = (...rows: Array<[string, string, string]>) =>
 	toRows(rows.map(([slug, label, max]) => ({ slug, label, max })));
 
+const problemsFor = (rows: ReturnType<typeof rowsOf>, index: number) =>
+	validate(rows, RULES).rows[rows[index]!.id] ?? [];
+
+/**
+ * The row's first problem, for the cases that have exactly one.
+ *
+ * @param rows  The rows under test.
+ * @param index Which row to look at.
+ * @return Its first problem, or undefined.
+ */
 const problemFor = (rows: ReturnType<typeof rowsOf>, index: number) =>
-	validate(rows, RULES).rows[rows[index]!.id];
+	problemsFor(rows, index)[0];
 
 describe('validate', () => {
 	/** Clearing every row is how an author empties the custom source. */
@@ -166,11 +176,13 @@ describe('saveHint', () => {
 		rows: Object.fromEntries(
 			Array.from({ length: count }, (_unused, index) => [
 				`row-${index}`,
-				{
-					field: 'label' as const,
-					severity: 'incomplete' as const,
-					message: 'x',
-				},
+				[
+					{
+						field: 'label' as const,
+						severity: 'incomplete' as const,
+						message: 'x',
+					},
+				],
 			])
 		),
 		set: [],
@@ -234,16 +246,95 @@ describe('saveHint', () => {
 	});
 });
 
+/**
+ * Reported from the screen: eight rows, two of them slugged `br-12`, and no
+ * conflict anywhere. The second `br-12` had no width yet.
+ *
+ * Both halves are asserted, because they are two different faults. A row can
+ * be wrong in more than one way at once and has to say so; and a row's own
+ * unfinished field must not stop it claiming its slug, or the *next* row to
+ * use that slug looks like the first one there.
+ */
+describe('a row is wrong one field at a time', () => {
+	it('names the slug clash on a row whose width is also missing', () => {
+		const rows = rowsOf(
+			['br-12', '12', '2400px'],
+			['br-6', '6', '800px'],
+			['br-12', '5', '']
+		);
+
+		expect(problemsFor(rows, 2)).toStrictEqual([
+			{
+				field: 'max',
+				severity: 'incomplete',
+				message: 'Needs a number and a unit — px, em or rem.',
+			},
+			{
+				field: 'slug',
+				severity: 'conflict',
+				message:
+					'Already used by 12. Two breakpoints cannot share a slug.',
+			},
+		]);
+	});
+
+	/**
+	 * The fault that hid the duplicate entirely. The *first* `br-12` is the
+	 * unfinished one, so under the old rule it registered nothing and the
+	 * second was reported as the first to use that slug -- a conflict on
+	 * screen, described nowhere, and missing from the count beside Save.
+	 */
+	it('claims a slug even when the width beside it does not parse', () => {
+		const rows = rowsOf(['br-12', '12', ''], ['br-12', '5', '600px']);
+
+		expect(problemFor(rows, 1)).toStrictEqual({
+			field: 'slug',
+			severity: 'conflict',
+			message: 'Already used by 12. Two breakpoints cannot share a slug.',
+		});
+
+		expect(countProblems(validate(rows, RULES))).toBe(2);
+	});
+
+	/** Same for a width: an unfinished name must not free the width beside it. */
+	it('claims a width even when the name beside it is blank', () => {
+		const rows = rowsOf(
+			['laptop', '', '1024px'],
+			['tablet', 'T', '1024px']
+		);
+
+		expect(problemFor(rows, 1)).toStrictEqual({
+			field: 'max',
+			severity: 'conflict',
+			message: 'Same width as laptop.',
+		});
+	});
+
+	/**
+	 * And the message still names something. A row can be the first to claim a
+	 * slug while its own name is blank, and "Already used by ." names nothing.
+	 */
+	it('falls back to the slug when the other row has no name', () => {
+		const rows = rowsOf(['br-12', '', '2400px'], ['br-12', '5', '600px']);
+
+		expect(problemFor(rows, 1)?.message).toBe(
+			'Already used by br-12. Two breakpoints cannot share a slug.'
+		);
+	});
+});
+
 describe('countProblems', () => {
 	it('counts row and set-wide problems together', () => {
 		expect(
 			countProblems({
 				rows: {
-					a: {
-						field: 'label',
-						severity: 'incomplete' as const,
-						message: 'x',
-					},
+					a: [
+						{
+							field: 'label',
+							severity: 'incomplete' as const,
+							message: 'x',
+						},
+					],
 				},
 				set: ['too many'],
 			})

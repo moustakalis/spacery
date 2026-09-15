@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spacery 1.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/moustakalis/spacery/issues\n"
-"POT-Creation-Date: 2026-09-15T12:17:58+00:00\n"
+"POT-Creation-Date: 2026-09-15T13:50:20+00:00\n"
 "PO-Revision-Date: 2026-09-12T15:17:59+00:00\n"
 "Last-Translator: Nickos Moustakas\n"
 "Language-Team: Greek\n"
@@ -428,24 +428,24 @@ msgstr "Τεκμηρίωση"
 msgid "Support"
 msgstr "Υποστήριξη"
 
-#: src/settings/BreakpointRows.js:89 src/settings/BreakpointRows.js:94
+#: src/settings/BreakpointRows.js:95 src/settings/BreakpointRows.js:100
 msgid "Name"
 msgstr "Όνομα"
 
-#: src/settings/BreakpointRows.js:89 src/settings/BreakpointRows.js:101
+#: src/settings/BreakpointRows.js:95 src/settings/BreakpointRows.js:107
 msgid "Slug"
 msgstr "Σύντομο όνομα"
 
-#: src/settings/BreakpointRows.js:89 src/settings/BreakpointRows.js:107
+#: src/settings/BreakpointRows.js:95 src/settings/BreakpointRows.js:113
 msgid "Up to"
 msgstr "Έως"
 
-#: src/settings/BreakpointRows.js:89
+#: src/settings/BreakpointRows.js:95
 msgid "Covers"
 msgstr "Καλύπτει"
 
 #. translators: %s: the slug the breakpoint was saved under.
-#: src/settings/BreakpointRows.js:107
+#: src/settings/BreakpointRows.js:113
 msgid ""
 "Values saved under %s will stop applying. To rename it, change the name and "
 "leave the slug alone."
@@ -454,20 +454,20 @@ msgstr ""
 "αλλάξτε το όνομα και αφήστε το slug ως έχει."
 
 #. translators: %s: breakpoint name.
-#: src/settings/BreakpointRows.js:111
+#: src/settings/BreakpointRows.js:117
 msgid "Remove %s"
 msgstr "Αφαίρεση %s"
 
-#: src/settings/BreakpointRows.js:112
+#: src/settings/BreakpointRows.js:118
 msgid "Add breakpoint"
 msgstr "Προσθήκη σημείου διακοπής"
 
 #. translators: %d: maximum number of breakpoints.
-#: src/settings/BreakpointRows.js:119 src/settings/validate.js:171
+#: src/settings/BreakpointRows.js:125 src/settings/validate.js:213
 msgid "%d breakpoints is the maximum."
 msgstr "Τα %d σημεία διακοπής είναι το ανώτατο όριο."
 
-#: src/settings/BreakpointRows.js:120
+#: src/settings/BreakpointRows.js:126
 msgid ""
 "Name appears in the editor. Slug is stored on your blocks and follows the "
 "name until you edit it."
@@ -475,18 +475,18 @@ msgstr ""
 "Το όνομα εμφανίζεται στον επεξεργαστή. Το slug αποθηκεύεται στα μπλοκ σας "
 "και ακολουθεί το όνομα μέχρι να το επεξεργαστείτε."
 
-#: src/settings/BreakpointRows.js:135
+#: src/settings/BreakpointRows.js:141
 msgid "You haven't defined any breakpoints yet"
 msgstr "Δεν έχετε ορίσει ακόμη σημεία διακοπής"
 
 #. translators: %s: the breakpoint set in use meanwhile.
-#: src/settings/BreakpointRows.js:137
+#: src/settings/BreakpointRows.js:143
 msgid "Until you add one, Spacery uses %s — shown in In use now below."
 msgstr ""
 "Μέχρι να προσθέσετε ένα, το Spacery χρησιμοποιεί %s — αυτό που δείχνει η "
 "ενότητα «Σε χρήση τώρα» παρακάτω."
 
-#: src/settings/BreakpointRows.js:137
+#: src/settings/BreakpointRows.js:143
 msgid "Add your first breakpoint"
 msgstr "Προσθέστε το πρώτο σας σημείο διακοπής"
 
@@ -620,40 +620,44 @@ msgstr "Μη αποθηκευμένη αλλαγή στο τι συμβαίνε�
 msgid "No changes to save."
 msgstr "Δεν υπάρχουν αλλαγές προς αποθήκευση."
 
-#: src/settings/validate.js:121
+#: src/settings/validate.js:107
+msgid "an unnamed breakpoint"
+msgstr "ένα σημείο διακοπής χωρίς όνομα"
+
+#: src/settings/validate.js:142
 msgid "Needs a name — this is what you pick in the editor."
 msgstr "Χρειάζεται όνομα — αυτό επιλέγετε στον επεξεργαστή."
 
-#: src/settings/validate.js:128
+#: src/settings/validate.js:150
 msgid "Lowercase letters, numbers and dashes only."
 msgstr "Μόνο πεζά λατινικά γράμματα, αριθμοί και παύλες."
 
-#: src/settings/validate.js:135
+#: src/settings/validate.js:158
 msgid "Needs a number and a unit — px, em or rem."
 msgstr "Χρειάζεται αριθμό και μονάδα — px, em ή rem."
 
-#: src/settings/validate.js:142
+#: src/settings/validate.js:165
 msgid "Has to be more than zero."
 msgstr "Πρέπει να είναι μεγαλύτερο από το μηδέν."
 
 #. translators: %s: the name of the breakpoint already using this slug.
-#: src/settings/validate.js:151
+#: src/settings/validate.js:185
 msgid "Already used by %s. Two breakpoints cannot share a slug."
 msgstr ""
 "Χρησιμοποιείται ήδη από το %s. Δύο σημεία διακοπής δεν μπορούν να έχουν το "
 "ίδιο slug."
 
 #. translators: %s: the name of the breakpoint at this width.
-#: src/settings/validate.js:160
+#: src/settings/validate.js:199
 msgid "Same width as %s."
 msgstr "Ίδιο πλάτος με το %s."
 
 #. translators: %s: a narrower CSS length, e.g. "1920px".
-#: src/settings/validate.js:201
+#: src/settings/validate.js:243
 msgid "Too wide for the ruler. Did you mean %s?"
 msgstr "Πολύ πλατύ. Μήπως εννοούσατε %s;"
 
-#: src/settings/validate.js:202
+#: src/settings/validate.js:244
 msgid "Too wide for the ruler."
 msgstr "Πολύ πλατύ για τον χάρακα."
 

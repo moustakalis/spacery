@@ -48,8 +48,16 @@ export interface RowProblem {
 
 /** Problems found in a set, ready for the screen to render. */
 export interface Problems {
-	/** One problem per row that has one, keyed by the row's client id. */
-	rows: Record<string, RowProblem>;
+	/**
+	 * Every problem a row has, keyed by the row's client id.
+	 *
+	 * A list rather than one problem, and at most one entry per field, because
+	 * a row can be wrong in more than one way at once and the three fields are
+	 * three places on screen. Reported one at a time, an author fixed the
+	 * width and only then learnt the slug was taken. A row with nothing wrong
+	 * has no key here at all, never an empty list -- `isValid()` counts keys.
+	 */
+	rows: Record<string, RowProblem[]>;
 
 	/** Problems with the set as a whole. */
 	set: string[];
@@ -75,7 +83,10 @@ export function isValid(problems: Problems): boolean {
  * @return The count.
  */
 export function countProblems(problems: Problems): number {
-	return problems.set.length + Object.keys(problems.rows).length;
+	return Object.values(problems.rows).reduce(
+		(total, list) => total + list.length,
+		problems.set.length
+	);
 }
 
 /**
@@ -153,6 +164,26 @@ export function saveHint(
 }
 
 /**
+ * What to call a row in a message about another row.
+ *
+ * §5.2 asks a conflict to name the other row rather than recite the rule, and
+ * the name is the obvious handle. A row can be the first to claim a slug while
+ * its own name is still blank, though, and “Already used by .” names nothing.
+ * The slug is the next best handle, because it is on screen in the same
+ * column the message is pointing at.
+ *
+ * @param row The row being named.
+ * @return Its name, its slug, or a description.
+ */
+function nameOf(row: Row): string {
+	return (
+		row.label.trim() ||
+		row.slug.trim() ||
+		__('an unnamed breakpoint', 'spacery')
+	);
+}
+
+/**
  * Everything wrong with a set, in the order the server would find it.
  *
  * An empty set is valid and meaningful: it clears the custom source. "No rows"
@@ -179,69 +210,102 @@ export function validate(rows: Row[], rules: ValidationRules): Problems {
 	const seenWidths = new Map<number, string>();
 
 	for (const row of rows) {
+		const label = row.label.trim();
+		const slugText = row.slug.trim();
+		const maxText = row.max.trim();
 		const width = toPixels(row.max, rules.pixelsPerEm);
+		const found: RowProblem[] = [];
 
-		if ('' === row.label.trim()) {
-			problems.rows[row.id] = {
+		if ('' === label) {
+			found.push({
 				field: 'label',
 				severity: 'incomplete',
 				message: __(
 					'Needs a name — this is what you pick in the editor.',
 					'spacery'
 				),
-			};
-		} else if (!slug.test(row.slug.trim())) {
-			problems.rows[row.id] = {
+			});
+		}
+
+		const slugIsSound = slug.test(slugText);
+
+		if (!slugIsSound) {
+			found.push({
 				field: 'slug',
 				severity: 'incomplete',
 				message: __(
 					'Lowercase letters, numbers and dashes only.',
 					'spacery'
 				),
-			};
-		} else if (!length.test(row.max.trim())) {
-			problems.rows[row.id] = {
+			});
+		}
+
+		const widthIsSound = length.test(maxText) && 0 < width;
+
+		if (!length.test(maxText)) {
+			found.push({
 				field: 'max',
 				severity: 'incomplete',
 				message: __(
 					'Needs a number and a unit — px, em or rem.',
 					'spacery'
 				),
-			};
+			});
 		} else if (0 >= width) {
-			problems.rows[row.id] = {
+			found.push({
 				field: 'max',
 				severity: 'incomplete',
 				message: __('Has to be more than zero.', 'spacery'),
-			};
-		} else if (seenSlugs.has(row.slug.trim())) {
-			problems.rows[row.id] = {
-				field: 'slug',
-				severity: 'conflict',
-				message: sprintf(
-					/* translators: %s: the name of the breakpoint already using this slug. */
-					__(
-						'Already used by %s. Two breakpoints cannot share a slug.',
-						'spacery'
-					),
-					seenSlugs.get(row.slug.trim()) ?? ''
-				),
-			};
-		} else if (seenWidths.has(width)) {
-			problems.rows[row.id] = {
-				field: 'max',
-				severity: 'conflict',
-				message: sprintf(
-					/* translators: %s: the name of the breakpoint at this width. */
-					__('Same width as %s.', 'spacery'),
-					seenWidths.get(width) ?? ''
-				),
-			};
+			});
 		}
 
-		if (undefined === problems.rows[row.id]) {
-			seenSlugs.set(row.slug.trim(), row.label.trim());
-			seenWidths.set(width, row.label.trim());
+		/*
+		 * Each field claims its value independently of the rest of the row.
+		 *
+		 * This used to register nothing for a row that had any problem at all,
+		 * which quietly lost conflicts: a row with a blank width never claimed
+		 * its slug, so the *next* row to use that slug looked like the first
+		 * one there and was reported as fine. The duplicate then appeared
+		 * nowhere on the screen and was not counted. A slug is a slug whether
+		 * or not the width beside it parses.
+		 */
+		if (slugIsSound) {
+			if (seenSlugs.has(slugText)) {
+				found.push({
+					field: 'slug',
+					severity: 'conflict',
+					message: sprintf(
+						/* translators: %s: the name of the breakpoint already using this slug. */
+						__(
+							'Already used by %s. Two breakpoints cannot share a slug.',
+							'spacery'
+						),
+						seenSlugs.get(slugText) ?? ''
+					),
+				});
+			} else {
+				seenSlugs.set(slugText, nameOf(row));
+			}
+		}
+
+		if (widthIsSound) {
+			if (seenWidths.has(width)) {
+				found.push({
+					field: 'max',
+					severity: 'conflict',
+					message: sprintf(
+						/* translators: %s: the name of the breakpoint at this width. */
+						__('Same width as %s.', 'spacery'),
+						seenWidths.get(width) ?? ''
+					),
+				});
+			} else {
+				seenWidths.set(width, nameOf(row));
+			}
+		}
+
+		if (0 < found.length) {
+			problems.rows[row.id] = found;
 		}
 	}
 
