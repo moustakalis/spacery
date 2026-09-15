@@ -145,6 +145,20 @@ it as a strings-only step.
 `pnpm run i18n:build` is different: it compiles `.po` into the `.mo` and the
 per-handle `.json`, so it only matters when a translation changed.
 
+**Three separate CI failures now, and the third was worse than the first two.**
+It was not a forgotten regeneration: the POT *was* regenerated, and the diff
+came back clean. It came back clean because the regeneration read a **stale copy
+of the source**. Two imports had been added to `register.tsx` minutes earlier,
+the regeneration ran somewhere the copy had not landed yet, and an unchanged POT
+was the honest answer to the question that was actually asked.
+
+**A verification whose input is stale reports the answer it was given.** So when
+the POT is regenerated anywhere other than beside the source it describes,
+**checksum the input before trusting the output** — `md5sum` the source on one
+side, `md5sum` it again on the other, compare, and only then run `make-pot.sh`.
+The same going back. Waiting longer is not the fix, because there is no length
+of wait that tells you the copy arrived.
+
 ## Stage explicit paths, never a directory
 
 `git add languages` swept in a stray `spacery-el-spacery-spacer-editor-script
