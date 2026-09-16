@@ -22,6 +22,10 @@ export default defineConfig({
 			 * are stubbed: an alias for a package no test touches would be a
 			 * quiet invitation to test against a fake instead of the real API.
 			 */
+			'@wordpress/block-editor': resolve(
+				process.cwd(),
+				'tests/unit/stubs/block-editor.ts'
+			),
 			'@wordpress/i18n': resolve(
 				process.cwd(),
 				'tests/unit/stubs/i18n.ts'

@@ -103,8 +103,6 @@ export function unitFor(
 	values: Array<string | undefined>,
 	allowed: string[]
 ): string {
-	const fallback = allowed.includes('px') ? 'px' : (allowed[0] ?? 'px');
-
 	/*
 	 * A value no number field can hold puts the box in custom mode, and it is
 	 * checked *first* -- before looking for a unit to use.
@@ -127,6 +125,40 @@ export function unitFor(
 		return CUSTOM;
 	}
 
+	return inheritedUnit(values, allowed);
+}
+
+/**
+ * The unit a box should show for values it does not hold.
+ *
+ * `unitFor()` with its first rule removed, and the removal is the point. That
+ * rule -- a value no number field can hold puts the box in custom mode -- is
+ * about what the box **holds**: the author typed those values, they are on the
+ * page, and a box that cannot show one of them is in the wrong mode. None of
+ * that is true of an inherited value. The box holds nothing; the value belongs
+ * to a wider tier or to core's own Dimensions panel, and it is on screen there.
+ *
+ * Applying the custom rule to inherited values instead put an empty box into a
+ * mode the author never chose, for a value they never typed, on the commonest
+ * path there is: core's Dimensions padding control stores a preset by default
+ * (`var:preset|spacing|50`), so *any* block whose padding was set the ordinary
+ * way opened every Spacery tier in `css`. That is not merely untidy -- in `css`
+ * a field takes a whole CSS value, so typing `24`, the obvious thing, stored
+ * `24`, which the allowlist accepts and the browser drops. A box in `px` would
+ * have stored `24px`.
+ *
+ * So an empty box takes the first allowed unit among the plain lengths it
+ * inherits, and falls back to `px`. It never goes to custom on its own; the
+ * author can still choose it from the picker.
+ *
+ * @param values  The values the box inherits, in side order.
+ * @param allowed Units the theme permits.
+ * @return A unit, always one of the allowed ones, never {@link CUSTOM}.
+ */
+export function inheritedUnit(
+	values: Array<string | undefined>,
+	allowed: string[]
+): string {
 	for (const value of values) {
 		const unit = parseLength(value)?.unit;
 
@@ -135,5 +167,5 @@ export function unitFor(
 		}
 	}
 
-	return fallback;
+	return allowed.includes('px') ? 'px' : (allowed[0] ?? 'px');
 }

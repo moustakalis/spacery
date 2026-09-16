@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spacery 1.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/moustakalis/spacery/issues\n"
-"POT-Creation-Date: 2026-09-15T15:23:30+00:00\n"
+"POT-Creation-Date: 2026-09-16T10:43:56+00:00\n"
 "PO-Revision-Date: 2026-09-12T15:17:59+00:00\n"
 "Last-Translator: Nickos Moustakas\n"
 "Language-Team: Greek\n"
@@ -214,28 +214,28 @@ msgid "Spacery — this block has responsive values"
 msgstr "Spacery — αυτό το μπλοκ έχει αποκρίσιμες τιμές"
 
 #. translators: a unit-picker entry; the fields then take whole CSS values.
-#: src/extension/SpacingBox.js:83
+#: src/extension/SpacingBox.js:94
 msgid "css"
 msgstr "css"
 
-#: src/extension/SpacingBox.js:127
+#: src/extension/SpacingBox.js:142
 msgid "Unit"
 msgstr "Μονάδα"
 
-#: src/extension/SpacingBox.js:128
+#: src/extension/SpacingBox.js:143
 msgid "Unlink sides"
 msgstr "Αποσύνδεση πλευρών"
 
-#: src/extension/SpacingBox.js:129
+#: src/extension/SpacingBox.js:144
 msgid "Link sides — one value for all four"
 msgstr "Σύνδεση πλευρών — μία τιμή και για τις τέσσερις"
 
 #. translators: %s: a spacing property, e.g. "Padding".
-#: src/extension/SpacingBox.js:131
+#: src/extension/SpacingBox.js:146
 msgid "Reset %s"
 msgstr "Επαναφορά: %s"
 
-#: src/extension/SpacingBox.js:146
+#: src/extension/SpacingBox.js:161
 msgid "A length, calc() or a preset, one per side. Anything else is dropped."
 msgstr ""
 "Μήκος, calc() ή προεπιλογή, ένα ανά πλευρά. Οτιδήποτε άλλο απορρίπτεται."

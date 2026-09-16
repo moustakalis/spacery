@@ -347,24 +347,47 @@ Any block with spacing support — Group, Cover, Columns, a Paragraph.
       in `GeneratorTest`, and re-checked on the page: `color` and `red` gone,
       `0` / `30rem` / `1vw` / `calc(100% - 2rem)` all still emitted.
 - [x] Give a block a preset spacing value through core's own control, then open
-      the Spacery panel at a tier. The box should open in custom mode showing
-      that value, not as an empty px field. **It opened in px**, with
-      `var:preset|spacing|60` rendered as the placeholder of an
-      `input[type=number]`, next to a sibling side reading a tidy `24`. The
-      custom box's own help text already said "a length, calc() or a preset";
-      only the unit resolution had missed it.
+      the Spacery panel at a tier. **Two halves, and they answer differently —
+      that is the point of the box.**
 
-      The fix turned out to cover a second, worse case. `unitFor()` checked for
-      an unholdable value *last*, so a box storing `var:preset|spacing|50` on
+      *Inherited* (the value is on the block's own `style`, nothing authored at
+      this tier): the box opens in **`px`**, four number fields, each empty side
+      showing the preset's **name** as its placeholder — `Regular` for
+      `var:preset|spacing|50` on Twenty Twenty-Five. Type `24` in a field: it
+      must store **`24px`**. Seen on 16 September.
+
+      *Held* (a preset authored at this tier): the box opens in **custom**,
+      four text fields, with the `A length, calc() or a preset…` help line.
+      Seen on 16 September.
+
+      **History, because this box has been wrong in both directions.**
+      It was first written expecting custom mode in *both* halves, and the
+      first run disproved the then-code: the box opened in `px` with
+      `var:preset|spacing|60` inside an `input[type=number]`, beside a sibling
+      side reading a tidy `24`. The custom box's own help text already said "a
+      length, calc() or a preset"; only the unit resolution had missed it.
+
+      That fix (D22) covered a second, worse case: `unitFor()` checked for an
+      unholdable value *last*, so a box **storing** `var:preset|spacing|50` on
       one side and `10px` on another opened in px and rendered the preset as an
       **empty** field — invisible, still applied, and overwritten by the next
       linked edit. That mixture is what a takeover produces from a block whose
-      author set one side from core's preset list and typed the other. One rule
-      now: a value the box cannot show in a number field puts the whole box in
-      custom mode, whoever supplied it.
+      author set one side from core's preset list and typed the other. A unit
+      test asserted the old order and had to be reversed; it carried no reason,
+      and the test directly above it stated the principle it violated.
 
-      A test asserted the old order and had to be reversed. It carried no
-      reason, and the test directly above it states the principle it violated.
+      **Then D22 was half wrong, and D37 took that half back.** Its rule ran
+      "whoever supplied it", which extended custom mode to *inherited* values —
+      and core's padding control stores a preset by default, so every tier of
+      every ordinarily-padded block opened in a mode its author never chose. In
+      that mode a field takes a whole CSS value, so typing `24` stored `24`,
+      which the allowlist accepts and the browser drops. The rule is about what
+      a box **holds**. An empty box reads its inherited values with
+      `inheritedUnit()`, which can never return custom, and an inherited preset
+      is shown by name rather than by reference.
+
+      **So the expectation above is the third one this box has carried.** If it
+      fails, check the box against `length.ts` before believing it.
 - [x] On a set whose tiers land on distinct device widths the selector shows
       icons; on one where two tiers would share an icon it falls back to names.
       Hovering an icon must still name its tier. Both halves seen on 14
@@ -421,7 +444,10 @@ Any block with spacing support — Group, Cover, Columns, a Paragraph.
       untouched; and the four padding fields came back showing their *inherited*
       placeholders per side — `var:preset|spacing|50`,
       `var(--wp--preset--spacing--40)`, `2rem`, and an empty Left because
-      `desktop` sets none — with empty values, not zeros. "Reset all"
+      `desktop` sets none — with empty values, not zeros. (Observed before D37.
+      The box holds nothing after a reset, so the preset side now reads
+      `Regular` and the box takes a unit rather than dropping to `css`. What
+      this box tests — inherited, not zero — is unchanged.) "Reset all"
       disappeared in the same moment, the gate closing in both directions.
 - [x] A box with nothing set at this tier shows no reset button at all. At a
       tier with nothing authored the panel offers **no** reset controls of any

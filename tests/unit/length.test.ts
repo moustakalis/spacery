@@ -12,6 +12,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	CUSTOM,
 	formatLength,
+	inheritedUnit,
 	parseLength,
 	unitFor,
 } from '../../src/extension/length';
@@ -114,7 +115,12 @@ describe('unitFor', () => {
  * presets; only the unit resolution had missed it.
  *
  * The rule is now one rule: a value the box cannot show in a number field puts
- * the whole box in custom mode, whoever supplied it.
+ * the whole box in custom mode.
+ *
+ * **"Whoever supplied it" is what this used to say, and D37 took it back** --
+ * not because the rule is wrong but because it was being asked of the wrong
+ * values. It is about what a box *holds*; `inheritedUnit()` below is what an
+ * empty box asks about the values it merely inherits.
  */
 describe('unitFor with a value no number field can hold', () => {
 	it('chooses custom over a unit it could have used', () => {
@@ -139,5 +145,54 @@ describe('unitFor with a value no number field can hold', () => {
 	it('still reads a unit when every value is a plain length', () => {
 		expect(unitFor(['2rem', '4rem'], ['px', 'rem'])).toBe('rem');
 		expect(unitFor([undefined, '24px'], ['px', 'rem'])).toBe('px');
+	});
+});
+
+/**
+ * D37. An empty box is described by what it inherits, and inheriting is not
+ * holding: the values belong to a wider tier or to core's Dimensions panel, and
+ * they are already legible where they were set.
+ *
+ * The case that made this matter is the default one. Core's padding control
+ * stores a preset, so every Spacery tier of every block whose padding was set
+ * the ordinary way opened in `css` -- where a field takes a whole CSS value, so
+ * typing `24` stored `24`, which the allowlist accepts and the browser drops.
+ */
+describe('inheritedUnit', () => {
+	it('never goes to custom on a value the box does not hold', () => {
+		expect(inheritedUnit(['var:preset|spacing|50'], ['px', 'rem'])).toBe(
+			'px'
+		);
+		expect(inheritedUnit(['calc(100% - 2rem)'], ['px'])).toBe('px');
+		expect(inheritedUnit(['clamp(30px, 5vw, 50px)'], ['rem', 'em'])).toBe(
+			'rem'
+		);
+	});
+
+	it('reads the unit off an inherited length', () => {
+		expect(inheritedUnit(['2rem', '4px'], ['px', 'rem'])).toBe('rem');
+		expect(inheritedUnit([undefined, '24px'], ['px', 'rem'])).toBe('px');
+	});
+
+	it('skips a unit the theme no longer allows', () => {
+		expect(inheritedUnit(['2rem', '4px'], ['px'])).toBe('px');
+		expect(inheritedUnit(['2vw'], ['em', 'rem'])).toBe('em');
+	});
+
+	/*
+	 * A preset beside a length is the mixture a takeover leaves behind. Held,
+	 * it is custom; inherited, the length is the only thing here that can name
+	 * a unit, so it does.
+	 */
+	it('reads past a preset to a length beside it', () => {
+		expect(
+			inheritedUnit(['var:preset|spacing|50', '2rem'], ['px', 'rem'])
+		).toBe('rem');
+	});
+
+	it('falls back the way unitFor does', () => {
+		expect(inheritedUnit([], ['px', 'rem'])).toBe('px');
+		expect(inheritedUnit([], ['em', 'rem'])).toBe('em');
+		expect(inheritedUnit([], [])).toBe('px');
 	});
 });

@@ -34,9 +34,12 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from 'react';
 
+import { useSettings } from '@wordpress/block-editor';
+
 import { applyEdit, clearBox, isAuthored, switchUnit } from './box';
 import { readBoxState, rememberLinked, rememberUnit } from './boxState';
-import { CUSTOM, parseLength, unitFor } from './length';
+import { CUSTOM, inheritedUnit, parseLength, unitFor } from './length';
+import { presetLabel, type SpacingSize } from './presets';
 import { type Side, sideLabel } from './supports';
 
 /** The link glyph, drawn here for the same reason the device icons are. */
@@ -138,6 +141,16 @@ export function SpacingBox({
 	const allowed = units.map((unit) => unit.value);
 
 	/*
+	 * Only to name an inherited preset. `useSettings` returns one value per
+	 * path, so a single path still arrives inside an array -- measured on a
+	 * live 7.1 editor, because the alternative failure is silent: a `.find()`
+	 * over an array of arrays matches nothing and falls back to the raw
+	 * reference, which is exactly what this is here to replace.
+	 */
+	const [sizes] = useSettings('spacing.spacingSizes');
+	const spacingSizes = (Array.isArray(sizes) ? sizes : []) as SpacingSize[];
+
+	/*
 	 * `css` rather than `custom`, and it is the label doing the work: it names
 	 * what the fields will take rather than describing the mode, in the three
 	 * characters the other entries use. The word `custom` was six, and a
@@ -156,9 +169,13 @@ export function SpacingBox({
 	 * Three sources, in order of who decided. The author's own pick outranks
 	 * everything, for as long as this page is loaded. Then the box's stored
 	 * values, which the author also typed. Only a box holding nothing of its
-	 * own is described by what it inherits -- which matters, because a box
-	 * inheriting `var:preset|spacing|60` from core's own control used to open
-	 * in `px` and put that string inside a number field.
+	 * own is described by what it inherits.
+	 *
+	 * That last case reads the inherited values with `inheritedUnit()` rather
+	 * than `unitFor()`, and the difference is the whole of D37: custom mode is
+	 * earned by what a box **holds**, never by what it inherits. Reading them
+	 * the same way put every tier of every block whose padding came from core's
+	 * own slider into `css`, because that slider stores a preset.
 	 *
 	 * @return The unit, or `CUSTOM`.
 	 */
@@ -173,7 +190,7 @@ export function SpacingBox({
 			return unitFor(stored, allowed);
 		}
 
-		return unitFor(
+		return inheritedUnit(
 			sides.map((side) => placeholders[side]),
 			allowed
 		);
@@ -348,7 +365,8 @@ export function SpacingBox({
 										}
 										placeholder={placeholderFor(
 											placeholders[side],
-											unit
+											unit,
+											spacingSizes
 										)}
 										onChange={(next?: string) =>
 											change(side, next)
@@ -382,16 +400,30 @@ export function SpacingBox({
  * value when it does not — a lone "2" under a `px` picker would read as two
  * pixels when it is two rem.
  *
+ * A preset is neither, and gets its name: core's Dimensions slider stores
+ * `var:preset|spacing|50` and displays it as *Regular*, so that is the word the
+ * author is looking for. The reference itself is 21 characters in a 59px field
+ * and tells them nothing. Only in a number field — `css` mode takes whole CSS
+ * values, where the reference is the thing you could type and a name is not.
+ *
  * @param inherited The value this side falls back to, if any.
  * @param unit      The unit the box is showing.
+ * @param sizes     The site's spacing sizes, for naming a preset.
  * @return Placeholder text, or undefined when nothing is inherited.
  */
 function placeholderFor(
 	inherited: string | undefined,
-	unit: string
+	unit: string,
+	sizes: SpacingSize[]
 ): string | undefined {
 	if (!inherited) {
 		return undefined;
+	}
+
+	const named = presetLabel(inherited, sizes);
+
+	if (named) {
+		return named;
 	}
 
 	const parsed = parseLength(inherited);

@@ -146,6 +146,20 @@ declare module '@wordpress/block-editor' {
 	 * @return One value per requested path, in order.
 	 */
 	export function useSettings(...paths: string[]): unknown[];
+
+	/**
+	 * Whether a value is a spacing preset reference.
+	 *
+	 * Public, and used rather than a regex of our own so that what counts as a
+	 * preset stays core's definition rather than a second one that can drift.
+	 * There is no exported companion for taking the reference apart, which is
+	 * why `presets.ts` reads the slug itself — but only after this has said
+	 * yes.
+	 *
+	 * @param value Any stored value.
+	 * @return True for `var:preset|spacing|<slug>`.
+	 */
+	export function isValueSpacingPreset(value: string): boolean;
 	/**
 	 * `group` picks which inspector tab the fill lands in.
 	 *
