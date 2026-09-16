@@ -1,9 +1,10 @@
 /**
- * The one thing `presets.ts` asks of `@wordpress/block-editor`.
+ * The two things `presets.ts` asks of `@wordpress/block-editor`.
  *
  * **A stub of an API is a place to test against a fake instead of the real
- * thing**, so this covers `isValueSpacingPreset()` and nothing else. The shape
- * was read off a live 7.1 editor rather than assumed:
+ * thing**, so this covers `isValueSpacingPreset()` and
+ * `getCustomValueFromPreset()` and nothing else. Both shapes were read off a
+ * live 7.1 editor rather than assumed:
  *
  * | value | returns |
  * |---|---|
@@ -25,4 +26,28 @@
  */
 export function isValueSpacingPreset(value: string): boolean {
 	return 'string' === typeof value && value.startsWith('var:preset|spacing|');
+}
+
+/**
+ * The length a preset reference stands for.
+ *
+ * Mirrors what the shipped 7.1 function was measured doing: a known slug gives
+ * its size, an unknown slug and an empty list give `undefined`, and a
+ * non-preset is returned unchanged.
+ *
+ * @param value Any stored value.
+ * @param sizes The site's spacing sizes.
+ * @return The size, or undefined when the slug is unknown.
+ */
+export function getCustomValueFromPreset(
+	value: string,
+	sizes: Array<{ name?: string; size?: string; slug: string }>
+): string | undefined {
+	if (!isValueSpacingPreset(value)) {
+		return value;
+	}
+
+	const slug = value.slice('var:preset|spacing|'.length);
+
+	return sizes.find((size) => size.slug === slug)?.size;
 }

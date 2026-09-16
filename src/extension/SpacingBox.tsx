@@ -39,7 +39,7 @@ import { useSettings } from '@wordpress/block-editor';
 import { applyEdit, clearBox, isAuthored, switchUnit } from './box';
 import { readBoxState, rememberLinked, rememberUnit } from './boxState';
 import { CUSTOM, inheritedUnit, parseLength, unitFor } from './length';
-import { presetLabel, type SpacingSize } from './presets';
+import { presetLabel, presetSize, type SpacingSize } from './presets';
 import { type Side, sideLabel } from './supports';
 
 /** The link glyph, drawn here for the same reason the device icons are. */
@@ -141,7 +141,8 @@ export function SpacingBox({
 	const allowed = units.map((unit) => unit.value);
 
 	/*
-	 * Only to name an inherited preset. `useSettings` returns one value per
+	 * To resolve an inherited preset, and to name one that resolves to
+	 * something no number field can hold. `useSettings` returns one value per
 	 * path, so a single path still arrives inside an array -- measured on a
 	 * live 7.1 editor, because the alternative failure is silent: a `.find()`
 	 * over an array of arrays matches nothing and falls back to the raw
@@ -149,6 +150,26 @@ export function SpacingBox({
 	 */
 	const [sizes] = useSettings('spacing.spacingSizes');
 	const spacingSizes = (Array.isArray(sizes) ? sizes : []) as SpacingSize[];
+
+	/*
+	 * What each empty side actually falls back to, with presets resolved.
+	 *
+	 * `placeholders` holds what the block stores, which for core's own control
+	 * is a reference rather than a length. Resolving it here and nowhere else
+	 * keeps `length.ts` free of the editor: the unit picker and the number
+	 * fields want a length, and `css` mode still shows the raw reference,
+	 * because that is what the block holds and the only one of the three a
+	 * person could type back in.
+	 */
+	const resolved: Partial<Record<Side, string>> = {};
+
+	for (const side of sides) {
+		const value = placeholders[side];
+
+		if (undefined !== value) {
+			resolved[side] = presetSize(value, spacingSizes) ?? value;
+		}
+	}
 
 	/*
 	 * `css` rather than `custom`, and it is the label doing the work: it names
@@ -191,7 +212,7 @@ export function SpacingBox({
 		}
 
 		return inheritedUnit(
-			sides.map((side) => placeholders[side]),
+			sides.map((side) => resolved[side]),
 			allowed
 		);
 	};
@@ -365,6 +386,7 @@ export function SpacingBox({
 										}
 										placeholder={placeholderFor(
 											placeholders[side],
+											resolved[side],
 											unit,
 											spacingSizes
 										)}
@@ -400,19 +422,26 @@ export function SpacingBox({
  * value when it does not — a lone "2" under a `px` picker would read as two
  * pixels when it is two rem.
  *
- * A preset is neither, and gets its name: core's Dimensions slider stores
- * `var:preset|spacing|50` and displays it as *Regular*, so that is the word the
- * author is looking for. The reference itself is 21 characters in a 59px field
- * and tells them nothing. Only in a number field — `css` mode takes whole CSS
- * values, where the reference is the thing you could type and a name is not.
+ * A preset is read through its resolved size, so it obeys the same two rules as
+ * everything else: `var:preset|spacing|30` is `20px` on Twenty Twenty-Five and
+ * shows as `20` in a `px` box. Only when that resolution is not a length — four
+ * of that theme's seven sizes are `clamp()` — does the preset's **name** stand
+ * in, because there is no number to show and the name is the word core itself
+ * uses for the value.
+ *
+ * All of this is for the number fields. `css` mode takes whole CSS values and
+ * is passed the raw reference instead: neither a name nor a resolved size is
+ * what the block stores, and only the reference can be typed back in.
  *
  * @param inherited The value this side falls back to, if any.
+ * @param resolved  The same value with a preset resolved to its size.
  * @param unit      The unit the box is showing.
- * @param sizes     The site's spacing sizes, for naming a preset.
+ * @param sizes     The site's spacing sizes, for naming an unresolvable preset.
  * @return Placeholder text, or undefined when nothing is inherited.
  */
 function placeholderFor(
 	inherited: string | undefined,
+	resolved: string | undefined,
 	unit: string,
 	sizes: SpacingSize[]
 ): string | undefined {
@@ -420,17 +449,12 @@ function placeholderFor(
 		return undefined;
 	}
 
-	const named = presetLabel(inherited, sizes);
+	const value = resolved ?? inherited;
+	const parsed = parseLength(value);
 
-	if (named) {
-		return named;
+	if (parsed) {
+		return parsed.unit === unit ? String(parsed.value) : value;
 	}
 
-	const parsed = parseLength(inherited);
-
-	if (!parsed || parsed.unit !== unit) {
-		return inherited;
-	}
-
-	return String(parsed.value);
+	return presetLabel(inherited, sizes) ?? value;
 }

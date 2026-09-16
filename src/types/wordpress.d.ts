@@ -160,6 +160,24 @@ declare module '@wordpress/block-editor' {
 	 * @return True for `var:preset|spacing|<slug>`.
 	 */
 	export function isValueSpacingPreset(value: string): boolean;
+
+	/**
+	 * The length a spacing preset reference stands for.
+	 *
+	 * Public. `sizes` is `{ name?, size?, slug }[]` as
+	 * `useSettings( 'spacing.spacingSizes' )` returns it. Measured on 7.1: a
+	 * slug the site does not define returns `undefined`, a non-preset is
+	 * returned unchanged, and **an undefined `sizes` throws** — so callers pass
+	 * an array always.
+	 *
+	 * @param value Any stored value.
+	 * @param sizes The site's spacing sizes.
+	 * @return The size, or undefined when the slug is unknown.
+	 */
+	export function getCustomValueFromPreset(
+		value: string,
+		sizes: Array<{ name?: string; size?: string; slug: string }>
+	): string | undefined;
 	/**
 	 * `group` picks which inspector tab the fill lands in.
 	 *

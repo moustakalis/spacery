@@ -351,10 +351,16 @@ Any block with spacing support — Group, Cover, Columns, a Paragraph.
       that is the point of the box.**
 
       *Inherited* (the value is on the block's own `style`, nothing authored at
-      this tier): the box opens in **`px`**, four number fields, each empty side
-      showing the preset's **name** as its placeholder — `Regular` for
-      `var:preset|spacing|50` on Twenty Twenty-Five. Type `24` in a field: it
-      must store **`24px`**. Seen on 16 September.
+      this tier): the box opens in **`px`**, four number fields, and each empty
+      side shows the preset's **resolved size** — on Twenty Twenty-Five,
+      `var:preset|spacing|30` is `20px`, so the placeholder reads `20`. Type
+      `24` in a field: it must store **`24px`**. Seen on 16 September.
+
+      *Inherited, with no size to show*: four of that theme's seven sizes are
+      `clamp()`, which no number field can hold. There the placeholder falls
+      back to the preset's **name** — `var:preset|spacing|50` reads `Regular`.
+      Seen on 16 September. If both halves read as names, `presetSize()` is not
+      resolving; if both read as references, the fix is not running at all.
 
       *Held* (a preset authored at this tier): the box opens in **custom**,
       four text fields, with the `A length, calc() or a preset…` help line.
@@ -384,10 +390,18 @@ Any block with spacing support — Group, Cover, Columns, a Paragraph.
       which the allowlist accepts and the browser drops. The rule is about what
       a box **holds**. An empty box reads its inherited values with
       `inheritedUnit()`, which can never return custom, and an inherited preset
-      is shown by name rather than by reference.
+      is resolved to its size — by name only when that size is not a length.
 
-      **So the expectation above is the third one this box has carried.** If it
-      fails, check the box against `length.ts` before believing it.
+      **D37 shipped twice, and the first shape was wrong too.** It showed the
+      preset's name in every case, on the argument that some presets are
+      `clamp()`. Nick's reply was the obvious one — core's own panel displays
+      `20px`, so why can Spacery not — and it is right: `getCustomValueFromPreset()`
+      is public, and a name where a number exists is a worse placeholder chosen
+      for the convenience of the minority case.
+
+      **So the expectation above is the fourth one this box has carried.** If it
+      fails, check the box against `length.ts` and `presets.ts` before believing
+      it.
 - [x] On a set whose tiers land on distinct device widths the selector shows
       icons; on one where two tiers would share an icon it falls back to names.
       Hovering an icon must still name its tier. Both halves seen on 14
