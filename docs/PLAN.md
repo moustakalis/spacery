@@ -728,7 +728,7 @@ nothing has reached the directory. The current-state snapshot lives in `spacery-
 | `!important` arms race with core's inline styles | Medium | Follow core's own precedent for 1.0; spike the custom-property rewrite in 1.1. |
 | CSS bloat on long pages | Low | Content-addressed classes make identical spacing collapse to one rule. Measure at M2 with a 200-block fixture. |
 | Editor performance with N tiers × many blocks | Medium | Only the selected block subscribes to the store; memoize generated rules by hash. |
-| WP.org review friction (trademark, slug, build sources) | Low | Plugin Check in CI from M0; ship unminified sources; confirm the slug early. |
+| WP.org review friction (trademark, slug, build sources) | Low | Plugin Check in CI from M0; confirm the slug early; **`readme.txt`'s `== Source Code ==` section** links the uncompiled `src/` and the build steps, which is what guideline 4 asks for. This row used to say "ship unminified sources" — it never happened: `package.json#files` ships `build/` without `src/`, and `build/extension.js` is minified. The readme link is the alternative the guideline allows, and it is the one implemented. |
 | `responsive-state` needs changes to fit | Medium | It is our package. Changes go upstream and ship as a version bump, not a fork. |
 | Double-declared properties alongside core's responsive styles | Low | Was **High** while the two systems ran opposite cascades; D10 aligned them. What remains is inspector UX — showing that core already manages a property and offering to take it over. See §3.3a. |
 
