@@ -3,16 +3,21 @@
 Responsive block controls for the WordPress block editor — unlimited, theme-defined
 breakpoints for any block.
 
-> **Status: 1.0.0, submitted to WordPress.org on 16 September 2026, from
-> commit `22ff7c9`.** Everything the plugin does is built, tested and shipped in
-> that zip. Review takes up to 14 business days, and until it returns **nothing
-> here should change what was submitted**.
+> **Status: 1.0.0, ready to submit to WordPress.org.** Everything the plugin
+> does is built and tested, every asset and every submission text is written,
+> and `python3 bin/check-release.py` passes. What has not happened yet is the
+> upload.
+>
+> **Submitted on:** _not yet — record the date and the commit here when it is._
+> Review then takes up to 14 business days, and from that moment the uploaded
+> zip is frozen: a fix lands here and ships in the deploy, not in the review.
 >
 > **Picking this up cold?** Read in this order:
 >
 > 1. [`docs/submission.md`](docs/submission.md) — the runbook for right now:
->    what went into the form, ready replies if the reviewer writes back, and the
->    steps that follow approval (date the changelog, add the SVN secrets, tag).
+>    what to check before the form, the overview to paste into it, ready replies
+>    if the reviewer writes back, and the steps that follow approval (date the
+>    changelog, add the SVN secrets, tag).
 > 2. [`docs/PLAN.md`](docs/PLAN.md) — the architecture, and a numbered decision
 >    table (D1–D37) giving the reasoning behind each choice. Read the decision
 >    before reopening the question; several rows record a rule that was

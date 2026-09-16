@@ -1,22 +1,28 @@
 # Submitting Spacery to WordPress.org — the runbook
 
-> **Where this stands: submitted on 16 September 2026, from commit `22ff7c9`.**
-> §1 and §2 are history now — what was checked, and the text that went into the
-> form. **If you are picking this up cold, go to the section that matches what
-> has happened:**
+> **Where this stands: ready, not yet uploaded.** Record the date and the
+> commit here the moment it is — this line is the one place that says whether
+> the plugin is in the queue, and everything below reads differently depending
+> on the answer.
+>
+> **Submitted on:** _not yet._
+>
+> **If you are picking this up cold, go to the row that matches:**
 >
 > | If | Go to |
 > |---|---|
-> | Nothing yet; still in the queue | Nowhere. Review takes up to **14 business days** and the reviewer reads the uploaded zip. Don't change it, don't re-submit, don't tag. |
+> | Not submitted yet | **§1**, then **§2**. The two live pre-flight items are the slug and the repository's visibility — see below. |
+> | Uploaded; still in the queue | Nowhere. Review takes up to **14 business days** and the reviewer reads the uploaded zip. Don't change it, don't re-submit, don't tag. |
 > | A reviewer has written back | **§3** — ready replies for the three things a code scan raises, and the rule about replying in the same thread rather than re-submitting |
 > | Approved; SVN credentials have arrived | **§4** — date the changelog, add the secrets, tag, check the listing |
-> | Something about the plugin itself needs changing | `docs/PLAN.md`'s decision table first. Then remember the zip under review is frozen: a fix lands in the repo and ships in the deploy, not in the queue. |
+> | Something about the plugin itself needs changing | `docs/PLAN.md`'s decision table first. Then check the line above: before upload a fix simply goes in the next zip; after it, the zip is frozen and the fix ships in the deploy. |
 >
-> Two facts settled before submitting, so nobody re-asks: the WordPress.org
+> **Two answers settled on 16 September**, so nobody re-asks: the WordPress.org
 > account is **`nikosmoustakas`**, which is what `readme.txt`'s `Contributors`
-> line grants the listing to; and `github.com/moustakalis/spacery` is **public**,
-> which is what makes `readme.txt`'s `== Source Code ==` section satisfy
-> guideline 4.
+> line grants the listing to; and `github.com/moustakalis/spacery` is
+> **public** — which is what makes `readme.txt`'s `== Source Code ==` section
+> satisfy guideline 4, so **confirm it still is before uploading**: a 404 there
+> is a review round-trip.
 
 **Written 16 September 2026, against the live handbook and the live plugin.**
 The submission itself is small: WordPress.org asks for **a zip** and **a short
@@ -34,15 +40,14 @@ Checked today rather than remembered:
   submission**. The display name can be.
 - Approval brings an email with Subversion credentials. The SVN repository does
   not exist before then.
-- Latest WordPress is **7.1** (19 August 2026), so `Tested up to: 7.1` was
-  current at submission. 7.1.1 was scheduled but not out. **Bumping that line
-  now does not reach the reviewer** — it is in the frozen zip. It gets updated
-  in the repository and goes out with the deploy, or afterwards through SVN like
-  any other `readme.txt` change.
+- Latest WordPress is **7.1** (19 August 2026), so `Tested up to: 7.1` is
+  current. 7.1.1 is scheduled but not out. If it ships before you upload, bump
+  that line and rebuild; after upload it is in the frozen zip and the change
+  goes out with the deploy instead.
 
 ---
 
-## 1. Before the form — done
+## 1. Before the form
 
 Five things, four of which are text that has to be right before anything is
 uploaded, because two of them cannot be changed afterwards.
@@ -68,7 +73,7 @@ pnpm run build && pnpm run plugin-zip
 
 ---
 
-## 2. The form — done, and this is what was sent
+## 2. The form
 
 **Plugin Name:** `Spacery`
 
