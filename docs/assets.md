@@ -42,12 +42,12 @@ the images it describes.
 
 ## Still outstanding
 
-Screenshots. They need a running WordPress with the plugin active, so they
-cannot be exported the way the icon and banner can. Until the files exist
-`readme.txt` carries no `== Screenshots ==` section: the captions are
-positional, so a declared line with no matching file renders as a broken image
-on the listing page. [`asset-handoff.md`](asset-handoff.md) says what each shot
-must show, and `readme-screenshots.txt` holds the readme block to paste back in
-when they land.
+Nothing. The screenshots were captured on 15 September and
+`assets/screenshot-1.png` ... `-3.png` sit beside the icons and banners, with
+the matching `== Screenshots ==` block in `readme.txt`.
+[`screenshot-brief.md`](screenshot-brief.md) records how they were taken and
+what to repeat if they are ever retaken; `readme-screenshots.txt` is now the
+captions alone, which is the one thing that must not drift from the files,
+because they are matched **by position**.
 
 See https://developer.wordpress.org/plugins/wordpress-org/plugin-assets/

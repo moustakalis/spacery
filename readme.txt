@@ -117,6 +117,24 @@ the values would just be different.
 So the choice is yours and it is off until you make it. Either way Spacery never writes
 anything into your posts, and never removes anything from them.
 
+== Source Code ==
+
+The JavaScript and CSS in `build/` are compiled. The human-readable sources they
+are built from are in `src/`, in the plugin's public repository:
+
+https://github.com/moustakalis/spacery
+
+Building them needs Node.js 22 or newer and pnpm:
+
+    pnpm install
+    pnpm run build
+
+That rebuilds the `build/` directory this plugin ships. The build uses
+`@wordpress/scripts` - webpack, Babel, TypeScript and Sass - and nothing else.
+Spacery bundles no third-party libraries and has no runtime dependencies: its
+`composer.json` requires only PHP itself, and nothing from `node_modules` is
+shipped.
+
 == Changelog ==
 
 = 1.0.0 =
