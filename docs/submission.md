@@ -1,4 +1,22 @@
-# Submitting Spacery to WordPress.org — every text it needs
+# Submitting Spacery to WordPress.org — the runbook
+
+> **Where this stands: submitted on 16 September 2026, from commit `22ff7c9`.**
+> §1 and §2 are history now — what was checked, and the text that went into the
+> form. **If you are picking this up cold, go to the section that matches what
+> has happened:**
+>
+> | If | Go to |
+> |---|---|
+> | Nothing yet; still in the queue | Nowhere. Review takes up to **14 business days** and the reviewer reads the uploaded zip. Don't change it, don't re-submit, don't tag. |
+> | A reviewer has written back | **§3** — ready replies for the three things a code scan raises, and the rule about replying in the same thread rather than re-submitting |
+> | Approved; SVN credentials have arrived | **§4** — date the changelog, add the secrets, tag, check the listing |
+> | Something about the plugin itself needs changing | `docs/PLAN.md`'s decision table first. Then remember the zip under review is frozen: a fix lands in the repo and ships in the deploy, not in the queue. |
+>
+> Two facts settled before submitting, so nobody re-asks: the WordPress.org
+> account is **`nikosmoustakas`**, which is what `readme.txt`'s `Contributors`
+> line grants the listing to; and `github.com/moustakalis/spacery` is **public**,
+> which is what makes `readme.txt`'s `== Source Code ==` section satisfy
+> guideline 4.
 
 **Written 16 September 2026, against the live handbook and the live plugin.**
 The submission itself is small: WordPress.org asks for **a zip** and **a short
@@ -21,7 +39,7 @@ Checked today rather than remembered:
 
 ---
 
-## 1. Before the form
+## 1. Before the form — done
 
 Five things, four of which are text that has to be right before anything is
 uploaded, because two of them cannot be changed afterwards.
@@ -47,7 +65,7 @@ pnpm run build && pnpm run plugin-zip
 
 ---
 
-## 2. The form
+## 2. The form — done, and this is what was sent
 
 **Plugin Name:** `Spacery`
 

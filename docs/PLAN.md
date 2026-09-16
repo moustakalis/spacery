@@ -708,15 +708,20 @@ one did not.
 Banner and icon assets, readme.txt final pass, a WordPress.org account and slug, and a
 release workflow deploying on tag.
 *Exit:* live on WP.org, release workflow deploying on tag.
-*State at 15 September 2026:* every asset is in `assets/` — the mark, the icons, the two
-banners and, as of today, the three screenshots, captured from the running plugin and
-declared by a `== Screenshots ==` block in `readme.txt` that matches them by position
-(`docs/screenshot-brief.md` records how, and what the earlier brief got wrong). The three
-other items this paragraph used to list are closed: `readme.txt` sends people to the
-Spacery screen in the admin menu, and `Settings/Screen.php` passes Spacery's own mark as a
-data URI rather than a dashicon. What remains is not asset work: **the WP.org account and
-slug are still unconfirmed, and no tag has been pushed**, so `release.yml` has never run and
-nothing has reached the directory. The current-state snapshot lives in `spacery-status.md`.
+*State at 16 September 2026:* **submitted to WordPress.org from `22ff7c9`.** Every asset
+is in `assets/` — the mark, the icons, the two banners and the three screenshots, captured
+from the running plugin and declared by a `== Screenshots ==` block in `readme.txt` that
+matches them by position (`docs/screenshot-brief.md` records how, and what the earlier
+brief got wrong). `readme.txt` sends people to the Spacery screen in the admin menu, gained
+a `== Source Code ==` section for guideline 4, and `Settings/Screen.php` passes Spacery's
+own mark as a data URI rather than a dashicon.
+
+**`docs/submission.md` is the runbook from here** — the overview that went into the form,
+replies for what a reviewer is likely to raise, and the steps that follow approval. Nothing
+in this repository should change the submitted zip while it is in the queue; review takes
+up to 14 business days and the reviewer reads the code that was uploaded. `release.yml`
+has still never run: its first run will be the deploy, after approval brings the SVN
+credentials. The current-state snapshot lives in `spacery-status.md`.
 
 ---
 

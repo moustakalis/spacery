@@ -3,11 +3,27 @@
 Responsive block controls for the WordPress block editor — unlimited, theme-defined
 breakpoints for any block.
 
-> **Status: 1.0.0, awaiting WordPress.org review.** Everything the plugin does is
-> built and tested; what remains is the directory submission itself, which needs
-> a slug before it can be released. See [`docs/PLAN.md`](docs/PLAN.md) for the
-> architecture and the reasoning behind each decision, and
-> [`docs/FILTERS.md`](docs/FILTERS.md) for the developer API.
+> **Status: 1.0.0, submitted to WordPress.org on 16 September 2026, from
+> commit `22ff7c9`.** Everything the plugin does is built, tested and shipped in
+> that zip. Review takes up to 14 business days, and until it returns **nothing
+> here should change what was submitted**.
+>
+> **Picking this up cold?** Read in this order:
+>
+> 1. [`docs/submission.md`](docs/submission.md) — the runbook for right now:
+>    what went into the form, ready replies if the reviewer writes back, and the
+>    steps that follow approval (date the changelog, add the SVN secrets, tag).
+> 2. [`docs/PLAN.md`](docs/PLAN.md) — the architecture, and a numbered decision
+>    table (D1–D37) giving the reasoning behind each choice. Read the decision
+>    before reopening the question; several rows record a rule that was
+>    corrected once already and say why.
+> 3. [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) — the pre-push checklist,
+>    which exists because the same mistakes recurred.
+> 4. [`docs/FILTERS.md`](docs/FILTERS.md) — the developer API.
+>
+> Screenshots, banners and icons live in `assets/` and are published to SVN
+> **separately from the zip**, so they can change during the queue without
+> touching what is under review.
 
 ## Why
 
