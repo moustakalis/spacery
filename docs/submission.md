@@ -34,8 +34,11 @@ Checked today rather than remembered:
   submission**. The display name can be.
 - Approval brings an email with Subversion credentials. The SVN repository does
   not exist before then.
-- Latest WordPress is **7.1** (19 August 2026), so `Tested up to: 7.1` is current
-  as of today. 7.1.1 is scheduled; if it ships before you submit, bump that line.
+- Latest WordPress is **7.1** (19 August 2026), so `Tested up to: 7.1` was
+  current at submission. 7.1.1 was scheduled but not out. **Bumping that line
+  now does not reach the reviewer** — it is in the frozen zip. It gets updated
+  in the repository and goes out with the deploy, or afterwards through SVN like
+  any other `readme.txt` change.
 
 ---
 
