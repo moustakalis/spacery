@@ -15,7 +15,15 @@
  * plausible and none of them was ruled out, so the check now prints what it
  * found before asserting anything.
  *
- * The actual answer, the first time, was the last of them: `wp option update
+ * Since the plugin stopped bundling translations there is a fifth: the pack
+ * itself not being installed. Spacery ships no `languages` directory, so CI
+ * copies the repository's compiled Greek into `WP_LANG_DIR/plugins` under the
+ * names WordPress looks for -- which is what a language pack from
+ * translate.wordpress.org is. The report therefore says whether that landed,
+ * and distinguishes it from the copy sitting in the checkout, which nothing
+ * loads and which is not in the distributable.
+ *
+ * The actual answer, the first time, was a different one: `wp option update
  * WPLANG el` silently does nothing on a site with no Greek language pack.
  * `sanitize_option()` restricts WPLANG to `get_available_languages()`, which is
  * a glob of `WP_LANG_DIR/*.mo`, and puts the previous value back otherwise
@@ -56,9 +64,15 @@ $spacery_report = array(
 		$wp_textdomain_registry->get( $spacery_domain, $spacery_locale ),
 		true
 	),
-	'.mo readable'            => is_readable(
-		WP_PLUGIN_DIR . "/spacery/languages/spacery-{$spacery_locale}.mo"
+	'pack .mo readable'       => is_readable(
+		WP_LANG_DIR . "/plugins/spacery-{$spacery_locale}.mo"
 	) ? 'yes' : 'no',
+	'pack .json files'        => count(
+		glob( WP_LANG_DIR . "/plugins/spacery-{$spacery_locale}-*.json" ) ?: array()
+	),
+	'bundled in the plugin'   => is_readable(
+		WP_PLUGIN_DIR . "/spacery/languages/spacery-{$spacery_locale}.mo"
+	) ? 'yes (the checkout; not in the zip)' : 'no',
 	'text domain loaded'      => is_textdomain_loaded( $spacery_domain ) ? 'yes' : 'no',
 	'__( "Save changes" )'    => $spacery_actual,
 );

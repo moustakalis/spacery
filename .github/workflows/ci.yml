@@ -116,7 +116,12 @@ jobs:
       # A string added without regenerating the POT is untranslatable and
       # nothing else would notice: the plugin works, the string is just stuck in
       # English forever. This is the only check that catches it.
-      - name: Regenerate the POT
+      #
+      # `i18n:pot` builds first. The POT is extracted from the distributable
+      # rather than from `src/`, because its references are what name the files
+      # in a language pack -- see bin/make-pot.sh -- so it needs `build/` to
+      # exist and to be current.
+      - name: Build, and regenerate the POT
         run: WP_CLI=/tmp/wp-cli.phar pnpm run i18n:pot
 
       - name: Fail if it differs from the committed one
@@ -197,10 +202,11 @@ jobs:
       - name: Run end-to-end tests
         run: pnpm run test:e2e
 
-      # M6's exit criterion. The site is switched to Greek and both halves of the
-      # translation pipeline are exercised: the PHP check proves WordPress's
-      # just-in-time loading finds the .mo, and the Playwright spec proves the
-      # browser loads the per-handle .json.
+      # M6's exit criterion. The site is switched to Greek, a language pack is
+      # installed, and both halves of the pipeline are exercised: the PHP check
+      # proves just-in-time loading finds the .mo with nothing registering a
+      # path, and the Playwright spec proves the browser loads the script
+      # payload named after build/settings.js.
       #
       # Setting the option alone does not switch the site. `sanitize_option()`
       # restricts WPLANG to the locales that have a core language pack in
@@ -210,6 +216,23 @@ jobs:
       # the option stick, and it is what a Greek site actually looks like.
       - name: Switch the test site to Greek
         run: pnpm run env run tests-cli wp language core install el --activate
+
+      # Spacery bundles no translations, so the only honest way to test one is
+      # to install it the way WordPress.org delivers it: the repository's
+      # compiled Greek, copied into WP_LANG_DIR/plugins under the names core
+      # looks for. Those names are an md5 of each script's path relative to the
+      # plugin root, which is why they look arbitrary; bin/make-translations.sh
+      # asserts them when it writes them.
+      #
+      # This step is what the two below are actually testing, so it reports what
+      # it wrote and fails here rather than letting a copy that moved nothing
+      # surface later as "the site is in English".
+      - name: Install Spacery's Greek as a language pack
+        run: |
+          pnpm run env run tests-cli \
+            wp eval-file wp-content/plugins/spacery/bin/install-language-pack.php \
+            | tee /tmp/language-pack.txt
+          grep -q '^OK:' /tmp/language-pack.txt
 
       # The assertion lives in a PHP file rather than in a pipe to `grep`, so
       # that a failure says which link broke -- locale, boot, registered path,
