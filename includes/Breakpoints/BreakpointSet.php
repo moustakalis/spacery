@@ -72,9 +72,32 @@ final class BreakpointSet {
 				$label = self::machine_label( $slug );
 				$max   = $value;
 			} elseif ( is_array( $value ) ) {
-				$slug  = (string) ( $value['slug'] ?? $key );
-				$label = (string) ( $value['label'] ?? self::machine_label( $slug ) );
-				$max   = (string) ( $value['max'] ?? '' );
+				/*
+				 * Types are checked rather than cast. `(string)` on an array
+				 * warns and yields the literal `Array`; on an object it throws,
+				 * and an uncaught Error inside a `register_setting()` sanitize
+				 * callback is a fatal on whatever page asked to save. Nothing
+				 * arrives here that way through the REST API, whose registered
+				 * schema refuses a non-string first -- a plain `update_option()`
+				 * from WP-CLI or another plugin does, and that is the caller
+				 * this class promises never to fatal for.
+				 *
+				 * A key is int|string by PHP's own guarantee, so the fallback
+				 * to `$key` needs no check beyond that.
+				 */
+				$slug = $value['slug'] ?? $key;
+
+				if ( ! is_string( $slug ) && ! is_int( $slug ) ) {
+					return null;
+				}
+
+				$slug  = (string) $slug;
+				$label = array_key_exists( 'label', $value ) ? $value['label'] : self::machine_label( $slug );
+				$max   = $value['max'] ?? '';
+
+				if ( ! is_string( $label ) || ! is_string( $max ) ) {
+					return null;
+				}
 			} else {
 				return null;
 			}

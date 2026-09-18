@@ -75,6 +75,20 @@ final class Breakpoint {
 	 * theme.json or option should make Spacery fall back to a known-good set,
 	 * never fatal a site.
 	 *
+	 * **The label is the one free-form part.** A slug and a boundary are
+	 * matched against patterns core itself uses, so nothing but `[a-z0-9-]`
+	 * and a CSS length survives them; a label is whatever somebody typed.
+	 * `sanitize_text_field()` runs here rather than at the option boundary
+	 * because there are four doors into this value -- the settings screen, a
+	 * theme's `settings.custom.spacery.breakpoints`, the `spacery_breakpoints`
+	 * filter and a plain `update_option()` -- and a rule enforced at one of
+	 * them is a rule three callers can skip. It also trims, which is what the
+	 * separate `trim()` here used to do.
+	 *
+	 * A label made entirely of markup sanitizes to nothing and is then refused
+	 * by the empty check below. That is the existing rule applying to a new
+	 * case rather than a new rule.
+	 *
 	 * @param string $slug  Machine name.
 	 * @param string $label Human-readable name.
 	 * @param string $max   Upper bound as a CSS length.
@@ -82,7 +96,7 @@ final class Breakpoint {
 	 */
 	public static function create( string $slug, string $label, string $max ): ?Breakpoint {
 		$slug  = trim( $slug );
-		$label = trim( $label );
+		$label = sanitize_text_field( $label );
 		$max   = trim( $max );
 
 		if ( 1 !== preg_match( '/' . self::SLUG_PATTERN . '/', $slug ) ) {

@@ -185,6 +185,44 @@ final class BreakpointSetTest extends TestCase {
 			'empty slug'           => array( array( '' => '782px' ), 'a slug is required' ),
 			'missing max'          => array( array( array( 'slug' => 'tablet' ) ), 'a boundary is required' ),
 			'non-string value'     => array( array( 'a' => 782 ), 'a boundary must be a CSS length string' ),
+			'array label'          => array(
+				array(
+					array(
+						'slug'  => 'tablet',
+						'label' => array( 'Tablet' ),
+						'max'   => '782px',
+					),
+				),
+				'casting an array to string yields the literal "Array"',
+			),
+			'object label'         => array(
+				array(
+					array(
+						'slug'  => 'tablet',
+						'label' => new \stdClass(),
+						'max'   => '782px',
+					),
+				),
+				'casting an object to string throws, and a sanitize callback may not fatal',
+			),
+			'array max'            => array(
+				array(
+					array(
+						'slug' => 'tablet',
+						'max'  => array( '782px' ),
+					),
+				),
+				'a boundary is a string or it is nothing',
+			),
+			'object slug'          => array(
+				array(
+					array(
+						'slug' => new \stdClass(),
+						'max'  => '782px',
+					),
+				),
+				'a slug is a string or it is nothing',
+			),
 		);
 	}
 
@@ -227,6 +265,66 @@ final class BreakpointSetTest extends TestCase {
 
 		$this->assertNotNull( $breakpoint );
 		$this->assertSame( 480.0, $breakpoint->max_in_pixels(), 'core assumes 16px per rem' );
+	}
+
+	// -- Labels ------------------------------------------------------------
+
+	/**
+	 * The label is the only part a pattern does not already confine.
+	 *
+	 * A slug is `[a-z0-9-]` and a boundary is a CSS length, both matched
+	 * against the rules core uses. A label is free text, and it reaches the
+	 * editor payload and the settings screen, so it is sanitized at the one
+	 * place every source passes through.
+	 */
+	public function test_strips_markup_from_a_label(): void {
+		$set = BreakpointSet::from_array(
+			array(
+				array(
+					'slug'  => 'tablet',
+					'label' => 'Tablet <img src=x onerror=alert(1)>',
+					'max'   => '782px',
+				),
+			)
+		);
+
+		$this->assertNotNull( $set );
+		$this->assertSame( 'Tablet', $set->all()[0]->label );
+	}
+
+	/**
+	 * A label with nothing left after sanitizing is no label at all.
+	 *
+	 * This is the empty-label rule that was already there, reached by a new
+	 * route rather than a second rule added beside it.
+	 */
+	public function test_rejects_a_label_that_is_only_markup(): void {
+		$set = BreakpointSet::from_array(
+			array(
+				array(
+					'slug'  => 'tablet',
+					'label' => '</script><img src=x onerror=alert(1)>',
+					'max'   => '782px',
+				),
+			)
+		);
+
+		$this->assertNull( $set, 'nothing survives sanitizing, so there is no name' );
+	}
+
+	public function test_keeps_a_label_that_needs_no_sanitizing(): void {
+		$set = BreakpointSet::from_array(
+			array(
+				array(
+					'slug'  => 'small-tablet',
+					'label' => '  Small tablet  ',
+					'max'   => '782px',
+				),
+			)
+		);
+
+		$this->assertNotNull( $set );
+		$this->assertSame( 'Small tablet', $set->all()[0]->label, 'sanitizing trims, as the trim it replaced did' );
 	}
 
 	// -- Tier count cap ----------------------------------------------------

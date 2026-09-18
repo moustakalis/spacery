@@ -40,6 +40,21 @@ if ( ! function_exists( '__' ) ) {
 	}
 }
 
+if ( ! function_exists( 'sanitize_text_field' ) ) {
+	/**
+	 * Stub of sanitize_text_field(), which `Breakpoint::create()` runs a label
+	 * through. Core's `formatting.php` is not loaded here; only the one class
+	 * under comparison is.
+	 *
+	 * @param string $str Value to sanitize.
+	 */
+	function sanitize_text_field( string $str ): string {
+		$str = (string) preg_replace( '@<(script|style)[^>]*?>.*?</\1>@si', '', $str );
+
+		return trim( strip_tags( $str ) );
+	}
+}
+
 require_once __DIR__ . '/../../includes/Autoloader.php';
 
 Spacery\Autoloader::register();

@@ -153,6 +153,23 @@ function __( string $text, string $domain = 'default' ): string {
 }
 
 /**
+ * Stub of sanitize_text_field().
+ *
+ * Core's version also strips percent-encoded octets and collapses whitespace.
+ * This reproduces the two parts Spacery relies on -- tags removed, including
+ * the contents of `script` and `style`, and the result trimmed -- and stops
+ * there, because a fuller copy would be a second implementation to keep in
+ * step with core for no assertion's benefit.
+ *
+ * @param string $str Value to sanitize.
+ */
+function sanitize_text_field( string $str ): string {
+	$str = (string) preg_replace( '@<(script|style)[^>]*?>.*?</\1>@si', '', $str );
+
+	return trim( strip_tags( $str ) );
+}
+
+/**
  * Stub of add_settings_error().
  *
  * Recorded rather than discarded: "the save was refused" is a claim worth
