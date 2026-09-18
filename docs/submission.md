@@ -28,6 +28,64 @@
 > satisfy guideline 4, so **confirm it still is before uploading**: a 404 there
 > is a review round-trip.
 
+## 0. Opening a new Claude session on this
+
+Paste one of these as the first message. They exist because the useful thing on
+a cold start is not a summary — it is getting the session to read the right
+three places before it says anything.
+
+**Nothing has happened yet — just resume:**
+
+```text
+Spacery, my WordPress plugin. It is submitted to WordPress.org and I am waiting
+on the review.
+
+Before answering anything, read, in this order:
+1. docs/submission.md — the header says where it stands, and §3 is the review
+   procedure.
+2. The project doc claude/spacery-status.md, §1 only — the boxed summary. The
+   rest is history; do not infer the current state from it.
+3. docs/PLAN.md's decision table (D1–D37) before reopening any design question.
+
+The repo is the connected folder ~/Documents/GitHub/spacery; the MAMP test site
+is ~/Dev/playground at https://playground:8890. You prepare commits, I push.
+The submitted zip is frozen — a fix lands in the repo and ships in the deploy.
+
+Then tell me where things stand and what, if anything, is worth doing today.
+```
+
+**The reviewer has written back:**
+
+```text
+Spacery — the WordPress.org reviewer replied. Their email is below.
+
+Read docs/submission.md §3 first: the reply mechanics, the table of Spacery
+against every Common Issues category with its evidence, and the ready replies.
+Also read the project doc claude/spacery-status.md §1 for the current state.
+
+Check each point they raise against the code before agreeing with it — §3's
+table has the evidence for the ones already verified. Then draft one reply for
+the same email thread. Do not re-submit through the form, and do not tag.
+
+Repo: ~/Documents/GitHub/spacery. I push, you don't.
+
+--- their email ---
+<paste>
+```
+
+**Approved:**
+
+```text
+Spacery was approved by WordPress.org and the SVN credentials have arrived.
+
+Read docs/submission.md §4 — it is the runbook for exactly this: date the
+changelog, add the repository secrets, tag, watch release.yml, check the
+listing. Note that release.yml has never run before, so its first run is the
+deploy itself.
+
+Repo: ~/Documents/GitHub/spacery. You prepare commits, I push and I tag.
+```
+
 **Written 16 September 2026, against the live handbook and the live plugin.**
 The submission itself is small: WordPress.org asks for **a zip** and **a short
 written overview of what the plugin does**. Everything else a reviewer reads is
