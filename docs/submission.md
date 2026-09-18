@@ -1,16 +1,23 @@
 # Submitting Spacery to WordPress.org — the runbook
 
-> **Submitted on: 16 September 2026.** In the queue, awaiting a first review.
-> This line is the one place that says where the plugin stands; everything below
-> reads differently depending on it, so update it here and nowhere else.
+> **Submitted 16 September 2026; pended by the automated pre-review on
+> 18 September.** This line is the one place that says where the plugin stands;
+> everything below reads differently depending on it, so update it here and
+> nowhere else.
 >
-> **What the zip contains:** the shipping files as of **`22ff7c9`**. Every
-> commit after that one touches `docs/` or `README.md`, and neither is in
-> `package.json#files`, so nothing since has reached the reviewer.
+> **The pre-review raised four things** (ID `AUTOPREREVIEW spacery/nikosmoustakas/18Sep26/T1`):
+> guideline 11 and admin notices, bundled `.po`/`.mo` files, the
+> `register_setting()` sanitizer for breakpoints, and `load_plugin_textdomain()`.
+> Three were fixed; guideline 11 is a false positive and is answered rather than
+> changed. §3's *What the pre-review asked* has the detail and the reply.
 >
-> **When to expect a reply:** review is *"within 14 business days"*, which from
-> 16 September is **on or about 6 October 2026**. That is a ceiling the handbook
-> states, not a promise, and a queue can run long.
+> **What the uploaded zip contains:** the shipping files as of **`22ff7c9`**.
+> The fixes are in the repository and are **not** in the zip the reviewer holds;
+> a corrected zip has to be uploaded before the reply is worth sending.
+>
+> **When to expect a reply:** a pended submission goes into the assigned
+> reviewer's queue once you reply, and response times depend on a volunteer's
+> availability — days to weeks. Do not ask for a status update inside a month.
 >
 > **If you are picking this up cold, go to the row that matches:**
 >
@@ -184,11 +191,12 @@ Notes for review, covering what a scan of the code will raise:
    so the icon's plain SVG markup is a readable constant a few lines above and
    is encoded at call time rather than pasted in pre-encoded.
 
-5. `includes/I18n.php` calls `load_plugin_textdomain()`, which Plugin Check
-   reports as discouraged since 4.6. It is there to register the plugin's own
-   `/languages` path so the bundled Greek translation is found. Once
-   translate.wordpress.org generates a language pack, the bundled files and this
-   call both go.
+5. No translations are bundled and there is no `load_plugin_textdomain()` call.
+   `wp_set_script_translations()` is given a handle and a domain and no path, so
+   both halves of the plugin's translations come from a language pack in
+   WP_LANG_DIR. The POT is extracted from the built bundles rather than from
+   `src/`, because a pack's script payloads are named after an md5 of the
+   registered script's path and would otherwise never be found.
 
 Stored data: two registered options, `spacery_breakpoint_source` and
 `spacery_custom_breakpoints`. `uninstall.php` removes them only if the site
@@ -208,8 +216,14 @@ reviewer reads `readme.txt` from the zip.
 **The mechanics first**, because getting these wrong costs more than any answer
 does.
 
-- Reply **in the same email thread**, to `plugins@wordpress.org`. **Do not
-  re-submit through the form** — a second submission makes a second ticket.
+- Reply **in the same email thread**, to `plugins@wordpress.org`.
+- **Uploading a corrected zip is not re-submitting.** The two are easy to
+  confuse and the cost of getting it wrong runs both ways. A *new* submission
+  makes a second ticket and is what to avoid; a *pended* submission is corrected
+  by uploading at the same "Add your plugin" page, which replaces the zip on the
+  existing ticket, and the pre-review email asks for exactly that. Upload first,
+  then reply in the thread — a reply saying something is fixed, sent against a
+  zip that still has it, costs a round trip.
 - Answer everything in **one** reply rather than a stream of them.
 - If a change is genuinely needed: make it in the repository, push it, and send
   a new zip **when they ask for one**. They normally do ask; do not pre-empt it.
@@ -217,6 +231,54 @@ does.
   repository does not exist until approval anyway.
 - Tone: state the fact, then **offer** the change. A reviewer who has to argue
   takes longer than one who can say "fine".
+
+### What the pre-review asked, and what was done
+
+18 September 2026. Every point was read against the code before it was agreed
+with, and two of the four were not what they looked like.
+
+| Raised | Verdict |
+|---|---|
+| **Guideline 11**, admin dashboard hijacking | **False positive.** Answered, not changed. Spacery registers exactly two `admin_notices` callbacks — `Requirements::register_notice()` and `Spacer::missing_build_notice()` — both `notice-error`, both gated on `current_user_can( 'activate_plugins' )`, both conditional on the plugin being unable to run. Nothing dismissible, no dashboard widget, no `plugin_action_links` or `plugin_row_meta`, no activation redirect, and no upsell wording anywhere in `includes/`, `build/` or `readme.txt`. The other thing the pattern could have caught is the top-level `add_menu_page()`, which is D16 and is allowed |
+| **Bundled `.po` / `.mo`** | Correct. Fixed — `languages` is out of `package.json#files` |
+| **`register_setting()` sanitization** | Half right, and the half it mentions in passing was the real one. All three options already carried a `sanitize_callback`; the note was about the callback's quality. Labels were trim-only, true — but there is no injection path, because the editor payload goes through `wp_json_encode()`, whose slash escaping stops a `</script>` label closing the inline script, and both bundles render labels as React text with no `dangerouslySetInnerHTML` anywhere. They are sanitized anyway. **The finding worth having was "validate string types":** `BreakpointSet::from_array()` cast with `(string)`, which *throws* for an object — an uncaught Error in a sanitize callback, fatal on whatever page asked to save. Unreachable through REST, reachable from `update_option()` |
+| **`load_plugin_textdomain()`** | Correct, and the same finding as the bundled files: the call exists only to register the path those files sit at. Both gone. D20 records the reversal |
+
+**Fixing the last one turned up a defect that predates the review**, and it is
+the reason the change is larger than the reviewer asked for. A language pack's
+script payloads are named after an md5 of the *registered* script's path —
+`build/settings.js` — and translate.wordpress.org names them from this
+repository's POT, which referenced `src/settings/App.js`. So JavaScript
+translations would never have loaded in any locale, and the bundled Greek was
+the only thing hiding it. D38.
+
+### The reply
+
+Short, as they ask. One clarification, because guideline 11 is the one thing
+not being changed, and one piece of context worth their time.
+
+```text
+Hi,
+
+Thanks — a corrected zip is uploaded.
+
+One clarification on guideline 11, since nothing there changed: Spacery
+registers two admin notices and no others. Both are notice-error, both are
+gated on current_user_can( 'activate_plugins' ), and both render only when the
+plugin cannot run at all — WordPress or PHP below the required minimum, or a
+source checkout with no build/ directory. Nothing is dismissible, and there are
+no dashboard widgets, no action-link or row-meta additions, no promotional
+content and no pro version.
+
+The other three are fixed. The bundled translations are gone and
+load_plugin_textdomain() with them — it was only registering the path those
+files sat at. Translations will come from translate.wordpress.org; the POT is
+now extracted from the built bundles, so that a pack's script payloads are found
+at the names WordPress looks for, which they would not have been before.
+
+Best,
+Nickos
+```
 
 ### Where Spacery stands against the handbook's Common Issues
 
@@ -241,10 +303,9 @@ If a reviewer raises one of these, the evidence column is where to start.
 | HEREDOC / NOWDOC, short tags | None | — |
 | Plugin activation of other plugins | None | — |
 
-**Two that are answers rather than all-clears**, and both already have replies
-below: the single `base64_encode()` for the admin menu icon, and
-`load_plugin_textdomain()`, which Plugin Check reports as discouraged. Those are
-the plugin's only two findings from any tool.
+**One that is an answer rather than an all-clear**, and it has a reply below:
+the single `base64_encode()` for the admin menu icon. `load_plugin_textdomain()`
+was the other, and is gone — see below.
 
 ### Ready replies
 
@@ -272,16 +333,14 @@ If you would rather review the sources in place, I can add `src/` to the zip
 and resubmit.
 ```
 
-### If they ask about `load_plugin_textdomain()`
+### If they ask about translations
 
 ```text
-It registers the plugin's own `/languages` path in `WP_Textdomain_Registry`, so
-the bundled Greek `.mo` is found; without it the block titles, the admin menu
-and every PHP string stay untranslated until a language pack exists. The call
-exists only because the bundled files do. Once the plugin is in the directory
-and translate.wordpress.org generates a pack, I will remove both in a 1.0.x
-release. If you would prefer it gone before approval, I can drop the bundled
-translation now and ship the POT alone.
+Nothing is bundled. The plugin carries no `languages` directory and no
+`load_plugin_textdomain()` call, and `wp_set_script_translations()` is given a
+handle and a domain but no path, so both halves come from a language pack in
+WP_LANG_DIR. The compiled Greek stays in the public repository to seed
+translate.wordpress.org once the plugin is listed.
 ```
 
 ### If they ask anything about data or privacy

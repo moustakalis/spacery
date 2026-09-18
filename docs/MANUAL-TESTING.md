@@ -100,8 +100,10 @@ rebuild:
 `~/Dev/playground` is served by MAMP Pro, and
 `wp-content/plugins/spacery` is a symlink to this repository. Symlinked plugins
 are fine on modern WordPress — `wp_register_plugin_realpath()` exists for
-exactly this — so `plugin_basename()` resolves correctly and the `languages/`
-lookup and `build/*.js` URLs work as they would from a real install. The link
+exactly this — so `plugin_basename()` resolves correctly and the `build/*.js`
+URLs work as they would from a real install. Translations no longer come from
+inside the plugin at all (D20's revision); to see a locale here, install the
+compiled Greek as a pack first — `wp eval-file bin/install-language-pack.php`. The link
 name has to stay `spacery`; both of those derive from it.
 
 Three preconditions, each of which fails in a way that looks like a plugin bug:
@@ -853,7 +855,9 @@ than a block library, so install something that actually registers blocks with
       settings-screen, front-end, takeover, deactivation and reactivation work.
       Nothing was appended on 14 September at all. In particular no
       `_doing_it_wrong` about translation timing, which is the one D20 accepted
-      a risk on by keeping `load_plugin_textdomain()`.
+      a risk on by keeping `load_plugin_textdomain()`. That call has since gone
+      (D20's revision), so the risk is gone with it and this box now only
+      watches for the notice core raises on its own.
 
       The file is not empty, and none of it is ours: 5 fatals and 5 warnings are
       an unrelated plugin (`folderfolio`) failing to load its autoloader on

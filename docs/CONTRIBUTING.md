@@ -142,8 +142,29 @@ build, with no string added, removed or altered.
 changed at all.** It costs seconds. Two separate CI failures came from treating
 it as a strings-only step.
 
+**The JavaScript half moves less than it used to, and that is not licence to
+skip it.** The POT is extracted from `build/` rather than from transpiled
+sources (D38), so every JavaScript reference is `build/extension.js:1` or one of
+its two siblings — a minified bundle is one line. A comment added above a
+`__()` call in `src/` therefore moves nothing. A string change still does, and
+anything at all in `includes/` still does.
+
 `pnpm run i18n:build` is different: it compiles `.po` into the `.mo` and the
-per-handle `.json`, so it only matters when a translation changed.
+per-bundle `.json`, so it only matters when a translation changed.
+
+## A JavaScript translation is found by the *built* path
+
+`_load_script_textdomain_from_src()` looks for
+`<domain>-<locale>-<md5 of 'build/settings.js'>.json` in `WP_LANG_DIR/plugins`,
+and translate.wordpress.org names a language pack's files after the references
+in this repository's POT. So the POT has to reference the bundles, which is why
+`bin/make-pot.sh` scans the distributable and why `pnpm run i18n:pot` builds
+first.
+
+Point it back at `src/` and every locale's JavaScript silently stops loading:
+the plugin works, the editor is simply in English, and nothing anywhere says so.
+`bin/make-translations.sh` asserts its three filenames against `md5()` of the
+three bundle paths, which is the check that would catch it.
 
 **Three separate CI failures now, and the third was worse than the first two.**
 It was not a forgotten regeneration: the POT *was* regenerated, and the diff
