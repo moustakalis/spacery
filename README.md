@@ -81,14 +81,18 @@ composer run test       # PHPUnit
 ### Translations
 
 ```bash
-pnpm run i18n:pot       # languages/spacery.pot
-pnpm run i18n:build     # .mo and per-handle .json from every .po
+pnpm run i18n:pot       # build, then languages/spacery.pot
+pnpm run i18n:build     # .mo and per-bundle .json from every .po
 ```
 
 Both need [WP-CLI](https://wp-cli.org/); set `WP_CLI` to a `wp-cli.phar` if it
-is not on your `PATH`. `i18n:pot` transpiles the TypeScript before extracting,
-because `wp i18n make-pot` cannot read it and skips every string in the editor
-and the settings screen without saying so.
+is not on your `PATH`. `i18n:pot` builds first and then extracts from the
+distributable rather than from `src/`, because the references in the POT are
+what name the files in a language pack and WordPress looks those up by an md5
+of the *built* script's path. `bin/make-pot.sh` explains it at length.
+
+None of `languages/` ships. It is the repository's own Greek translation, kept
+to seed translate.wordpress.org and to give CI a language pack to install.
 
 CI runs all of the above plus
 [Plugin Check](https://github.com/WordPress/plugin-check-action) on every push and pull
@@ -119,7 +123,7 @@ spacery.php              Plugin header and boot
 assets/                  WordPress.org icon and banner (see docs/assets.md)
 includes/                PHP, PSR-4 under the Spacery\ namespace
 src/                     TypeScript: the block, the editor extension, the settings screen
-languages/               POT, and translations
+languages/               POT, and the repository's Greek translation (not shipped)
 bin/                     Toolchain scripts (core fetch, POT, translation build)
 tests/{php,unit,e2e,contract}
 docs/PLAN.md             Architecture and roadmap

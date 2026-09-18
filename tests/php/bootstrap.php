@@ -39,8 +39,9 @@ function spacery_test_reset(): void {
 	$GLOBALS['spacery_test_filters']    = array();
 	$GLOBALS['spacery_test_priorities'] = array();
 
-	$GLOBALS['spacery_test_settings_errors'] = array();
-	$GLOBALS['spacery_test_inline_scripts']  = array();
+	$GLOBALS['spacery_test_settings_errors']     = array();
+	$GLOBALS['spacery_test_inline_scripts']      = array();
+	$GLOBALS['spacery_test_script_translations'] = array();
 }
 
 spacery_test_reset();
@@ -220,6 +221,23 @@ function wp_add_inline_script( string $handle, string $data, string $position = 
  */
 function wp_script_is( string $handle, string $status = 'enqueued' ): bool {
 	return 'spacery-extension' === $handle;
+}
+
+/**
+ * Stub of wp_set_script_translations().
+ *
+ * Recorded with its third argument, because the absence of that argument is
+ * the assertion: a path is where the handle-named lookup happens, and a
+ * language pack cannot answer it. {@see \Spacery\Tests\I18nTest}.
+ *
+ * @param string      $handle Script handle.
+ * @param string      $domain Text domain.
+ * @param string|null $path   Directory holding translation files, if any.
+ */
+function wp_set_script_translations( string $handle, string $domain = 'default', ?string $path = null ): bool {
+	$GLOBALS['spacery_test_script_translations'][] = compact( 'handle', 'domain', 'path' );
+
+	return true;
 }
 
 /*

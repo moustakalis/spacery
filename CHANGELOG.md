@@ -40,8 +40,10 @@ submitted, and `release.yml` refuses a tag whose entry is still undated.
 - The screen checks a set against the server's own rules as you type rather than after
   saving, says which set is in use and why when that is not the one you chose, draws it to
   scale, and warns before a navigation that would discard unsaved rows.
-- Translations: a POT generated from source, a Greek translation, and script translations
-  for every bundle. `bin/make-pot.sh` and `bin/make-translations.sh` regenerate them.
+- Internationalisation: every string translatable, with a POT generated from the
+  distributable so that a language pack from translate.wordpress.org loads in the editor
+  as well as in PHP. Nothing is bundled. `bin/make-pot.sh` and `bin/make-translations.sh`
+  regenerate the POT and the repository's Greek translation.
 - Developer documentation for the filter API in `docs/FILTERS.md`.
 
 [1.0.0]: https://github.com/moustakalis/spacery/releases/tag/v1.0.0

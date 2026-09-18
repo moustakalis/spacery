@@ -85,8 +85,6 @@ final class Plugin {
 
 		$this->booted = true;
 
-		( new I18n() )->register();
-
 		$this->breakpoints()->register();
 
 		( new BlockFilter(

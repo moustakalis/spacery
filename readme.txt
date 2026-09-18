@@ -91,8 +91,10 @@ second implementation would drift from the first.
 
 = Is it translated? =
 
-Spacery ships a Greek translation and a POT file. Every string in the plugin is
-translatable, in the editor as well as on the settings screen. There is one exception:
+Every string in the plugin is translatable, in the editor as well as on the settings
+screen, and translations arrive from translate.wordpress.org through WordPress's normal
+translation updates — nothing is bundled, so any locale the community translates it into
+is available without an update to the plugin. There is one exception:
 the tagline under the plugin's name is part of the brand, like the name itself, and stays
 as it is in every language — the same line the banner carries, where it is artwork.
 
@@ -144,4 +146,4 @@ shipped.
 * A spacer block with a height per breakpoint.
 * An editor that follows the canvas, so the preview matches the rendered page.
 * Adopts values WordPress already sets responsively, when the breakpoints agree.
-* Settings screen, and full translations.
+* Settings screen, and every string ready for translation.

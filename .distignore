@@ -20,6 +20,11 @@
 /bin
 /assets
 
+# The compiled Greek and the POT are repository files, not plugin files:
+# translations come from translate.wordpress.org once the plugin is listed, and
+# a bundled copy is what load_plugin_textdomain() existed to find. See D20.
+/languages
+
 /.distignore
 /.editorconfig
 /.gitignore
