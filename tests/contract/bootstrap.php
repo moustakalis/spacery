@@ -51,6 +51,7 @@ if ( ! function_exists( 'sanitize_text_field' ) ) {
 	function sanitize_text_field( string $str ): string {
 		$str = (string) preg_replace( '@<(script|style)[^>]*?>.*?</\1>@si', '', $str );
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.strip_tags_strip_tags -- wp_strip_all_tags() is what this stub reproduces, and it does not exist here.
 		return trim( strip_tags( $str ) );
 	}
 }
