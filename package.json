@@ -24,7 +24,7 @@
 	"packageManager": "pnpm@11.25.0",
 	"scripts": {
 		"build": "wp-scripts build",
-		"i18n:pot": "bash bin/make-pot.sh",
+		"i18n:pot": "pnpm run build && bash bin/make-pot.sh",
 		"i18n:build": "bash bin/make-translations.sh",
 		"start": "wp-scripts start",
 		"format": "wp-scripts format",

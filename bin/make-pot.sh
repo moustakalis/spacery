@@ -1,32 +1,33 @@
 #!/usr/bin/env bash
 #
-# Regenerates languages/spacery.pot.
+# Regenerates languages/spacery.pot, by scanning the distributable.
 #
-# Not a plain `wp i18n make-pot .`, for one reason: **WP-CLI cannot read
-# TypeScript.** Its JavaScript scanner parses .js and .jsx, so pointing it at
-# Spacery's source extracts the PHP strings and silently skips every string in
-# the editor and the settings screen. The first run of this pipeline produced 24
-# strings where there are 84, with no warning that anything had been missed.
+# **The references in a POT are not a convenience, they are how WordPress finds
+# a JavaScript translation.** `_load_script_textdomain_from_src()` looks for
+# `<domain>-<locale>-<md5>.json` in `WP_LANG_DIR/plugins`, where the md5 is of
+# the registered script's path relative to the plugin root -- `build/settings.js`.
+# translate.wordpress.org names the files in a language pack after the paths in
+# this POT. So a POT that references sources rather than bundles produces a pack
+# whose JavaScript half nothing ever loads, in every locale, with no error
+# anywhere. That is what this file used to do, and a bundled Greek `.json`
+# passed to `wp_set_script_translations()` was hiding it.
 #
-# So the sources are transpiled to plain JavaScript first and the scan runs over
-# that. `tsc` leaves `__( 'x', 'spacery' )` exactly as written -- `@wordpress/i18n`
-# is an import, not a transform -- so the extracted strings and their line
-# numbers correspond to the real files.
+# So the scan runs over a copy of exactly what ships: `build/`, `includes/` and
+# `spacery.php`, laid out as they are in the zip. The block's metadata is read
+# from `build/blocks/spacer/block.json` for the same reason -- that is the copy
+# core registers.
 #
-# `--jsx react-jsx` rather than `preserve`, and the reason is not JSX at all:
-# it makes every output file `.js`. `wp i18n make-json` skips `.jsx` references
-# entirely, so preserving JSX produced translation files for exactly one source
-# file out of fourteen -- again with no warning.
+# **WP-CLI reads the minified bundles.** That was measured rather than hoped:
+# `wp i18n make-pot` over `build/` extracts all 119 JavaScript strings, the same
+# set the old transpile-first pass produced and nothing extra. Two translator
+# comments are lost, on "Spacery" and on "css", where minification moved the
+# comment off the front of the call. The line references become
+# `build/extension.js:1`, which tells a translator nothing about where a string
+# lives; that is the price of the file WordPress actually hashes, and it is
+# recorded here so nobody pays it twice by accident.
 #
-# Type errors are ignored here on purpose. This pass exists to parse syntax, not
-# to check types; `pnpm run typecheck` does that, against the real config, with
-# the ambient declarations this pass deliberately does without.
-#
-# `--ignoreConfig` is required, not cosmetic. TypeScript 6 made it error TS5112
-# to name files on the command line while a tsconfig.json exists, where 5.x
-# merely proceeded. Without the flag nothing is emitted at all -- which is how
-# this script first failed in CI, silently, because it was discarding tsc's
-# output at the time. It no longer does.
+# The previous approach transpiled `src/**` with `tsc` because WP-CLI cannot
+# parse TypeScript. None of that is needed now, and neither is `tsc`.
 #
 set -euo pipefail
 
@@ -35,7 +36,6 @@ SCAN="$(mktemp -d)"
 trap 'rm -rf "$SCAN"' EXIT
 
 WP_CLI="${WP_CLI:-wp}"
-TSC="${TSC:-$ROOT/node_modules/.bin/tsc}"
 
 # A .phar is not executable on its own, so run it through PHP.
 if command -v "$WP_CLI" >/dev/null 2>&1; then
@@ -47,35 +47,33 @@ else
   exit 1
 fi
 
-if [ ! -x "$TSC" ]; then
-  echo "tsc not found at $TSC. Run 'pnpm install' first." >&2
-  exit 1
-fi
+BUNDLES=(
+  build/extension.js
+  build/settings.js
+  build/blocks/spacer/index.js
+  build/blocks/spacer/block.json
+)
 
-# PHP and block metadata are scanned as they are.
+for bundle in "${BUNDLES[@]}"; do
+  if [ ! -f "$ROOT/$bundle" ]; then
+    echo "$bundle is missing. Run 'pnpm run build' first." >&2
+    exit 1
+  fi
+done
+
+# There is deliberately no mtime check for a stale build here, and the reason
+# is worth keeping: webpack's `output.compareBeforeEmit` is on by default, so a
+# bundle whose contents did not change is *not rewritten* and keeps its old
+# mtime. A blanket "is any source newer than the oldest bundle" rule therefore
+# refuses on a perfectly fresh build -- measured, on a build one minute old
+# whose spacer bundle was two days older than the sources feeding it, because
+# nothing in it had changed. Freshness is guaranteed instead by building:
+# `pnpm run i18n:pot` runs `pnpm run build` first.
+
+# The distributable, laid out as the zip lays it out.
+cp -R "$ROOT/build" "$SCAN/build"
 cp -R "$ROOT/includes" "$SCAN/includes"
 cp "$ROOT/spacery.php" "$SCAN/spacery.php"
-mkdir -p "$SCAN/src/blocks/spacer"
-cp "$ROOT/src/blocks/spacer/block.json" "$SCAN/src/blocks/spacer/block.json"
-
-# Everything else is transpiled, keeping its path so references stay meaningful.
-cd "$ROOT"
-mapfile -t sources < <(find src -name '*.ts' -o -name '*.tsx' | grep -v '\.d\.ts$')
-
-"$TSC" --ignoreConfig \
-  --outDir "$SCAN/src" --rootDir src \
-  --module esnext --target es2022 --jsx react-jsx --moduleResolution bundler \
-  --declaration false --sourceMap false --skipLibCheck \
-  "${sources[@]}" > "$SCAN/tsc.log" 2>&1 || true
-
-emitted="$(find "$SCAN/src" -name '*.js' | wc -l)"
-
-if [ "$emitted" -lt 20 ]; then
-  echo "Transpilation emitted $emitted files. Refusing to write a POT that would silently be missing JavaScript strings." >&2
-  echo "--- tsc output ---" >&2
-  cat "$SCAN/tsc.log" >&2
-  exit 1
-fi
 
 mkdir -p "$ROOT/languages"
 
@@ -83,4 +81,13 @@ mkdir -p "$ROOT/languages"
   --domain=spacery \
   --headers='{"Report-Msgid-Bugs-To":"https://github.com/moustakalis/spacery/issues"}'
 
-echo "Wrote languages/spacery.pot"
+# The guard the transpiling version had, kept for the same reason: a scan that
+# quietly reads nothing produces a POT that is valid, small and wrong.
+strings="$(grep -c '^msgid "' "$ROOT/languages/spacery.pot")"
+
+if [ "$strings" -lt 100 ]; then
+  echo "Only $strings strings were extracted. Refusing to write a POT that is missing most of the plugin." >&2
+  exit 1
+fi
+
+echo "Wrote languages/spacery.pot ($strings strings)"

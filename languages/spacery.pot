@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-16T11:15:32+00:00\n"
+"POT-Creation-Date: 2026-09-18T15:13:44+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: spacery\n"
@@ -18,9 +18,8 @@ msgstr ""
 #: spacery.php
 #: includes/Settings/Screen.php:115
 #: includes/Settings/Screen.php:116
-#: src/extension/register.js:79
-#: src/extension/register.js:82
-#: src/settings/Brand.js:89
+#: build/extension.js:10
+#: build/settings.js:3
 msgid "Spacery"
 msgstr ""
 
@@ -77,8 +76,7 @@ msgid "Spacery requires WordPress %1$s or newer. This site is running WordPress 
 msgstr ""
 
 #: includes/Settings/Options.php:73
-#: src/settings/App.js:175
-#: src/settings/App.js:189
+#: build/settings.js:22
 msgid "Breakpoint source"
 msgstr ""
 
@@ -106,465 +104,361 @@ msgstr ""
 msgid "Those breakpoints were not saved. Every breakpoint needs a name and a width in px, em or rem, widths must all differ, and there is a maximum of 12."
 msgstr ""
 
-#: src/blocks/spacer/edit.js:46
-#: src/blocks/spacer/edit.js:88
-msgid "Height"
-msgstr ""
-
-#: src/blocks/spacer/edit.js:46
-msgid "Default"
-msgstr ""
-
-#: src/blocks/spacer/edit.js:46
-msgid "Applies at every width unless a narrower breakpoint overrides it."
-msgstr ""
-
-#: src/blocks/spacer/edit.js:46
-msgid "Set at"
-msgstr ""
-
-#. translators: 1: breakpoint name, 2: its upper bound, e.g. "Laptop · ≤1024px".
-#: src/blocks/spacer/edit.js:72
-#: src/extension/SpacingPanel.js:110
+#. translators: %s: breakpoint name. Marks a tier that has values set.
+#: build/blocks/spacer/index.js:2
+#: build/extension.js:2
 #, js-format
-msgid "%1$s · ≤%2$s"
+msgid "%s (has values)"
 msgstr ""
 
-#: src/blocks/spacer/edit.js:88
-msgid "Reset"
+#: build/blocks/spacer/index.js:2
+#: build/extension.js:2
+msgid "Breakpoint"
 msgstr ""
 
 #. translators: %s: breakpoint name.
-#: src/blocks/spacer/edit.js:109
+#: build/blocks/spacer/index.js:3
+#: build/extension.js:3
 #, js-format
-msgid "%s (editing)"
+msgid "The canvas is still previewing %s."
 msgstr ""
 
-#: src/blocks/spacer/height.js:80
-#: src/extension/provenance.js:65
+#: build/blocks/spacer/index.js:3
+#: build/extension.js:3
+msgid "Responsive editing is off for this site, so the canvas does not follow."
+msgstr ""
+
+#: build/blocks/spacer/index.js:3
+#: build/extension.js:7
 msgid "Set here"
 msgstr ""
 
 #. translators: %s: the breakpoint a value is inherited from.
 #. translators: %s: a breakpoint name, or "this block's own spacing".
-#: src/blocks/spacer/height.js:85
-#: src/extension/provenance.js:84
+#: build/blocks/spacer/index.js:4
+#: build/extension.js:8
 #, js-format
 msgid "Inherited from %s"
 msgstr ""
 
-#: src/blocks/spacer/height.js:94
+#: build/blocks/spacer/index.js:4
 msgid "No height set"
 msgstr ""
 
-#: src/blocks/spacer/height.js:96
+#: build/blocks/spacer/index.js:4
 msgid "Inherited from Default"
 msgstr ""
 
-#. translators: %s: breakpoint name. Marks a tier that has values set.
-#: src/breakpoints/TierSelector.js:54
+#. translators: 1: breakpoint name, 2: its upper bound, e.g. "Laptop · ≤1024px".
+#: build/blocks/spacer/index.js:5
+#: build/extension.js:7
 #, js-format
-msgid "%s (has values)"
+msgid "%1$s · ≤%2$s"
 msgstr ""
 
-#: src/breakpoints/TierSelector.js:56
-#: src/breakpoints/TierSelector.js:58
-msgid "Breakpoint"
+#: build/blocks/spacer/index.js:5
+#: build/blocks/spacer/index.js:6
+msgid "Height"
+msgstr ""
+
+#: build/blocks/spacer/index.js:5
+msgid "Reset"
 msgstr ""
 
 #. translators: %s: breakpoint name.
-#: src/breakpoints/TierSelector.js:67
+#: build/blocks/spacer/index.js:6
 #, js-format
-msgid "The canvas is still previewing %s."
+msgid "%s (editing)"
 msgstr ""
 
-#: src/breakpoints/TierSelector.js:67
-msgid "Responsive editing is off for this site, so the canvas does not follow."
+#: build/blocks/spacer/index.js:6
+msgid "Default"
 msgstr ""
 
-#: src/extension/provenance.js:50
+#: build/blocks/spacer/index.js:6
+msgid "Applies at every width unless a narrower breakpoint overrides it."
+msgstr ""
+
+#: build/blocks/spacer/index.js:6
+msgid "Set at"
+msgstr ""
+
+#: build/extension.js:1
+msgid "Padding"
+msgstr ""
+
+#: build/extension.js:1
+msgid "Margin"
+msgstr ""
+
+#: build/extension.js:1
+msgid "Top"
+msgstr ""
+
+#: build/extension.js:1
+msgid "Right"
+msgstr ""
+
+#: build/extension.js:1
+msgid "Bottom"
+msgstr ""
+
+#: build/extension.js:1
+msgid "Left"
+msgstr ""
+
+#: build/extension.js:3
 msgid "this block's own spacing"
 msgstr ""
 
-#: src/extension/provenance.js:68
-msgid "Partly set here"
-msgstr ""
-
-#. translators: 1: a breakpoint name. 2: another breakpoint name.
-#: src/extension/provenance.js:89
-#, js-format
-msgid "Inherited from %1$s and %2$s"
-msgstr ""
-
-#. translators: %d: how many places a box's values come from.
-#: src/extension/provenance.js:98
-#, js-format
-msgid "Inherited from %d different places"
-msgstr ""
-
-#: src/extension/register.js:81
-msgid "Spacery — this block has responsive values"
-msgstr ""
-
-#. translators: a unit-picker entry; the fields then take whole CSS values.
-#: src/extension/SpacingBox.js:112
+#: build/extension.js:3
 msgid "css"
 msgstr ""
 
-#: src/extension/SpacingBox.js:160
+#: build/extension.js:3
 msgid "Unit"
 msgstr ""
 
-#: src/extension/SpacingBox.js:161
+#: build/extension.js:3
 msgid "Unlink sides"
 msgstr ""
 
-#: src/extension/SpacingBox.js:162
+#: build/extension.js:3
 msgid "Link sides — one value for all four"
 msgstr ""
 
 #. translators: %s: a spacing property, e.g. "Padding".
-#: src/extension/SpacingBox.js:164
+#: build/extension.js:4
 #, js-format
 msgid "Reset %s"
 msgstr ""
 
-#: src/extension/SpacingBox.js:179
+#: build/extension.js:4
 msgid "A length, calc() or a preset, one per side. Anything else is dropped."
 msgstr ""
 
-#: src/extension/SpacingPanel.js:67
-msgid "This site has no breakpoints, so there is nothing to set here yet."
-msgstr ""
-
-#: src/extension/SpacingPanel.js:75
-msgid "This theme has spacing controls switched off for this block."
-msgstr ""
-
-#: src/extension/SpacingPanel.js:112
-msgid "Reset all"
-msgstr ""
-
-#: src/extension/supports.js:99
-msgid "Padding"
-msgstr ""
-
-#: src/extension/supports.js:100
-msgid "Margin"
-msgstr ""
-
-#: src/extension/supports.js:111
-msgid "Top"
-msgstr ""
-
-#: src/extension/supports.js:113
-msgid "Right"
-msgstr ""
-
-#: src/extension/supports.js:115
-msgid "Bottom"
-msgstr ""
-
-#: src/extension/supports.js:117
-msgid "Left"
-msgstr ""
-
 #. translators: %d: number of values WordPress sets for narrower screens.
-#: src/extension/TakeoverNotice.js:55
+#: build/extension.js:5
 #, js-format
 msgid "WordPress already sets %d value here for narrower screens."
 msgid_plural "WordPress already sets %d values here for narrower screens."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/extension/TakeoverNotice.js:55
+#: build/extension.js:5
 msgid "In Spacery they also reach narrower screens, unless a narrower breakpoint sets its own value."
 msgstr ""
 
-#: src/extension/TakeoverNotice.js:66
+#: build/extension.js:5
 msgid "Manage these in Spacery"
 msgstr ""
 
 #. translators: %s: comma-separated list of WordPress viewport names.
-#: src/extension/TakeoverNotice.js:81
+#: build/extension.js:6
 #, js-format
 msgid "Leaving %s to WordPress: no Spacery breakpoint covers the same widths."
 msgstr ""
 
-#: src/settings/App.js:97
-msgid "Loading your breakpoints…"
+#: build/extension.js:6
+msgid "This site has no breakpoints, so there is nothing to set here yet."
 msgstr ""
 
-#: src/settings/App.js:189
-msgid "Only one source applies at a time — Spacery never merges two sets."
+#: build/extension.js:6
+msgid "This theme has spacing controls switched off for this block."
 msgstr ""
 
-#: src/settings/App.js:189
-msgid "Your breakpoints"
+#: build/extension.js:7
+msgid "Reset all"
 msgstr ""
 
-#. translators: 1: how many breakpoints are defined. 2: the maximum.
-#: src/settings/App.js:191
+#: build/extension.js:7
+msgid "Partly set here"
+msgstr ""
+
+#. translators: 1: a breakpoint name. 2: another breakpoint name.
+#: build/extension.js:9
 #, js-format
-msgid "%1$d of %2$d · sorted widest first"
+msgid "Inherited from %1$s and %2$s"
 msgstr ""
 
-#: src/settings/App.js:191
-msgid "In use now"
-msgstr ""
-
-#. translators: %s: where the breakpoints come from.
-#: src/settings/App.js:193
+#. translators: %d: how many places a box's values come from.
+#: build/extension.js:10
 #, js-format
-msgid "From: %s"
+msgid "Inherited from %d different places"
 msgstr ""
 
-#: src/settings/App.js:193
-msgid "When you delete Spacery"
-msgstr ""
-
-#: src/settings/App.js:193
-msgid "Delete my settings when Spacery is deleted"
-msgstr ""
-
-#: src/settings/App.js:194
-msgid "Your breakpoints go too. Values on your blocks stay, but a future install may apply them at different widths."
-msgstr ""
-
-#: src/settings/App.js:195
-msgid "Your breakpoints are kept, so reinstalling leaves your values exactly as they are."
-msgstr ""
-
-#: src/settings/App.js:199
-msgid "Save changes"
-msgstr ""
-
-#: src/settings/App.js:200
-msgid "Discard"
-msgstr ""
-
-#: src/settings/App.js:226
-msgid "No breakpoints are active."
-msgstr ""
-
-#: src/settings/App.js:245
-msgid "Settings saved."
-msgstr ""
-
-#: src/settings/App.js:253
-msgid "Settings saved. Reload the page to see what is in use."
-msgstr ""
-
-#: src/settings/App.js:257
-msgid "Your source was saved. The breakpoints were not: each needs a name and a width in px, em or rem, and no two may share a width."
-msgstr ""
-
-#: src/settings/App.js:258
-msgid "Nothing was saved: each breakpoint needs a name and a width in px, em or rem, and no two may share a width."
-msgstr ""
-
-#: src/settings/App.js:278
-msgid "Something went wrong talking to the site."
-msgstr ""
-
-#. translators: %s: a CSS length, e.g. "480px".
-#: src/settings/bands.js:127
-#, js-format
-msgid "up to %s"
+#: build/extension.js:10
+msgid "Spacery — this block has responsive values"
 msgstr ""
 
 #. translators: 1: a CSS length. 2: a wider CSS length.
-#: src/settings/bands.js:131
+#: build/settings.js:2
 #, js-format
 msgid "over %1$s, up to %2$s"
 msgstr ""
 
-#: src/settings/bands.js:166
-msgid "no tier"
+#. translators: %s: a CSS length, e.g. "480px".
+#: build/settings.js:3
+#, js-format
+msgid "up to %s"
 msgstr ""
 
-#: src/settings/bands.js:244
+#: build/settings.js:3
 msgid "Nothing — no screens left"
 msgstr ""
 
 #. translators: %s: the plugin version.
-#: src/settings/Brand.js:113
+#: build/settings.js:4
 #, js-format
 msgid "Spacery %s"
 msgstr ""
 
-#: src/settings/Brand.js:113
+#: build/settings.js:4
 msgid "Documentation"
 msgstr ""
 
-#: src/settings/Brand.js:113
+#: build/settings.js:4
 msgid "Support"
 msgstr ""
 
-#: src/settings/BreakpointRows.js:95
-#: src/settings/BreakpointRows.js:100
+#: build/settings.js:4
 msgid "Name"
 msgstr ""
 
-#: src/settings/BreakpointRows.js:95
-#: src/settings/BreakpointRows.js:107
+#: build/settings.js:4
 msgid "Slug"
 msgstr ""
 
-#: src/settings/BreakpointRows.js:95
-#: src/settings/BreakpointRows.js:113
+#: build/settings.js:4
+#: build/settings.js:5
 msgid "Up to"
 msgstr ""
 
-#: src/settings/BreakpointRows.js:95
+#: build/settings.js:4
 msgid "Covers"
 msgstr ""
 
 #. translators: %s: the slug the breakpoint was saved under.
-#: src/settings/BreakpointRows.js:113
+#: build/settings.js:5
 #, js-format
 msgid "Values saved under %s will stop applying. To rename it, change the name and leave the slug alone."
 msgstr ""
 
 #. translators: %s: breakpoint name.
-#: src/settings/BreakpointRows.js:117
+#: build/settings.js:6
 #, js-format
 msgid "Remove %s"
 msgstr ""
 
-#: src/settings/BreakpointRows.js:118
+#: build/settings.js:6
 msgid "Add breakpoint"
 msgstr ""
 
 #. translators: %d: maximum number of breakpoints.
-#: src/settings/BreakpointRows.js:125
-#: src/settings/validate.js:213
+#: build/settings.js:7
+#: build/settings.js:22
 #, js-format
 msgid "%d breakpoints is the maximum."
 msgstr ""
 
-#: src/settings/BreakpointRows.js:126
+#: build/settings.js:7
 msgid "Name appears in the editor. Slug is stored on your blocks and follows the name until you edit it."
 msgstr ""
 
-#: src/settings/BreakpointRows.js:141
+#: build/settings.js:7
 msgid "You haven't defined any breakpoints yet"
 msgstr ""
 
 #. translators: %s: the breakpoint set in use meanwhile.
-#: src/settings/BreakpointRows.js:143
+#: build/settings.js:8
 #, js-format
 msgid "Until you add one, Spacery uses %s — shown in In use now below."
 msgstr ""
 
-#: src/settings/BreakpointRows.js:143
+#: build/settings.js:8
 msgid "Add your first breakpoint"
 msgstr ""
 
 #. translators: 1: breakpoint name. 2: a CSS length.
-#: src/settings/Ruler.js:95
+#: build/settings.js:9
 #, js-format
 msgid "%1$s to %2$s"
 msgstr ""
 
 #. translators: 1: breakpoint name. 2: the range it covers.
-#: src/settings/Ruler.js:113
+#: build/settings.js:10
 #, js-format
 msgid "%1$s, %2$s."
 msgstr ""
 
+#: build/settings.js:10
+msgid "no tier"
+msgstr ""
+
 #. translators: %s: a CSS length, e.g. "11920px".
-#: src/settings/Ruler.js:218
+#: build/settings.js:11
 #, js-format
 msgid "The widest band runs to %s and is cut short here."
 msgstr ""
 
 #. translators: %s: a CSS length, e.g. "1280px".
-#: src/settings/Ruler.js:221
+#: build/settings.js:12
 #, js-format
 msgid "Screens wider than %s match no breakpoint, so blocks use their ordinary values. Raise the widest breakpoint to cover them."
 msgstr ""
 
 #. translators: 1: comma-separated breakpoint names. 2: how many further breakpoints there are.
-#: src/settings/sources.js:49
+#: build/settings.js:13
 #, js-format
 msgid "%1$s and %2$d more"
 msgid_plural "%1$s and %2$d more"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/settings/sources.js:69
+#: build/settings.js:13
 msgid "your theme"
 msgstr ""
 
-#: src/settings/sources.js:71
+#: build/settings.js:13
 msgid "the breakpoints you defined"
 msgstr ""
 
-#: src/settings/sources.js:73
+#: build/settings.js:13
 msgid "Spacery's own set"
 msgstr ""
 
-#: src/settings/sources.js:75
+#: build/settings.js:13
 msgid "a filter on this site"
 msgstr ""
 
-#: src/settings/sources.js:94
+#: build/settings.js:13
 msgid "This theme — it declares no breakpoints"
 msgstr ""
 
 #. translators: %s: a list of breakpoint names.
-#: src/settings/sources.js:97
+#: build/settings.js:14
 #, js-format
 msgid "This theme — %s"
 msgstr ""
 
 #. translators: %s: the source that will be followed.
-#: src/settings/sources.js:103
+#: build/settings.js:15
 #, js-format
 msgid "Decide for me — currently %s"
 msgstr ""
 
 #. translators: %s: a list of breakpoint names.
-#: src/settings/sources.js:110
+#: build/settings.js:16
 #, js-format
 msgid "Spacery's own — %s"
 msgstr ""
 
-#: src/settings/sources.js:112
+#: build/settings.js:16
 msgid "Breakpoints I define below"
 msgstr ""
 
-#: src/settings/sources.js:152
-msgid "A spacery_breakpoints filter replaces the set, so these are stored but not in use."
-msgstr ""
-
-#. translators: %s: the breakpoint set in use instead.
-#: src/settings/sources.js:163
-#, js-format
-msgid "Your theme declares breakpoints Spacery could not read, so %s is in use."
-msgstr ""
-
-#. translators: %s: the breakpoint set in use instead.
-#: src/settings/sources.js:168
-#, js-format
-msgid "You have not defined any yet, so %s is in use."
-msgstr ""
-
-#. translators: %s: the breakpoint set in use instead.
-#: src/settings/sources.js:173
-#, js-format
-msgid "Your theme declares none Spacery can use, so %s is in use."
-msgstr ""
-
-#. translators: %s: the breakpoint set in use instead.
-#: src/settings/sources.js:177
-#, js-format
-msgid "The set you chose is empty, so %s is in use."
-msgstr ""
-
 #. translators: %d: how many problems are on the screen.
-#: src/settings/validate.js:68
+#: build/settings.js:17
 #, js-format
 msgid "Fix %d problem above to save."
 msgid_plural "Fix %d problems above to save."
@@ -572,103 +466,207 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: how many breakpoints have been changed.
-#: src/settings/validate.js:73
+#: build/settings.js:18
 #, js-format
 msgid "Unsaved change to %d breakpoint."
 msgid_plural "Unsaved changes to %d breakpoints."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/settings/validate.js:80
+#: build/settings.js:18
 msgid "Unsaved change to the breakpoint source."
 msgstr ""
 
-#: src/settings/validate.js:88
+#: build/settings.js:18
 msgid "Unsaved change to what happens on deletion."
 msgstr ""
 
-#: src/settings/validate.js:90
+#: build/settings.js:18
 msgid "No changes to save."
 msgstr ""
 
-#: src/settings/validate.js:107
+#: build/settings.js:18
 msgid "an unnamed breakpoint"
 msgstr ""
 
-#: src/settings/validate.js:142
+#. translators: %s: a narrower CSS length, e.g. "1920px".
+#: build/settings.js:19
+#, js-format
+msgid "Too wide for the ruler. Did you mean %s?"
+msgstr ""
+
+#: build/settings.js:19
+msgid "Too wide for the ruler."
+msgstr ""
+
+#: build/settings.js:19
+msgid "Loading your breakpoints…"
+msgstr ""
+
+#: build/settings.js:19
 msgid "Needs a name — this is what you pick in the editor."
 msgstr ""
 
-#: src/settings/validate.js:150
+#: build/settings.js:19
 msgid "Lowercase letters, numbers and dashes only."
 msgstr ""
 
-#: src/settings/validate.js:158
-msgid "Needs a number and a unit — px, em or rem."
-msgstr ""
-
-#: src/settings/validate.js:165
+#: build/settings.js:19
 msgid "Has to be more than zero."
 msgstr ""
 
+#: build/settings.js:19
+msgid "Needs a number and a unit — px, em or rem."
+msgstr ""
+
 #. translators: %s: the name of the breakpoint already using this slug.
-#: src/settings/validate.js:185
+#: build/settings.js:20
 #, js-format
 msgid "Already used by %s. Two breakpoints cannot share a slug."
 msgstr ""
 
 #. translators: %s: the name of the breakpoint at this width.
-#: src/settings/validate.js:199
+#: build/settings.js:21
 #, js-format
 msgid "Same width as %s."
 msgstr ""
 
-#. translators: %s: a narrower CSS length, e.g. "1920px".
-#: src/settings/validate.js:243
+#: build/settings.js:22
+msgid "Only one source applies at a time — Spacery never merges two sets."
+msgstr ""
+
+#: build/settings.js:22
+msgid "Your breakpoints"
+msgstr ""
+
+#. translators: 1: how many breakpoints are defined. 2: the maximum.
+#: build/settings.js:23
 #, js-format
-msgid "Too wide for the ruler. Did you mean %s?"
+msgid "%1$d of %2$d · sorted widest first"
 msgstr ""
 
-#: src/settings/validate.js:244
-msgid "Too wide for the ruler."
+#: build/settings.js:23
+msgid "In use now"
 msgstr ""
 
-#: src/blocks/spacer/block.json
+#. translators: %s: where the breakpoints come from.
+#: build/settings.js:24
+#, js-format
+msgid "From: %s"
+msgstr ""
+
+#: build/settings.js:24
+msgid "When you delete Spacery"
+msgstr ""
+
+#: build/settings.js:24
+msgid "Delete my settings when Spacery is deleted"
+msgstr ""
+
+#: build/settings.js:24
+msgid "Your breakpoints go too. Values on your blocks stay, but a future install may apply them at different widths."
+msgstr ""
+
+#: build/settings.js:24
+msgid "Your breakpoints are kept, so reinstalling leaves your values exactly as they are."
+msgstr ""
+
+#: build/settings.js:24
+msgid "Save changes"
+msgstr ""
+
+#: build/settings.js:24
+msgid "Discard"
+msgstr ""
+
+#: build/settings.js:24
+msgid "A spacery_breakpoints filter replaces the set, so these are stored but not in use."
+msgstr ""
+
+#. translators: %s: the breakpoint set in use instead.
+#: build/settings.js:25
+#, js-format
+msgid "Your theme declares breakpoints Spacery could not read, so %s is in use."
+msgstr ""
+
+#. translators: %s: the breakpoint set in use instead.
+#: build/settings.js:26
+#, js-format
+msgid "You have not defined any yet, so %s is in use."
+msgstr ""
+
+#. translators: %s: the breakpoint set in use instead.
+#: build/settings.js:27
+#, js-format
+msgid "Your theme declares none Spacery can use, so %s is in use."
+msgstr ""
+
+#. translators: %s: the breakpoint set in use instead.
+#: build/settings.js:28
+#, js-format
+msgid "The set you chose is empty, so %s is in use."
+msgstr ""
+
+#: build/settings.js:28
+msgid "No breakpoints are active."
+msgstr ""
+
+#: build/settings.js:28
+msgid "Settings saved."
+msgstr ""
+
+#: build/settings.js:28
+msgid "Settings saved. Reload the page to see what is in use."
+msgstr ""
+
+#: build/settings.js:28
+msgid "Your source was saved. The breakpoints were not: each needs a name and a width in px, em or rem, and no two may share a width."
+msgstr ""
+
+#: build/settings.js:28
+msgid "Nothing was saved: each breakpoint needs a name and a width in px, em or rem, and no two may share a width."
+msgstr ""
+
+#: build/settings.js:28
+msgid "Something went wrong talking to the site."
+msgstr ""
+
+#: build/blocks/spacer/block.json
 msgctxt "block title"
 msgid "Responsive Spacer"
 msgstr ""
 
-#: src/blocks/spacer/block.json
+#: build/blocks/spacer/block.json
 msgctxt "block description"
 msgid "Vertical space whose height can change at every breakpoint."
 msgstr ""
 
-#: src/blocks/spacer/block.json
+#: build/blocks/spacer/block.json
 msgctxt "block keyword"
 msgid "spacer"
 msgstr ""
 
-#: src/blocks/spacer/block.json
+#: build/blocks/spacer/block.json
 msgctxt "block keyword"
 msgid "space"
 msgstr ""
 
-#: src/blocks/spacer/block.json
+#: build/blocks/spacer/block.json
 msgctxt "block keyword"
 msgid "responsive"
 msgstr ""
 
-#: src/blocks/spacer/block.json
+#: build/blocks/spacer/block.json
 msgctxt "block keyword"
 msgid "gap"
 msgstr ""
 
-#: src/blocks/spacer/block.json
+#: build/blocks/spacer/block.json
 msgctxt "block keyword"
 msgid "breakpoint"
 msgstr ""
 
-#: src/blocks/spacer/block.json
+#: build/blocks/spacer/block.json
 msgctxt "block keyword"
 msgid "spacery"
 msgstr ""
