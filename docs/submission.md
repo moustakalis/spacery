@@ -1,18 +1,22 @@
 # Submitting Spacery to WordPress.org — the runbook
 
-> **Where this stands: ready, not yet uploaded.** Record the date and the
-> commit here the moment it is — this line is the one place that says whether
-> the plugin is in the queue, and everything below reads differently depending
-> on the answer.
+> **Submitted on: 16 September 2026.** In the queue, awaiting a first review.
+> This line is the one place that says where the plugin stands; everything below
+> reads differently depending on it, so update it here and nowhere else.
 >
-> **Submitted on:** _not yet._
+> **What the zip contains:** the shipping files as of **`22ff7c9`**. Every
+> commit after that one touches `docs/` or `README.md`, and neither is in
+> `package.json#files`, so nothing since has reached the reviewer.
+>
+> **When to expect a reply:** review is *"within 14 business days"*, which from
+> 16 September is **on or about 6 October 2026**. That is a ceiling the handbook
+> states, not a promise, and a queue can run long.
 >
 > **If you are picking this up cold, go to the row that matches:**
 >
 > | If | Go to |
 > |---|---|
-> | Not submitted yet | **§1**, then **§2**. The two live pre-flight items are the slug and the repository's visibility — see below. |
-> | Uploaded; still in the queue | Nowhere. Review takes up to **14 business days** and the reviewer reads the uploaded zip. Don't change it, don't re-submit, don't tag. |
+> | Still in the queue, nothing heard | Nowhere. The reviewer reads the uploaded zip. Don't change it, don't re-submit, don't tag. **§3**'s last part lists the two things worth doing while waiting. |
 > | A reviewer has written back | **§3** — ready replies for the three things a code scan raises, and the rule about replying in the same thread rather than re-submitting |
 > | Approved; SVN credentials have arrived | **§4** — date the changelog, add the secrets, tag, check the listing |
 > | Something about the plugin itself needs changing | `docs/PLAN.md`'s decision table first. Then check the line above: before upload a fix simply goes in the next zip; after it, the zip is frozen and the fix ships in the deploy. |
@@ -141,15 +145,50 @@ reviewer reads `readme.txt` from the zip.
 
 ---
 
-## 3. If the review comes back
+## 3. When the review comes back
 
-Reply in the same email thread, to `plugins@wordpress.org`, and **do not
-re-submit through the form** — a second submission makes a second ticket. If a
-change is needed, make it, reply with what changed, and attach or link the
-updated zip when they ask for one.
+**The mechanics first**, because getting these wrong costs more than any answer
+does.
 
-Three replies worth having ready, because they are the three things most likely
-to be raised. Each states the fact and offers the change rather than arguing.
+- Reply **in the same email thread**, to `plugins@wordpress.org`. **Do not
+  re-submit through the form** — a second submission makes a second ticket.
+- Answer everything in **one** reply rather than a stream of them.
+- If a change is genuinely needed: make it in the repository, push it, and send
+  a new zip **when they ask for one**. They normally do ask; do not pre-empt it.
+- **Do not tag.** `release.yml` refuses an undated changelog, and the SVN
+  repository does not exist until approval anyway.
+- Tone: state the fact, then **offer** the change. A reviewer who has to argue
+  takes longer than one who can say "fine".
+
+### Where Spacery stands against the handbook's Common Issues
+
+Re-checked on **18 September 2026**, against the *shipping* files only — the
+seven entries in `package.json#files` — so these are answers rather than hopes.
+If a reviewer raises one of these, the evidence column is where to start.
+
+| What the handbook checks | Spacery | How that was established |
+|---|---|---|
+| Sanitize, validate, escape | Clean | No `$_POST` / `$_GET` / `$_REQUEST` / `$_SERVER` / `$_COOKIE` **anywhere** in shipping PHP — the settings screen talks to the REST API, which does its own nonce and capability work. Every `echo` in `includes/` is escaped. All three registered options carry a `sanitize_callback` |
+| SQL injection | Not applicable | No `$wpdb`, no raw SQL. The plugin stores two options and block attributes |
+| Direct file access | Guarded | All 20 shipping PHP files carry `defined( 'ABSPATH' ) \|\| exit;`, or `WP_UNINSTALL_PLUGIN` in `uninstall.php`'s case. Re-verified file by file |
+| Prefixes on everything | Clean | `Spacery\` namespace throughout, options `spacery_breakpoint_source` / `spacery_custom_breakpoints` / `spacery_delete_data`, block `spacery/spacer`, filters `spacery_breakpoints` / `spacery_denied_blocks` |
+| Dev tools, vendor folders, tests in the zip | None | `package.json#files` is an **allow-list** of seven entries. No `tests/`, no `vendor/`, no `node_modules/`, no `bin/`, no `.github/`, no `docs/` |
+| External services, update checkers, remote assets | None at all | Nothing in `includes/` makes an HTTP request; the only URL in shipping JS is the SVG XML namespace, and the only network call is `apiFetch` to the site's own REST route. No update checker, no telemetry, no CDN |
+| Bundled or duplicated libraries | None | `composer.json` requires only PHP; nothing from `node_modules` ships; no jQuery, SimplePie or PHPMailer copy |
+| Compiled code without source | Covered | `readme.txt`'s `== Source Code ==` names the public repository, Node 22 and the two `pnpm` commands — the alternative guideline 4 allows |
+| Stable Tag matches Version | Yes | `bin/check-release.py` asserts it, and is run before every zip |
+| Literal text domain | Yes | `'spacery'` as a literal in every gettext call; the POT pipeline would not extract them otherwise |
+| GPL | Declared three times | Plugin header, `readme.txt`, `composer.json`, all `GPL-2.0-or-later` |
+| Trademarks / naming | Clean | "Spacery" is invented; no third-party mark appears in the slug, the name or the tags |
+| HEREDOC / NOWDOC, short tags | None | — |
+| Plugin activation of other plugins | None | — |
+
+**Two that are answers rather than all-clears**, and both already have replies
+below: the single `base64_encode()` for the admin menu icon, and
+`load_plugin_textdomain()`, which Plugin Check reports as discouraged. Those are
+the plugin's only two findings from any tool.
+
+### Ready replies
 
 ### If they ask about `base64_encode()`
 
@@ -198,6 +237,50 @@ is nothing to disclose in a privacy policy.
 ```
 
 ---
+
+
+### If they ask why `composer.json` is not in the zip
+
+```text
+`composer.json` is development-only here: it requires PHP itself and a
+`require-dev` block of PHPCS, PHPStan, PHPUnit and the WordPress coding
+standards. No Composer package is installed at runtime, nothing from `vendor/`
+is shipped, and the directory does not exist in the distributable —
+`package.json#files` is an allow-list of seven entries. I left it out on the
+"remove development tools from distributions" guideline rather than the
+"include composer.json to document dependencies" one, since there are no
+runtime dependencies for it to document. It is in the public repository at
+https://github.com/moustakalis/spacery, and I am happy to add it to the zip if
+you would rather it travelled with the plugin.
+```
+
+### If they ask for a change you agree with
+
+```text
+Fixed in <version or commit> — <one sentence on what changed and why it is the
+right fix rather than a workaround>. <If a second thing was found while fixing
+it, say so here.> Let me know if you would like an updated zip.
+```
+
+Keep it to that. A reply that re-argues a point the reviewer has already made
+costs a round trip; one that quietly fixes something adjacent and does not
+mention it costs trust.
+
+### What has *not* been checked
+
+Honest gaps, so a later session does not mistake silence for a pass.
+
+- **The official readme validator** at
+  `https://wordpress.org/plugins/developers/readme-validator/` has never been
+  run against `readme.txt`. Plugin Check's own readme rules pass, which is close
+  but is not the tool the handbook names. It is a paste-and-click, and worth
+  doing while waiting — a fix there is `readme.txt` only and would travel in the
+  next zip.
+- **`release.yml`'s deploy step has never run.** Its guard step was extracted
+  and executed by hand against the real files; the deploy itself will run for
+  the first time on the tag.
+- **PHPCS, PHPStan and PHPUnit run only in CI** — they cannot run in the
+  assistant's environment. CI is green at `9cf897f`, which is the evidence.
 
 ## 4. After approval
 

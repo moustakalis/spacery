@@ -3,14 +3,14 @@
 Responsive block controls for the WordPress block editor — unlimited, theme-defined
 breakpoints for any block.
 
-> **Status: 1.0.0, ready to submit to WordPress.org.** Everything the plugin
-> does is built and tested, every asset and every submission text is written,
-> and `python3 bin/check-release.py` passes. What has not happened yet is the
-> upload.
+> **Status: 1.0.0, submitted to WordPress.org on 16 September 2026 and awaiting
+> review.** The zip carries the shipping files as of `22ff7c9`; every commit
+> since touches `docs/` or this file, neither of which is in
+> `package.json#files`.
 >
-> **Submitted on:** _not yet — record the date and the commit here when it is._
-> Review then takes up to 14 business days, and from that moment the uploaded
-> zip is frozen: a fix lands here and ships in the deploy, not in the review.
+> Review is *"within 14 business days"* — on or about **6 October 2026**. Until
+> it returns the uploaded zip is frozen: a fix lands here and ships in the
+> deploy, not in the review.
 >
 > **Picking this up cold?** Read in this order:
 >

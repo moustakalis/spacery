@@ -708,19 +708,20 @@ one did not.
 Banner and icon assets, readme.txt final pass, a WordPress.org account and slug, and a
 release workflow deploying on tag.
 *Exit:* live on WP.org, release workflow deploying on tag.
-*State at 16 September 2026:* **everything is ready and nothing is uploaded yet.** Every
-asset is in `assets/` — the mark, the icons, the two banners and the three screenshots, captured
+*State at 16 September 2026:* **submitted, and awaiting review.** The zip carries the
+shipping files as of `22ff7c9`. Every asset is in `assets/` — the mark, the icons, the two banners and the three screenshots, captured
 from the running plugin and declared by a `== Screenshots ==` block in `readme.txt` that
 matches them by position (`docs/screenshot-brief.md` records how, and what the earlier
 brief got wrong). `readme.txt` sends people to the Spacery screen in the admin menu, gained
 a `== Source Code ==` section for guideline 4, and `Settings/Screen.php` passes Spacery's
 own mark as a data URI rather than a dashicon.
 
-**`docs/submission.md` is the runbook from here** — what to check before opening the form,
-the overview to paste into it, replies for what a reviewer is likely to raise, and the steps
-that follow approval. Once the zip is uploaded it is frozen: review takes up to 14 business
-days and the reviewer reads the code that was sent, so a fix made afterwards lands here and
-ships in the deploy. `release.yml` has still never run: its first run will be that deploy,
+**`docs/submission.md` is the runbook from here**, and its §3 is the part that matters now:
+the mechanics of replying, a table putting Spacery against every category the handbook's
+*Common Issues* page lists with the evidence for each, six ready replies, and an honest list
+of what has not been checked. The zip is frozen — review runs to about 6 October and the
+reviewer reads the code that was sent, so a fix made now lands here and ships in the
+deploy. `release.yml` has still never run: its first run will be that deploy,
 after approval brings the SVN credentials. The current-state snapshot lives in
 `spacery-status.md`.
 
