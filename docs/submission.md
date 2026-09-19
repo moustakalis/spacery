@@ -1,9 +1,13 @@
 # Submitting Spacery to WordPress.org — the runbook
 
-> **Submitted 16 September 2026; pended by the automated pre-review on
-> 18 September.** This line is the one place that says where the plugin stands;
-> everything below reads differently depending on it, so update it here and
-> nowhere else.
+> **Approved 19 September 2026.** Submitted 16 September, pended by the
+> automated pre-review on 18 September, corrected zip uploaded the same day,
+> approved the next morning. This line is the one place that says where the
+> plugin stands; everything below reads differently depending on it, so update
+> it here and nowhere else.
+>
+> **What is left is §4**, and nothing else in this document is live. Review
+> ID `APPROVED spacery/nikosmoustakas/18Sep26/T2 19Sep26/4.2`.
 >
 > **The pre-review raised four things** (ID `AUTOPREREVIEW spacery/nikosmoustakas/18Sep26/T1`):
 > guideline 11 and admin notices, bundled `.po`/`.mo` files, the
@@ -109,10 +113,11 @@ Checked today rather than remembered:
   submission**. The display name can be.
 - Approval brings an email with Subversion credentials. The SVN repository does
   not exist before then.
-- Latest WordPress is **7.1** (19 August 2026), so `Tested up to: 7.1` is
-  current. 7.1.1 is scheduled but not out. If it ships before you upload, bump
-  that line and rebuild; after upload it is in the frozen zip and the change
-  goes out with the deploy instead.
+- `Tested up to: 7.1` is current, and **stays `7.1` now that 7.1.1 has
+  shipped** (September 2026). An earlier version of this line said to bump it
+  when 7.1.1 landed, which was wrong: the handbook takes a branch here and says
+  the minor version can be left off, so `7.1` already covers 7.1.1. Bump it when
+  7.2 ships, and it travels in a deploy like any other `readme.txt` change.
 
 ---
 
@@ -411,8 +416,29 @@ Replace it with the day you tag:
 ## [1.0.0] - YYYY-MM-DD
 ```
 
-**b. Add the repository secrets** `SVN_USERNAME` and `SVN_PASSWORD` from the
-approval email.
+**b. Add the repository secrets** `SVN_USERNAME` and `SVN_PASSWORD`.
+
+**There are two names and they are not interchangeable.** The approval email's
+summary block says `nikosmoustakas`, which is wrong for this purpose; the
+SVN-access mail says `nikos.moustakas` twice — once as the account granted
+commit access and once as *"your SVN username"* — and `nikos.moustakas` is also
+what the upload confirmation logged. So:
+
+| | Value |
+|---|---|
+| `SVN_USERNAME` secret | `nikos.moustakas` |
+| `readme.txt` `Contributors` | `nikosmoustakas` — the profile slug, which is what `profiles.wordpress.org/nikosmoustakas` resolves to and what grants the listing |
+
+Both are case-sensitive. If the deploy fails to authenticate, try
+`nikosmoustakas` in the secret before looking anywhere else; it is the only
+thing here with two plausible answers.
+
+The password is **not** the WordPress.org account password. It is set at
+*Account & Security → SVN password* on the profile, and it is one password
+across every repository the account owns.
+
+Access takes **up to an hour** to activate. A deploy that runs before then fails
+on authentication and says nothing about the plugin.
 
 **c. Tag.** `git tag v1.0.0 && git push --tags` — `release.yml` populates
 `trunk/` and `assets/` through `10up/action-wordpress-plugin-deploy`. This is

@@ -5,11 +5,10 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-A version is dated on the day it is tagged, not the day it was written. Nothing here has
-shipped yet: 1.0.0 is waiting on a WordPress.org review that begins when the zip is
-submitted, and `release.yml` refuses a tag whose entry is still undated.
+A version is dated on the day it is tagged, not the day it was written, and
+`release.yml` refuses a tag whose entry is still undated.
 
-## [1.0.0] - Unreleased
+## [1.0.0] - 2026-09-19
 
 ### Added
 
