@@ -5,6 +5,20 @@ on:
     tags:
       - 'v*'
 
+  # A rehearsal. `deploy.sh` does everything except the `svn commit` when
+  # `dry-run` is set -- the checkout, the `.distignore` rsync, `svn add`, the
+  # `tags/$VERSION` copy, the mime-type propsets and a closing `svn status` --
+  # so a manual run is the only way to see what would land in `trunk/` before a
+  # commit makes it permanent. WordPress.org's repository has no force-push and
+  # no delete, and `deploy.sh` bails out of a *re*-run with "already published"
+  # and exit 0 once `tags/$VERSION` exists, so the first real run is the only
+  # one that can be right.
+  #
+  # The dry-run flag is derived from the event rather than offered as an input:
+  # a tag push is always a deploy, a manual run is always a rehearsal, and
+  # neither can be turned into the other by a mis-click.
+  workflow_dispatch:
+
 permissions:
   contents: write
 
@@ -26,7 +40,11 @@ jobs:
       # header still says 1.0.0 ships an update WordPress will never offer
       # anyone, because it compares the header against the directory's version
       # rather than the tag. Cheaper to refuse here than to withdraw a release.
+      # Tag pushes only. A rehearsal has no tag to compare anything against --
+      # `GITHUB_REF_NAME` is the branch there, and this step would refuse
+      # before the Deploy step it exists to protect ever ran.
       - name: The tag and the plugin must agree
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           tag="${GITHUB_REF_NAME#v}"
           header="$(grep -oP '^\s*\*\s*Version:\s*\K.+' spacery.php | tr -d '[:space:]')"
@@ -48,6 +66,17 @@ jobs:
             exit 1
           fi
 
+      # `deploy.sh` derives its version from the tag, which a rehearsal does not
+      # have: it would read `refs/heads/main` and then fail trying to
+      # `svn cp trunk tags/refs/heads/main`. So the version is stated here, from
+      # the one place that is authoritative either way -- and on a tag push the
+      # step above has already proved the tag agrees with it.
+      - name: The version being deployed
+        run: |
+          stable="$(grep -oP '^Stable tag:\s*\K.+' readme.txt | tr -d '[:space:]')"
+          echo "VERSION=$stable" >> "$GITHUB_ENV"
+          echo "Deploying version $stable"
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -58,14 +87,20 @@ jobs:
         uses: 10up/action-wordpress-plugin-deploy@stable
         with:
           generate-zip: true
+          dry-run: ${{ github.event_name == 'workflow_dispatch' }}
         env:
           SLUG: spacery
+          VERSION: ${{ env.VERSION }}
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
           BUILD_DIR: ./
           ASSETS_DIR: assets
 
+      # Only on a tag. A manual run has no release to attach anything to, and
+      # `softprops/action-gh-release` would try to create one named after the
+      # branch.
       - name: Attach the zip to the GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ github.workspace }}/spacery.zip

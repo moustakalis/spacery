@@ -525,32 +525,40 @@ rules pass, which is close but is not the tool the handbook names. Paste
 Do it **now**, because a finding there is a `readme.txt`-only fix that travels
 in this deploy, and afterwards it is a second release.
 
-**b. A dry run of the deploy — recommended, and not currently possible.**
-`deploy.sh` supports a `dry-run` input that does everything except the
-`svn commit`: checkout, the `.distignore` rsync, `svn add`, the `tags/1.0.0`
-copy, the mime-type propsets, and a final `svn status`. `release.yml` only
-triggers on a tag, so there is no way to reach it today.
+**b. Rehearse the deploy.** `release.yml` now has a `workflow_dispatch`
+trigger, and on that path `deploy.sh` runs with `dry-run` set: it does the SVN
+checkout, the `.distignore` rsync into `trunk/`, `svn add`, the `tags/1.0.0`
+copy, the mime-type propsets and a closing `svn status`, and stops before the
+commit. A tag push is always a deploy and a manual run is always a rehearsal —
+the flag is derived from the event, so neither can be turned into the other by a
+mis-click.
 
-Given that the deploy step has never run and an SVN commit cannot be taken back,
-adding a manual dry-run path is cheap:
+Run it from *Actions → Release → Run workflow* on `main`, once Phase 0 is
+green. It does not need the credentials to be working yet; they are only used by
+the commit.
 
-```yaml
-on:
-  push:
-    tags:
-      - 'v*'
-  workflow_dispatch:
+**What to read in the output:** the `svn status` near the end is the whole
+point. It lists every path that would be added to `trunk/`, and that list should
+be the six entries below and their contents — no `src/`, no `tests/`, no
+`node_modules/`, no `languages/`. This is the one thing about the deploy that
+has never been observed rather than reasoned about.
 
-# ...and on the Deploy step:
-        with:
-          generate-zip: true
-          dry-run: ${{ github.event_name == 'workflow_dispatch' }}
-```
+Two things the rehearsal cannot tell you: whether the credentials work, because
+the commit is the only step that uses them; and whether WordPress.org accepts
+the result, because nothing is sent.
 
-That keeps a tag push a real deploy and makes a manual run always a rehearsal.
-The rehearsal proves the one thing this repository has never observed: what the
-`.distignore` rsync actually puts in `trunk/`. It does not prove
-authentication, because the credentials are only used by the commit.
+**Two adjustments the dry-run path needed**, both of which would have failed a
+rehearsal rather than a release:
+
+- The *tag and the plugin must agree* guard reads `GITHUB_REF_NAME`, which on a
+  manual run is the branch. It is now tag-only, so it still guards every real
+  deploy and no longer refuses the rehearsal before it reaches the step it
+  exists to protect.
+- `deploy.sh` derives its version from the tag the same way, and would have
+  tried to `svn cp trunk tags/refs/heads/main`. The version is now stated by a
+  step that reads `readme.txt`'s `Stable tag` and passed in as `VERSION` — one
+  authoritative source on both paths, and on a tag push the guard has already
+  proved the tag agrees with it.
 
 ---
 
