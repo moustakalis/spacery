@@ -564,8 +564,27 @@ the rehearsal never commits. So Phase 1b comes first; Phase 1's hour does not.
 **What to read in the output:** the `svn status` near the end is the whole
 point. It lists every path that would be added to `trunk/`, and that list should
 be the six entries below and their contents — no `src/`, no `tests/`, no
-`node_modules/`, no `languages/`. This is the one thing about the deploy that
-has never been observed rather than reasoned about.
+`node_modules/`, no `languages/`.
+
+**Run on 19 September, and it is clean.** The four lines that mattered:
+`ℹ︎ Dry run: No files will be committed to Subversion.`, `ℹ︎ VERSION is 1.0.0`
+(so the readme-derived version step works on the branch path),
+`ℹ︎ Using .distignore` (so `deploy.sh` took the branch this workflow was written
+for, with `node_modules` present in the workspace and excluded), and
+`➤ Dry run: Files not committed.` `trunk/` came out as exactly the six entries,
+`tags/1.0.0` was copied, and `assets/` took all eight files. So the thing that
+had never been observed rather than reasoned about has now been observed.
+
+**One warning in that output is expected and is not a problem:**
+
+> `svn: warning: 'image/svg+xml' is a binary mime-type but file
+> '…/assets/icon.svg' looks like text; diff, merge, blame, and other operations
+> will stop working on this file`
+
+The action sets `svn:mime-type` on every asset so the directory serves them
+rather than offering them as downloads, and `image/svg+xml` is the right type
+for `icon.svg`. Subversion is only warning that it will stop treating that one
+file as text for *its own* diff and blame, which nothing here depends on.
 
 Two things the rehearsal cannot tell you: whether the credentials work, because
 the commit is the only step that uses them; and whether WordPress.org accepts
@@ -619,7 +638,8 @@ most of the diagnosis:
 6. **Attach the zip to the GitHub release**, from `spacery.zip`, with generated
    release notes.
 
-**Expected `trunk/` contents — six entries, and nothing else:**
+**Expected `trunk/` contents — six entries, and nothing else, as the rehearsal
+confirmed:**
 
 ```
 LICENSE  build/  includes/  readme.txt  spacery.php  uninstall.php
