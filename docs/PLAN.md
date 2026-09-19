@@ -43,7 +43,7 @@ slots.
 
 ### Positioning
 
-> **Spacery is a responsive controls toolkit for the block editor: unlimited,
+> **Spacery is a responsive controls toolkit for the block editor: up to twelve,
 > theme-defined breakpoints for any block.**
 
 Two deliverables in one plugin:
@@ -83,7 +83,7 @@ this.
 established, maintained and free. Shipping only Deliverable A would mean competing on
 identical ground against an incumbent with a four-year head start.
 
-This is the strongest argument for the toolkit scope: *unlimited, theme-defined*
+This is the strongest argument for the toolkit scope: *many, theme-defined*
 breakpoints applied to *any block's* spacing is a category nobody in the directory
 occupies. Two fixed breakpoints is what every competitor offers, because it is what core
 offers. N breakpoints sourced from the theme's own design system is the differentiator —

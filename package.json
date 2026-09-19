@@ -1,7 +1,7 @@
 {
 	"name": "spacery",
 	"version": "1.0.0",
-	"description": "Responsive block controls \u2014 unlimited, theme-defined breakpoints for any block.",
+	"description": "Responsive padding, margin and spacer height on any block, at the breakpoints your design uses.",
 	"author": "Nickos Moustakas (https://github.com/moustakalis)",
 	"license": "GPL-2.0-or-later",
 	"private": true,

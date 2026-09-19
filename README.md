@@ -1,7 +1,8 @@
 # Spacery
 
-Responsive block controls for the WordPress block editor — unlimited, theme-defined
-breakpoints for any block.
+Responsive padding, margin and spacer height on any block in the WordPress block
+editor, at the breakpoints your design uses — up to twelve tiers, read from your
+theme where it declares them.
 
 > **Status: 1.0.0, submitted to WordPress.org on 16 September 2026 and awaiting
 > review.** The zip carries the shipping files as of `22ff7c9`; every commit

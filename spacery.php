@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Spacery
  * Plugin URI:        https://github.com/moustakalis/spacery
- * Description:       Responsive block controls — unlimited, theme-defined breakpoints for any block.
+ * Description:       Responsive padding, margin and spacer height on any block, at the breakpoints your design uses.
  * Version:           1.0.0
  * Requires at least: 7.1
  * Requires PHP:      8.2

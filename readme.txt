@@ -8,29 +8,61 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Responsive block controls: unlimited, theme-defined breakpoints for any block.
+Responsive padding, margin and spacer height on any block, at the breakpoints your design uses.
 
 == Description ==
 
-WordPress 7.1 added responsive block styles with two breakpoints, mobile and tablet, set by
-the theme. That covers a lot of designs. It does not cover a design system with four, five
-or six tiers, and it does not make the core Spacer block's height responsive at all.
+Your design has four breakpoints. WordPress gives you two.
 
-Spacery fills both gaps.
+Spacery closes that gap. Padding and margin per breakpoint on any block that supports
+spacing, a spacer block whose height changes at each one, and up to twelve tiers instead
+of two — read from your theme where it declares them, so the editor offers the same
+breakpoints your CSS already uses.
 
-* **Unlimited breakpoints.** Define as many tiers as your design system has. Spacery reads
-  them from your theme where possible, so the editor offers the same breakpoints your CSS
-  already uses.
-* **Consistent with WordPress.** Spacery uses the same desktop-first model and the same
-  breakpoint values as core's own responsive styles, so the two never disagree.
-* **A responsive spacer block.** A height per breakpoint, which the core Spacer block
-  still does not offer.
-* **Responsive controls on any block.** Padding and margin per breakpoint on any block that
-  supports spacing, including blocks from other plugins.
+= Why you would use it =
+
+* **Stop hand-writing media queries for spacing.** Set the value for each breakpoint in
+  the inspector, and watch the editor canvas apply it as you work.
+* **Breakpoints that match your design system.** Up to twelve tiers, named the way your
+  team names them, instead of the two core offers.
+* **A spacer that finally responds.** 120px of air on desktop and 32px on a phone, from
+  one block. The core Spacer block still has a single height.
+* **It adopts what you have already set.** Where your breakpoints line up with the ones
+  WordPress uses, Spacery offers to move values core set responsively into the matching
+  tier — one click, nothing retyped.
+* **It works with blocks you did not write.** There is no list of supported blocks: the
+  controls appear wherever WordPress says spacing applies, including blocks from other
+  plugins.
+* **Light CSS.** Rules come from WordPress's own Style Engine and are shared between
+  blocks that use the same values — two hundred blocks with three spacing recipes between
+  them emit three rules, not two hundred.
+
+= Is Spacery for you? =
+
+**Yes**, if you build with the block editor, your design system has more than two
+breakpoints, and you would rather set spacing in the inspector than in a stylesheet.
+
+**Probably not**, if any of these is true:
+
+* **Your design has one or two breakpoints and your theme declares them.** WordPress
+  7.1's own responsive styles already cover you, and Spacery would be a dependency you
+  do not need.
+* **You want responsive typography, colours, or hide-on-mobile.** Spacery does spacing.
+  It does not pretend otherwise.
+* **You need responsive block gap.** WordPress does that itself, with its own controls.
+  Spacery deliberately does not ship a second implementation that would drift from the
+  first.
+* **You are on the classic editor**, or a page builder that replaces the block editor.
+* **You cannot run WordPress 7.1 and PHP 8.2.** Spacery says so on activation rather
+  than half-working.
+
+One more thing worth knowing before you install: breakpoints are one set for the whole
+site, not a per-page choice. That is deliberate — a design system is one set of tiers —
+but if you wanted different breakpoints on different pages, this is not that plugin.
 
 = You choose where breakpoints come from =
 
-Spacery uses one set of breakpoints at a time, and you pick which:
+Spacery uses one set at a time, and you pick which:
 
 * **Your theme.** Its `settings.custom.spacery.breakpoints`, or the `settings.viewport`
   values WordPress 7.1 understands. This is the default whenever your theme declares
@@ -39,17 +71,31 @@ Spacery uses one set of breakpoints at a time, and you pick which:
   that applies everywhere. Tablet and Mobile use WordPress's own values, so choosing this
   adds tiers without moving the ones you already had. This is what you get on a site whose
   theme declares no breakpoints, which is most of them.
-* **Your own.** Any set you like, up to twelve tiers, defined on the Spacery screen in the admin menu.
+* **Your own.** Any set you like, up to twelve tiers, defined on the Spacery screen in the
+  admin menu.
 
 The sets are never blended: values from two different intentions sitting side by side
 produce a set nobody designed. Developers can override the result entirely with the
 `spacery_breakpoints` filter.
 
-= Your content stays yours =
+= How it fits with WordPress =
 
-Spacery stores its values as block attributes, not as markup. Deactivate the plugin and
-your posts stay valid: nothing breaks, nothing needs repairing, and reactivating restores
-your values.
+WordPress 7.1 added responsive block styles with two theme-set breakpoints, mobile and
+tablet. Spacery extends that rather than competing with it: the same desktop-first model,
+the same disjoint media-query shapes, and the same values where your breakpoints and
+core's agree — so the two never disagree at a boundary, and turning Spacery off leaves
+core's own responsive styles working exactly as before.
+
+= No strings =
+
+* **Nothing leaves your site.** No external requests, no account, no key, no telemetry,
+  no analytics.
+* **No upsell and no pro version.** There is no paid tier to be steered towards, and the
+  admin screens carry no promotion of any kind.
+* **Your content stays yours.** Values are stored as block attributes, never written into
+  your posts' markup. Deactivate the plugin and every post stays valid; reactivate and
+  your values are still there.
+* **GPL-2.0-or-later**, with the full, uncompiled source on GitHub.
 
 == Installation ==
 
@@ -75,7 +121,13 @@ breakpoints so the two systems agree.
 = What happens if I deactivate the plugin? =
 
 Your posts stay valid. Spacery's values are stored as block attributes rather than written
-into your content's markup, so nothing is left behind to break.
+into your content's markup, so nothing is left behind to break, and reactivating brings
+them back.
+
+One caveat, which is inherent rather than a bug: with Spacery switched off its attribute
+is not registered, so opening a post in that state and **saving** it rewrites the block
+without Spacery's values. Reading is safe; re-saving is not. If you are deactivating to
+test something, avoid saving posts until it is back on.
 
 = Does it work with blocks from other plugins? =
 

@@ -133,7 +133,7 @@ uploaded, because two of them cannot be changed afterwards.
 | Slug | `spacery`, derived from `Plugin Name: Spacery` | **Permanent.** Re-check it is still free in the same sitting as the upload — it was free on 15 September, which is not the same as free today |
 | Display name | `Spacery` | Changeable later |
 | Contributors | `nikosmoustakas` | Must be an existing WordPress.org account, confirmed yours. This line is what grants you the listing |
-| Short description | *Responsive block controls: unlimited, theme-defined breakpoints for any block.* (78 chars, limit is 150) | Final |
+| Short description | *Responsive padding, margin and spacer height on any block, at the breakpoints your design uses.* (95 chars, limit is 150) | Rewritten 19 September; the previous one said "unlimited", which the twelve-tier cap makes untrue |
 | `Tested up to` | `7.1` | Correct today |
 
 Also, before the form and not text: whitelist `plugins@wordpress.org` in your

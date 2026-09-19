@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Spacery 1.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/moustakalis/spacery/issues\n"
-"POT-Creation-Date: 2026-09-18T15:13:44+00:00\n"
+"POT-Creation-Date: 2026-09-19T20:12:51+00:00\n"
 "PO-Revision-Date: 2026-09-12T15:17:59+00:00\n"
 "Last-Translator: Nickos Moustakas\n"
 "Language-Team: Greek\n"
@@ -27,11 +27,11 @@ msgstr ""
 #. Description of the plugin
 #: spacery.php
 msgid ""
-"Responsive block controls — unlimited, theme-defined breakpoints for any "
-"block."
+"Responsive padding, margin and spacer height on any block, at the "
+"breakpoints your design uses."
 msgstr ""
-"Αποκρίσιμα στοιχεία ελέγχου μπλοκ — απεριόριστα σημεία διακοπής, ορισμένα "
-"από το θέμα, για κάθε μπλοκ."
+"Αποκρίσιμα εσωτερικά και εξωτερικά περιθώρια και ύψος κενού σε κάθε μπλοκ, "
+"στα σημεία διακοπής που χρησιμοποιεί ο σχεδιασμός σας."
 
 #. Author of the plugin
 #: spacery.php

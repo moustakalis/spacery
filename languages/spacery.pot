@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-18T15:13:44+00:00\n"
+"POT-Creation-Date: 2026-09-19T20:12:51+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: spacery\n"
@@ -30,7 +30,7 @@ msgstr ""
 
 #. Description of the plugin
 #: spacery.php
-msgid "Responsive block controls — unlimited, theme-defined breakpoints for any block."
+msgid "Responsive padding, margin and spacer height on any block, at the breakpoints your design uses."
 msgstr ""
 
 #. Author of the plugin
