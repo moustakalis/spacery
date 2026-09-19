@@ -1,15 +1,18 @@
 # Submitting Spacery to WordPress.org — the runbook
 
-> **Approved 19 September 2026.** Submitted 16 September, pended by the
-> automated pre-review on 18 September, corrected zip uploaded the same day,
-> approved the next morning. This line is the one place that says where the
-> plugin stands; everything below reads differently depending on it, so update
-> it here and nowhere else.
+> **Released 19 September 2026.** `v1.0.0` is live at
+> `https://wordpress.org/plugins/spacery/`. Submitted 16 September, pended by
+> the automated pre-review on 18 September, corrected zip uploaded the same day,
+> approved 19 September, deployed the same night at `r3703665`. This line is the
+> one place that says where the plugin stands, so update it here and nowhere
+> else.
 >
-> **What is left is §4**, which is the release plan in phases: push and prove
-> CI, credentials and the hour's wait, two preflights, the tag, verify SVN,
-> then the listing. Nothing else in this document is live. Review ID
-> `APPROVED spacery/nikosmoustakas/18Sep26/T2 19Sep26/4.2`.
+> **Nothing in §1–§4 is live any more.** They are the record of how it got here,
+> kept because the next release walks the same ground. What is live is **§4's
+> Phase 6**, the first-days list: the 72-hour search index, translations, and
+> the `== Upgrade Notice ==` that 1.0.1 will want.
+>
+> Review ID `APPROVED spacery/nikosmoustakas/18Sep26/T2 19Sep26/4.2`.
 >
 > **The pre-review raised four things** (ID `AUTOPREREVIEW spacery/nikosmoustakas/18Sep26/T1`):
 > guideline 11 and admin notices, bundled `.po`/`.mo` files, the
@@ -671,6 +674,13 @@ svn log -l 1 https://plugins.svn.wordpress.org/spacery
   screenshots.
 - The log's one entry reads *"Update to version 1.0.0 from GitHub"*.
 
+**Verified on 19 September, and all four agree.** `trunk/` is the six entries
+and nothing else; `tags/` holds `1.0.0/`; `assets/` holds all eight files; and
+the log reads `r3703665 | nikos.moustakas | Update to version 1.0.0 from
+GitHub`. The published `readme.txt` carries `Stable tag: 1.0.0` and the plugin
+header carries `Version: 1.0.0`, so what the directory serves and what it
+advertises are the same thing.
+
 **If the deploy failed at the commit**, nothing above exists and the tag can
 simply be deleted and re-pushed once the cause is fixed:
 
@@ -703,6 +713,19 @@ and a new tag.
 - **Run Plugin Check against the published zip**, not the checkout. §3vicies of
   the status notes explains why the difference matters: the last run was against
   a superset of what ships.
+
+**Checked on 19 September, minutes after the deploy.** The page renders with the
+short description and the rewritten Description, version 1.0.0, *Requires
+WordPress 7.1 or higher*, *Requires PHP 8.2 or higher*. All three screenshots
+appear, in order, with their captions matched correctly — the failure this
+section exists to catch, since they are paired by position. Every one of the
+eight assets is served from `ps.w.org`, and the three screenshots' byte counts
+are identical to the files in `assets/`.
+
+**One thing the listing settles:** it displays *Tested up to: **7.1.1***, where
+`readme.txt` says `7.1`. The directory resolves the branch to its latest
+release, which is the behaviour §1 reasoned about when it declined to bump that
+line. The reasoning was right and is now observed rather than argued.
 
 ---
 
@@ -756,5 +779,8 @@ and a new tag.
   so no text here says "exactly".
 - **That the slug was free.** It was checked at the keyboard on 15 September and
   granted on 19 September; `spacery` is now permanent and the question is closed.
-- **That `release.yml` works.** Its guard step was extracted and run; the deploy
-  step's first run will be its first run.
+- ~~That `release.yml` works.~~ **It ran on 19 September and it worked**, once
+  as a rehearsal and once for real. What is still unclaimed is that it works for
+  an *update*: every run so far has published into an empty repository, and the
+  paths that matter next time — `--delete` against an existing `trunk/`, and the
+  early exit when `tags/<version>` is already there — have not been exercised.
