@@ -705,26 +705,32 @@ transform with no input, and `wp spacery migrate` a command with nothing to conv
 work this milestone described was real, but only against a version that shipped — and this
 one did not.
 
-**M8 — Publish — IN FLIGHT**
+**M8 — Publish — DONE**
 Banner and icon assets, readme.txt final pass, a WordPress.org account and slug, and a
 release workflow deploying on tag.
 *Exit:* live on WP.org, release workflow deploying on tag.
-*State at 16 September 2026:* **submitted, and awaiting review.** The zip carries the
-shipping files as of `22ff7c9`. Every asset is in `assets/` — the mark, the icons, the two banners and the three screenshots, captured
-from the running plugin and declared by a `== Screenshots ==` block in `readme.txt` that
-matches them by position (`docs/screenshot-brief.md` records how, and what the earlier
-brief got wrong). `readme.txt` sends people to the Spacery screen in the admin menu, gained
-a `== Source Code ==` section for guideline 4, and `Settings/Screen.php` passes Spacery's
-own mark as a data URI rather than a dashicon.
+*Exit met 19 September 2026:* **`1.0.0` is in the directory** at
+`https://wordpress.org/plugins/spacery/`, deployed from the tag `v1.0.0` at SVN
+`r3703665`. Submitted 16 September, pended by the automated pre-review on 18 September,
+corrected and approved on the 19th. Every asset is in `assets/` — the mark, the icons, the
+two banners and the three screenshots, captured from the running plugin and declared by a
+`== Screenshots ==` block in `readme.txt` that matches them by position
+(`docs/screenshot-brief.md` records how, and what the earlier brief got wrong).
+`readme.txt` gained a `== Source Code ==` section for guideline 4, and
+`Settings/Screen.php` passes Spacery's own mark as a data URI rather than a dashicon.
 
-**`docs/submission.md` is the runbook from here**, and its §3 is the part that matters now:
-the mechanics of replying, a table putting Spacery against every category the handbook's
-*Common Issues* page lists with the evidence for each, six ready replies, and an honest list
-of what has not been checked. The zip is frozen — review runs to about 6 October and the
-reviewer reads the code that was sent, so a fix made now lands here and ships in the
-deploy. `release.yml` has still never run: its first run will be that deploy,
-after approval brings the SVN credentials. The current-state snapshot lives in
-`spacery-status.md`.
+**Three defects were found in those four days and none was what the reviewer raised**:
+JavaScript translations would never have loaded from a language pack in any locale (D38),
+"unlimited breakpoints" was false against a hard cap of twelve, and
+`BreakpointSet::from_array()` could fatal a save on a `(string)` cast of an object. The
+account is in `spacery-status.md` §3quatervicies–§3septvicies.
+
+**`docs/submission.md` is the record**, and its §4 is the phased release plan — what is
+irreversible and why the order follows from it, the six workflow steps, the four `svn`
+commands that verify a deploy, and a failure-mode table. `release.yml` has now run twice,
+once as a rehearsal and once for real; what it has *not* done is publish an **update**, so
+`rsync --delete` against a populated `trunk/` and `deploy.sh`'s silent "already published"
+early exit are both unexercised. The current-state snapshot lives in `spacery-status.md`.
 
 ---
 
