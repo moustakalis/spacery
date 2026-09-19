@@ -501,15 +501,24 @@ Both are case-sensitive. `readme.txt`'s `Contributors` line stays
 `nikosmoustakas`, the profile slug, and is a different thing entirely: it is
 what grants the listing, not what authenticates.
 
-**c. Confirm the repository exists** once the hour is up. This needs no
-credentials:
+**c. Confirm the repository exists.** This needs no credentials:
 
 ```bash
 svn info https://plugins.svn.wordpress.org/spacery
+svn ls   https://plugins.svn.wordpress.org/spacery/
 ```
 
-A revision number means the repository is there. It does **not** prove your
-commit access; nothing short of a commit does.
+**Checked on 19 September: it is there.** Created at r3703470, 19:35 local, with
+`assets/`, `tags/` and `trunk/` all empty. The commit message WordPress.org
+wrote is *"Adding Spacery by **nikos.moustakas**."* — which is the fourth and
+most authoritative sighting of that username, after the access mail's two and
+the upload confirmation. The approval email's `nikosmoustakas` stands alone.
+
+`tags/` being empty also means the early-exit in Phase 3 is not in play: the
+first deploy run will be a real one.
+
+A revision number does **not** prove your commit access. Nothing short of a
+commit does, and access takes up to an hour from the approval email.
 
 ---
 
@@ -543,8 +552,14 @@ the flag is derived from the event, so neither can be turned into the other by a
 mis-click.
 
 Run it from *Actions → Release → Run workflow* on `main`, once Phase 0 is
-green. It does not need the credentials to be working yet; they are only used by
-the commit.
+green.
+
+**The secrets must exist first, even though the rehearsal never uses them.**
+`deploy.sh` checks `SVN_USERNAME` and `SVN_PASSWORD` for emptiness and exits 1
+before it reaches the dry-run branch, so a rehearsal with no secrets set fails
+with *"Set the SVN_USERNAME secret"* and proves nothing. They do not have to be
+*correct* — only non-empty — because the credentials are used by the commit and
+the rehearsal never commits. So Phase 1b comes first; Phase 1's hour does not.
 
 **What to read in the output:** the `svn status` near the end is the whole
 point. It lists every path that would be added to `trunk/`, and that list should
