@@ -32,10 +32,10 @@
 >
 > | If | Go to |
 > |---|---|
-> | Still in the queue, nothing heard | Nowhere. The reviewer reads the uploaded zip. Don't change it, don't re-submit, don't tag. **§3**'s last part lists the two things worth doing while waiting. |
-> | A reviewer has written back | **§3** — ready replies for the three things a code scan raises, and the rule about replying in the same thread rather than re-submitting |
-> | Approved; SVN credentials have arrived | **§4** — the phased release plan. Read *What is irreversible* first; it is why the order is what it is |
-> | Something about the plugin itself needs changing | `docs/PLAN.md`'s decision table first. Then check the line above: before upload a fix simply goes in the next zip; after it, the zip is frozen and the fix ships in the deploy. |
+> | Shipping a 1.0.x or 1.1 | **§4**, which is the release plan and has been walked once end to end. Read *What is irreversible* first. Note that **every path in it so far has run against an empty SVN repository** — an update exercises two things that never have, listed in that section |
+> | Something about the plugin itself needs changing | `docs/PLAN.md`'s decision table (D1–D38) first. Then §4, because a fix now reaches users through a release rather than through a zip |
+> | A user reports a bug, or WordPress.org writes again | `claude/spacery-status.md` for whether it is already known — §3 onward is a catalogue of what this plugin has got wrong and how each was found. Then the decision table |
+> | Just resuming, nothing specific | §0's first prompt. The short answer is that 1.0.0 is out and Phase 6 is the only live list |
 >
 > **Two answers settled on 16 September**, so nobody re-asks: the WordPress.org
 > account is **`nikosmoustakas`**, which is what `readme.txt`'s `Contributors`
@@ -50,59 +50,69 @@ Paste one of these as the first message. They exist because the useful thing on
 a cold start is not a summary — it is getting the session to read the right
 three places before it says anything.
 
-**Nothing has happened yet — just resume:**
+**Just resuming:**
 
 ```text
-Spacery, my WordPress plugin. It is submitted to WordPress.org and I am waiting
-on the review.
+Spacery, my WordPress plugin. 1.0.0 is released and in the WordPress.org
+directory.
 
 Before answering anything, read, in this order:
-1. docs/submission.md — the header says where it stands, and §3 is the review
-   procedure.
-2. The project doc claude/spacery-status.md, §1 only — the boxed summary. The
-   rest is history; do not infer the current state from it.
-3. docs/PLAN.md's decision table (D1–D37) before reopening any design question.
+1. docs/submission.md — the header says where it stands, and its routing table
+   says where to go next. §4 is the release plan, already walked once.
+2. The project doc claude/spacery-status.md, §1 only — the boxed summary. §1a
+   onward is history; do not infer the current state from it.
+3. docs/PLAN.md's decision table (D1–D38) before reopening any design question.
+   Several rows record a rule that was corrected once already.
 
-The repo is the connected folder ~/Documents/GitHub/spacery; the MAMP test site
-is ~/Dev/playground at https://playground:8890. You prepare commits, I push.
-The submitted zip is frozen — a fix lands in the repo and ships in the deploy.
+The repo is the connected folder ~/Documents/GitHub/spacery. You prepare
+commits, I push and I tag.
 
 Then tell me where things stand and what, if anything, is worth doing today.
 ```
 
-**The reviewer has written back:**
+**Shipping an update:**
 
 ```text
-Spacery — the WordPress.org reviewer replied. Their email is below.
+Spacery — I want to ship <version>.
 
-Read docs/submission.md §3 first: the reply mechanics, the table of Spacery
-against every Common Issues category with its evidence, and the ready replies.
-Also read the project doc claude/spacery-status.md §1 for the current state.
+Read docs/submission.md §4 first. It is the release plan and it has been run
+once, but only ever into an empty SVN repository, so two things in it have
+never happened: rsync --delete against a populated trunk/, and deploy.sh's
+early exit, which prints "already published" and exits 0 once tags/<version>
+exists — so a re-run after a bad deploy reports success and does nothing.
 
-Check each point they raise against the code before agreeing with it — §3's
-table has the evidence for the ones already verified. Then draft one reply for
-the same email thread. Do not re-submit through the form, and do not tag.
+Also read claude/spacery-status.md §1 and docs/PLAN.md's decision table.
+
+Bump the version in all three places the guard checks (plugin header,
+readme.txt Stable tag, CHANGELOG heading with a date), add == Upgrade Notice ==
+if this one matters to existing users, and regenerate the POT if includes/,
+spacery.php or src/ changed. Rehearse with Actions → Release → Run workflow
+before tagging.
+
+Repo: ~/Documents/GitHub/spacery. I push, I tag.
+```
+
+**A bug report, or WordPress.org writing again:**
+
+```text
+Spacery — <the report, or their email, below>.
+
+Before agreeing with any of it, check it against the code. claude/spacery-status.md
+§3 onward is a catalogue of what this plugin has already got wrong and how each
+one was found; read whether this is known before treating it as new. §1 is the
+current state.
+
+docs/submission.md §3 has the evidence table for every WordPress.org Common
+Issues category, and §3quatervicies records that two of the four findings in
+the last pre-review were not what the message said they were.
 
 Repo: ~/Documents/GitHub/spacery. I push, you don't.
 
---- their email ---
+--- report ---
 <paste>
 ```
 
-**Approved:**
-
-```text
-Spacery was approved by WordPress.org and the SVN credentials have arrived.
-
-Read docs/submission.md §4 — it is the runbook for exactly this: date the
-changelog, add the repository secrets, tag, watch release.yml, check the
-listing. Note that release.yml has never run before, so its first run is the
-deploy itself.
-
-Repo: ~/Documents/GitHub/spacery. You prepare commits, I push and I tag.
-```
-
-**Written 16 September 2026, against the live handbook and the live plugin.**
+**Written 16 September 2026 against the live handbook, and revised 20 September against the released plugin.**
 The submission itself is small: WordPress.org asks for **a zip** and **a short
 written overview of what the plugin does**. Everything else a reviewer reads is
 already in `readme.txt` and in the code. So this document holds the texts, in
