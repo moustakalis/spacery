@@ -394,12 +394,10 @@ mention it costs trust.
 
 Honest gaps, so a later session does not mistake silence for a pass.
 
-- **The official readme validator** at
-  `https://wordpress.org/plugins/developers/readme-validator/` has never been
-  run against `readme.txt`. Plugin Check's own readme rules pass, which is close
-  but is not the tool the handbook names. It is a paste-and-click, and worth
-  doing while waiting — a fix there is `readme.txt` only and would travel in the
-  next zip.
+- ~~The official readme validator has never been run.~~ **Run on 19 September**,
+  against the rewritten `readme.txt`: no errors, no warnings, and two notes —
+  no `== Upgrade Notice ==` section and no donate link. Both are deliberate and
+  neither is a defect; see Phase 2a.
 - **`release.yml`'s deploy step has never run.** Its guard step was extracted
   and executed by hand against the real files; the deploy itself will run for
   the first time on the tag.
@@ -517,13 +515,24 @@ commit access; nothing short of a commit does.
 
 ### Phase 2 — The two preflights worth the minutes
 
-**a. The readme validator, which has never been run.** §3's *What has not been
-checked* has listed it since the submission was written. Plugin Check's readme
-rules pass, which is close but is not the tool the handbook names. Paste
-`readme.txt` into `https://wordpress.org/plugins/developers/readme-validator/`.
+**a. The readme validator — done, 19 September.** Run against the rewritten
+`readme.txt` at `https://wordpress.org/plugins/developers/readme-validator/`,
+which is the tool the handbook names and which Plugin Check's own readme rules
+only approximate. The result:
 
-Do it **now**, because a finding there is a `readme.txt`-only fix that travels
-in this deploy, and afterwards it is a second release.
+> **Notes:** No `== Upgrade Notice ==` section was found. No donate link was
+> found.
+
+No errors and no warnings. Both notes are deliberate: 1.0.0 has nothing to say
+in an upgrade nag and Phase 6 is where that section gets added, and there is no
+donate link because there is nothing to donate to.
+
+**Re-run it if `readme.txt` changes again before the tag**, and note that the
+validator's paste form posts on a real submit rather than on a scripted click —
+the button reports as clicked and the page does not reload. The way to be sure
+it ran is that the result block appears above the form; the way to be sure it
+validated *this* file is to hash the textarea's contents against `readme.txt`
+before submitting, because a paste is a copy and a copy can be stale.
 
 **b. Rehearse the deploy.** `release.yml` now has a `workflow_dispatch`
 trigger, and on that path `deploy.sh` runs with `dry-run` set: it does the SVN
