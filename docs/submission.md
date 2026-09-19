@@ -6,8 +6,10 @@
 > plugin stands; everything below reads differently depending on it, so update
 > it here and nowhere else.
 >
-> **What is left is §4**, and nothing else in this document is live. Review
-> ID `APPROVED spacery/nikosmoustakas/18Sep26/T2 19Sep26/4.2`.
+> **What is left is §4**, which is the release plan in phases: push and prove
+> CI, credentials and the hour's wait, two preflights, the tag, verify SVN,
+> then the listing. Nothing else in this document is live. Review ID
+> `APPROVED spacery/nikosmoustakas/18Sep26/T2 19Sep26/4.2`.
 >
 > **The pre-review raised four things** (ID `AUTOPREREVIEW spacery/nikosmoustakas/18Sep26/T1`):
 > guideline 11 and admin notices, bundled `.po`/`.mo` files, the
@@ -29,7 +31,7 @@
 > |---|---|
 > | Still in the queue, nothing heard | Nowhere. The reviewer reads the uploaded zip. Don't change it, don't re-submit, don't tag. **§3**'s last part lists the two things worth doing while waiting. |
 > | A reviewer has written back | **§3** — ready replies for the three things a code scan raises, and the rule about replying in the same thread rather than re-submitting |
-> | Approved; SVN credentials have arrived | **§4** — date the changelog, add the secrets, tag, check the listing |
+> | Approved; SVN credentials have arrived | **§4** — the phased release plan. Read *What is irreversible* first; it is why the order is what it is |
 > | Something about the plugin itself needs changing | `docs/PLAN.md`'s decision table first. Then check the line above: before upload a fix simply goes in the next zip; after it, the zip is frozen and the fix ships in the deploy. |
 >
 > **Two answers settled on 16 September**, so nobody re-asks: the WordPress.org
@@ -404,70 +406,294 @@ Honest gaps, so a later session does not mistake silence for a pass.
 - **PHPCS, PHPStan and PHPUnit run only in CI** — they cannot run in the
   assistant's environment. CI is green at `9cf897f`, which is the evidence.
 
-## 4. After approval
+## 4. Releasing 1.0.0 — the phased plan
 
-The SVN repository arrives with the approval email. In order:
+Written 19 September 2026, the day of approval, against the real workflow and
+the real `deploy.sh` rather than from memory.
 
-**a. Date the changelog.** `CHANGELOG.md`'s heading is
-`## [1.0.0] - Unreleased` and `release.yml` refuses a tag while it says that.
-Replace it with the day you tag:
+### What is irreversible, because it decides the order
 
-```
-## [1.0.0] - YYYY-MM-DD
-```
+Everything below is arranged around three things that cannot be taken back.
 
-**b. Add the repository secrets** `SVN_USERNAME` and `SVN_PASSWORD`.
-
-**There are two names and they are not interchangeable.** The approval email's
-summary block says `nikosmoustakas`, which is wrong for this purpose; the
-SVN-access mail says `nikos.moustakas` twice — once as the account granted
-commit access and once as *"your SVN username"* — and `nikos.moustakas` is also
-what the upload confirmation logged. So:
-
-| | Value |
+| Irreversible | Why it matters |
 |---|---|
-| `SVN_USERNAME` secret | `nikos.moustakas` |
-| `readme.txt` `Contributors` | `nikosmoustakas` — the profile slug, which is what `profiles.wordpress.org/nikosmoustakas` resolves to and what grants the listing |
+| **An SVN commit** | WordPress.org's repository has no force-push and no delete. A wrong `trunk/` is fixed by committing over it, and the mistake stays in the history for everyone to read |
+| **`tags/1.0.0` existing** | `deploy.sh` bails out early if `tags/$VERSION` is already there — it prints *"Version 1.0.0 of plugin spacery was already published"*, generates the zip and **exits 0**. A re-run after a bad deploy therefore reports success and does nothing |
+| **The slug** | `spacery` is granted and permanent |
 
-Both are case-sensitive. If the deploy fails to authenticate, try
-`nikosmoustakas` in the secret before looking anywhere else; it is the only
-thing here with two plausible answers.
+So: everything that can be checked for free is checked before the tag, and the
+tag is the last thing that happens.
 
-The password is **not** the WordPress.org account password. It is set at
-*Account & Security → SVN password* on the profile, and it is one password
-across every repository the account owns.
+---
 
-Access takes **up to an hour** to activate. A deploy that runs before then fails
-on authentication and says nothing about the plugin.
+### Phase 0 — Land the tree, and let CI prove it
 
-**c. Tag.** `git tag v1.0.0 && git push --tags` — `release.yml` populates
-`trunk/` and `assets/` through `10up/action-wordpress-plugin-deploy`. This is
-the first time that workflow has ever run; its guard step has been tested
-standalone, the deploy step has not.
+**Precondition:** `HEAD` is the commit that dates the changelog, and it is the
+only thing ahead of `origin/main`.
 
-**d. The assets go with it.** `assets/` already holds
-`icon-128x128.png`, `icon-256x256.png`, `banner-772x250.png`,
-`banner-1544x500.png` and `screenshot-1.png` … `screenshot-3.png`. The
-`== Screenshots ==` block in `readme.txt` matches them **by position**; do not
-reorder the files.
+```bash
+git -C ~/Documents/GitHub/spacery log --oneline -1   # expect: Date 1.0.0 for the tag
+git -C ~/Documents/GitHub/spacery status --short --branch
+```
 
-**e. Check the listing** once it is live: the three screenshots render with the
-right captions under them, the banner is not cropped oddly at either size, and
-the Description reads as intended.
+Expect a clean tree and `## main...origin/main [ahead 1]`. Then:
 
-### The one text 1.0.0 does not have, and the next release will want
+```bash
+git push origin main
+```
 
-`readme.txt` has no `== Upgrade Notice ==` section, and does not need one for a
-first release. Add it at the first update that matters to an existing user — it
-is what shows in the update nag, so it is one short sentence, under 300
-characters, about why to update rather than what changed:
+**Wait for all five CI jobs on `main` to be green before going further.** This
+is not routine caution. This push is the first CI run that contains:
+
+- the POT extracted from `build/` instead of transpiled sources (D38), so the
+  `i18n` job now builds before it extracts and diffs a POT whose every
+  JavaScript reference changed;
+- the `e2e` job's new *Install Spacery's Greek as a language pack* step, which
+  runs `bin/install-language-pack.php` through `wp eval-file` in the
+  `tests-cli` container and has never executed anywhere;
+- `tests/php/I18nTest.php`, rewritten around a `wp_set_script_translations()`
+  stub that only CI has ever run.
+
+`php`, `js`, `plugin-check` are the settled ones; `i18n` and `e2e` are the two
+to watch. **A red run here is a reason to stop, not to tag** — a tag pushed
+against a broken tree deploys it.
+
+**If `i18n` fails** it will be a POT diff. Run `pnpm run i18n:pot` locally
+(it builds first now) and commit the result; the references are the likely
+culprit and the failure prints the diff.
+
+**If `e2e` fails on the locale steps**, read the *Install Spacery's Greek as a
+language pack* step's own output first — it lists every file it wrote into
+`WP_LANG_DIR/plugins`. If that list is right and the assertions still fail, the
+pack is installed and the lookup is what is wrong; `bin/locale-check.php`'s
+report distinguishes those two cases by design.
+
+**Also confirm, at the keyboard rather than from this document:**
+`github.com/moustakalis/spacery` is still **public**. `readme.txt`'s
+`== Source Code ==` section links there, and that link is what satisfies
+guideline 4 for a plugin that ships `build/` without `src/`. A 404 there after
+approval is a compliance problem, not a cosmetic one.
+
+---
+
+### Phase 1 — Credentials, and the hour that has to pass
+
+Commit access is granted **within one hour** of the approval email. Nothing
+before that hour will authenticate, and the failure arrives at the very last
+step of the deploy (see Phase 3), so starting early costs a full run.
+
+**a. Generate the SVN password.** *Account & Security → SVN password* at
+`profiles.wordpress.org/nikosmoustakas/profile/edit/group/3/?screen=svn-password`.
+It is **not** the WordPress.org account password, and it is one password across
+every repository the account owns.
+
+**b. Add two repository secrets** at *Settings → Secrets and variables →
+Actions* on the GitHub repository:
+
+| Secret | Value |
+|---|---|
+| `SVN_USERNAME` | `nikos.moustakas` |
+| `SVN_PASSWORD` | the password from (a) |
+
+**The username has two plausible answers and only one is right.** The approval
+email's summary block says `nikosmoustakas`; the SVN-access mail says
+`nikos.moustakas` twice — as the account granted commit access, and as *"your
+SVN username"* — and `nikos.moustakas` is what the upload confirmation logged.
+Both are case-sensitive. `readme.txt`'s `Contributors` line stays
+`nikosmoustakas`, the profile slug, and is a different thing entirely: it is
+what grants the listing, not what authenticates.
+
+**c. Confirm the repository exists** once the hour is up. This needs no
+credentials:
+
+```bash
+svn info https://plugins.svn.wordpress.org/spacery
+```
+
+A revision number means the repository is there. It does **not** prove your
+commit access; nothing short of a commit does.
+
+---
+
+### Phase 2 — The two preflights worth the minutes
+
+**a. The readme validator, which has never been run.** §3's *What has not been
+checked* has listed it since the submission was written. Plugin Check's readme
+rules pass, which is close but is not the tool the handbook names. Paste
+`readme.txt` into `https://wordpress.org/plugins/developers/readme-validator/`.
+
+Do it **now**, because a finding there is a `readme.txt`-only fix that travels
+in this deploy, and afterwards it is a second release.
+
+**b. A dry run of the deploy — recommended, and not currently possible.**
+`deploy.sh` supports a `dry-run` input that does everything except the
+`svn commit`: checkout, the `.distignore` rsync, `svn add`, the `tags/1.0.0`
+copy, the mime-type propsets, and a final `svn status`. `release.yml` only
+triggers on a tag, so there is no way to reach it today.
+
+Given that the deploy step has never run and an SVN commit cannot be taken back,
+adding a manual dry-run path is cheap:
+
+```yaml
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+# ...and on the Deploy step:
+        with:
+          generate-zip: true
+          dry-run: ${{ github.event_name == 'workflow_dispatch' }}
+```
+
+That keeps a tag push a real deploy and makes a manual run always a rehearsal.
+The rehearsal proves the one thing this repository has never observed: what the
+`.distignore` rsync actually puts in `trunk/`. It does not prove
+authentication, because the credentials are only used by the commit.
+
+---
+
+### Phase 3 — Tag, and what the deploy will do
+
+```bash
+git -C ~/Documents/GitHub/spacery tag v1.0.0
+git -C ~/Documents/GitHub/spacery push origin v1.0.0
+```
+
+`release.yml` then runs six steps, in this order. Knowing which one failed is
+most of the diagnosis:
+
+1. **Checkout, pnpm, Node** — boring.
+2. **The tag and the plugin must agree.** Compares the tag minus `v` against
+   the plugin header's `Version` and `readme.txt`'s `Stable tag`, then requires
+   a dated `## [1.0.0] - YYYY-MM-DD` heading in `CHANGELOG.md`. All three say
+   `1.0.0` and the heading is dated `2026-09-19`; the step was extracted from
+   the YAML and run by hand against the real files, and passes.
+3. **Install dependencies** — `pnpm install --frozen-lockfile`. This is why
+   `node_modules` exists in the workspace by the time the deploy copies files,
+   and why the next point matters.
+4. **Build** — `pnpm run build`, producing the `build/` that ships. `build/` is
+   gitignored, so the deploy has no plugin to publish without this step.
+5. **Deploy.** `BUILD_DIR: ./` is read by `deploy.sh` as *"no build directory"*
+   (it maps `./` to `false`), which selects the branch that copies the
+   workspace with `rsync -rc --exclude-from=.distignore --delete
+   --delete-excluded`. That is the branch that honours `.distignore`; the other
+   branch would copy the workspace wholesale, `node_modules` included.
+   Then `svn cp trunk tags/1.0.0`, mime-type propsets on `assets/*.png` and
+   `assets/*.svg` so screenshots render instead of downloading, and finally a
+   single `svn commit` — **the only step that uses the credentials, and the
+   last thing that happens.**
+6. **Attach the zip to the GitHub release**, from `spacery.zip`, with generated
+   release notes.
+
+**Expected `trunk/` contents — six entries, and nothing else:**
 
 ```
-== Upgrade Notice ==
-
-= 1.0.1 =
-Fixes <the thing>. Existing breakpoints and block values are untouched.
+LICENSE  build/  includes/  readme.txt  spacery.php  uninstall.php
 ```
+
+`assets/` gets the eight files it holds. `src/`, `tests/`, `docs/`, `bin/`,
+`languages/`, `node_modules/`, `.github/` and every dotfile are excluded by
+`.distignore`, and `bin/check-release.py` is what keeps that list and
+`package.json#files` from drifting apart.
+
+---
+
+### Phase 4 — Verify what reached SVN, before looking at the page
+
+The listing takes minutes to appear and is the pleasant check. This is the one
+that catches a bad deploy while it is still one commit old.
+
+```bash
+svn ls https://plugins.svn.wordpress.org/spacery/trunk/
+svn ls https://plugins.svn.wordpress.org/spacery/tags/
+svn ls https://plugins.svn.wordpress.org/spacery/assets/
+svn log -l 1 https://plugins.svn.wordpress.org/spacery
+```
+
+- `trunk/` is the six entries above. **Anything else there is the rsync having
+  taken the wrong branch**, and the fix is a corrective commit, not a re-run.
+- `tags/` holds `1.0.0/`.
+- `assets/` holds the two banners, two icons, `icon.svg` and the three
+  screenshots.
+- The log's one entry reads *"Update to version 1.0.0 from GitHub"*.
+
+**If the deploy failed at the commit**, nothing above exists and the tag can
+simply be deleted and re-pushed once the cause is fixed:
+
+```bash
+git push origin :refs/tags/v1.0.0
+git tag -d v1.0.0
+```
+
+**If the deploy committed and the result is wrong**, deleting the tag does not
+help: `tags/1.0.0` now exists, so a re-run bails out and *reports success*. The
+route is a corrective change, a version bump to `1.0.1` in all three places,
+and a new tag.
+
+---
+
+### Phase 5 — The public listing
+
+`https://wordpress.org/plugins/spacery` appears once `trunk/` is populated.
+
+- **The three screenshots render, with the right captions.** `readme.txt`'s
+  `== Screenshots ==` block matches files **by position**, so a reordering shows
+  as captions under the wrong images rather than as an error. The order is
+  panel, spacer, settings — `docs/screenshot-brief.md` is the record.
+- **The banner is not cropped oddly** at either 772×250 or 1544×500. The lockup
+  is centred by a rule the artwork never stated until it was measured; if
+  something looks off-centre, `docs/asset-handoff.md` has the numbers.
+- **The icon** resolves at both sizes and in the search listing.
+- **The Description** reads as intended, and the tagline on the banner matches
+  the one on the settings screen — they are deliberately the same single line.
+- **Run Plugin Check against the published zip**, not the checkout. §3vicies of
+  the status notes explains why the difference matters: the last run was against
+  a superset of what ships.
+
+---
+
+### Phase 6 — The first days
+
+- **Search results take up to 72 hours** to include the plugin, and the profile
+  page the same. Nothing is wrong before then.
+- **Translations.** translate.wordpress.org builds its own originals by
+  extracting strings from `trunk/`, and `trunk/` contains `build/` and not
+  `src/` — which is exactly the naming the plugin now depends on (D38). The
+  repository's Greek is not uploaded automatically: importing it needs editor
+  rights for `el`, requested from the Polyglots team. Until then the strings are
+  there for anyone to translate and the plugin is simply untranslated.
+- **`== Upgrade Notice ==`** is the one text 1.0.0 does not have and does not
+  need. Add it at the first update that matters to an existing user; it is what
+  shows in the update nag, so one sentence under 300 characters about why to
+  update rather than what changed:
+
+  ```
+  == Upgrade Notice ==
+
+  = 1.0.1 =
+  Fixes <the thing>. Existing breakpoints and block values are untouched.
+  ```
+
+- **`Tested up to`** stays `7.1` now that 7.1.1 has shipped — the handbook takes
+  a branch there. Bump it when 7.2 ships, in a deploy like any other
+  `readme.txt` change.
+
+---
+
+### The failure modes, in one place
+
+| Symptom | Cause | Action |
+|---|---|---|
+| Guard step fails on the version | Tag, header and `Stable tag` disagree | Delete the tag, fix, re-tag. Nothing has been published |
+| Guard step fails on the changelog | Heading is undated | Same. This is the guard doing its job |
+| `Set the SVN_USERNAME secret` | Secret missing or empty | Add it. Nothing has been published |
+| Commit fails to authenticate | Wrong username, wrong password, or the hour has not passed | Try `nikosmoustakas`; regenerate the SVN password; wait. Nothing has been published — the commit is the last step |
+| Deploy says *"already published"* and exits green | `tags/1.0.0` exists | The deploy already ran. Do not re-run expecting a different outcome; verify Phase 4 and correct forward with 1.0.1 |
+| `trunk/` has `src/` or `node_modules` | The rsync took the build-directory branch | Corrective commit. Check `BUILD_DIR` is exactly `./` |
+| Screenshots download instead of rendering | mime-types not set | The action sets them; if not, `svn propset svn:mime-type image/png` on `assets/*.png` |
+| Captions under the wrong screenshots | Files reordered relative to `readme.txt` | Fix the block or the filenames; it travels in the next deploy |
 
 ---
 
@@ -476,7 +702,7 @@ Fixes <the thing>. Existing breakpoints and block values are untouched.
 - **That the build is byte-reproducible.** `pnpm run build` rebuilds `build/`;
   whether webpack emits identical bytes on another machine has not been tested,
   so no text here says "exactly".
-- **That the slug is free.** It was on 15 September. It is permanent, so it gets
-  re-checked at the keyboard, not quoted from a document.
+- **That the slug was free.** It was checked at the keyboard on 15 September and
+  granted on 19 September; `spacery` is now permanent and the question is closed.
 - **That `release.yml` works.** Its guard step was extracted and run; the deploy
   step's first run will be its first run.
