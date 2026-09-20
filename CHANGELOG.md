@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 A version is dated on the day it is tagged, not the day it was written, and
 `release.yml` refuses a tag whose entry is still undated.
 
+## [1.0.1] - 2026-09-20
+
+### Changed
+
+- Directory listing: the readme title names what the plugin does, and the tags
+  trade `block editor` for `gutenberg`. No code changed.
+
 ## [1.0.0] - 2026-09-19
 
 ### Added
@@ -45,4 +52,5 @@ A version is dated on the day it is tagged, not the day it was written, and
   regenerate the POT and the repository's Greek translation.
 - Developer documentation for the filter API in `docs/FILTERS.md`.
 
+[1.0.1]: https://github.com/moustakalis/spacery/releases/tag/v1.0.1
 [1.0.0]: https://github.com/moustakalis/spacery/releases/tag/v1.0.0
