@@ -2,15 +2,31 @@
 #
 # Regenerates languages/spacery.pot, by scanning the distributable.
 #
-# **The references in a POT are not a convenience, they are how WordPress finds
-# a JavaScript translation.** `_load_script_textdomain_from_src()` looks for
+# **The references in a POT decide which file a JavaScript translation is
+# written into.** `_load_script_textdomain_from_src()` looks for
 # `<domain>-<locale>-<md5>.json` in `WP_LANG_DIR/plugins`, where the md5 is of
 # the registered script's path relative to the plugin root -- `build/settings.js`.
-# translate.wordpress.org names the files in a language pack after the paths in
-# this POT. So a POT that references sources rather than bundles produces a pack
-# whose JavaScript half nothing ever loads, in every locale, with no error
-# anywhere. That is what this file used to do, and a bundled Greek `.json`
-# passed to `wp_set_script_translations()` was hiding it.
+# `wp i18n make-json` derives that filename from the references it finds in the
+# `.po`, which come from this POT. So a POT that references sources produces
+# payloads named after paths core never hashes: files nothing will ever open,
+# which look exactly like working ones. That is what this file used to do, and a
+# bundled Greek `.json` passed to `wp_set_script_translations()` was hiding it.
+#
+# **What this POT does not decide is the name of a real language pack's files,
+# and an earlier version of this header said that it did.**
+# translate.wordpress.org never sees this file -- `/languages` is in
+# `.distignore` and out of `package.json#files`, so it reaches neither the zip
+# nor SVN. GlotPress extracts its own originals from `trunk/`. Measured on
+# 21 September 2026: `svn ls` gives `trunk/` six entries and no `languages/`,
+# while translate.wordpress.org holds 136 originals whose references are
+# `build/*.js`, `build/blocks/spacer/block.json`, `includes/**.php` and
+# `spacery.php` -- the same ten files, with the same per-file counts, as this
+# POT. **The packaging list is what names a pack**, and this POT is a local
+# model of what WordPress.org's own extraction will produce from it.
+#
+# The model is what makes the mistake visible before a release rather than
+# after one, and it is a model only while it scans the same files -- which is
+# what the guard below checks.
 #
 # So the scan runs over a copy of exactly what ships: `build/`, `includes/` and
 # `spacery.php`, laid out as they are in the zip. The block's metadata is read
@@ -70,10 +86,42 @@ done
 # nothing in it had changed. Freshness is guaranteed instead by building:
 # `pnpm run i18n:pot` runs `pnpm run build` first.
 
+# The list below is a *third* declaration of what ships, beside
+# `package.json#files` and `.distignore` -- and `bin/check-release.py` checks
+# those two against each other and knows nothing about this one. A distributable
+# that grows a PHP or JS file this scan does not copy produces a POT that is
+# valid, current and green in CI, and quietly missing that file's strings. Worse,
+# it breaks the property the header above rests on: that this POT models what
+# WordPress.org extracts from `trunk/`. So the packaging list is checked against
+# the scan here rather than trusted to stay in step.
+#
+# `readme.txt` and `LICENSE` are excluded on purpose. WP-CLI would not read
+# either, and `readme.txt` is translated as its own project on
+# translate.wordpress.org (the "Stable Readme" sub-project), not as part of this
+# POT.
+SCANNED=(build includes spacery.php uninstall.php)
+NOT_SCANNED=(readme.txt LICENSE)
+
+while read -r shipped; do
+  [ -n "$shipped" ] || continue
+  known=no
+
+  for entry in "${SCANNED[@]}" "${NOT_SCANNED[@]}"; do
+    [ "$shipped" = "$entry" ] && known=yes
+  done
+
+  if [ "$known" = no ]; then
+    echo "package.json#files ships '$shipped', which bin/make-pot.sh does not know about." >&2
+    echo "Copy it into the scan and add it to SCANNED, or add it to NOT_SCANNED with a reason." >&2
+    exit 1
+  fi
+done < <(node -p "require('$ROOT/package.json').files.join('\n')")
+
 # The distributable, laid out as the zip lays it out.
 cp -R "$ROOT/build" "$SCAN/build"
 cp -R "$ROOT/includes" "$SCAN/includes"
 cp "$ROOT/spacery.php" "$SCAN/spacery.php"
+cp "$ROOT/uninstall.php" "$SCAN/uninstall.php"
 
 mkdir -p "$ROOT/languages"
 
