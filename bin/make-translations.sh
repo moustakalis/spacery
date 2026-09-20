@@ -9,10 +9,14 @@
 #
 # The md5 is of the script's path relative to the plugin root -- `build/settings.js`
 # and its two siblings. That is the name `_load_script_textdomain_from_src()`
-# looks for in `WP_LANG_DIR/plugins`, and the name translate.wordpress.org gives
-# the files in a pack. `wp i18n make-json` derives it from the references in the
-# POT, which is why `bin/make-pot.sh` scans `build/`; its header is the longer
-# version of this paragraph.
+# looks for in `WP_LANG_DIR/plugins`, and `wp i18n make-json` derives it from
+# the references in the POT, which is why `bin/make-pot.sh` scans `build/`.
+#
+# A pack from translate.wordpress.org arrives at those names too, but not
+# because of anything in this repository: GlotPress extracts its own originals
+# from `trunk/`, which contains `build/` and not `src/`. The two agree by
+# construction rather than by transfer. `bin/make-pot.sh`'s header is the longer
+# version of this paragraph, and records the measurement.
 #
 # **This used to merge make-json's output into one payload per script handle.**
 # `<domain>-<locale>-<handle>.json` is tried first and does not depend on where

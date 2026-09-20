@@ -331,10 +331,13 @@ with, and two of the four were not what they looked like.
 **Fixing the last one turned up a defect that predates the review**, and it is
 the reason the change is larger than the reviewer asked for. A language pack's
 script payloads are named after an md5 of the *registered* script's path —
-`build/settings.js` — and translate.wordpress.org names them from this
-repository's POT, which referenced `src/settings/App.js`. So JavaScript
-translations would never have loaded in any locale, and the bundled Greek was
-the only thing hiding it. D38.
+`build/settings.js` — and `wp i18n make-json` names what it writes from this
+repository's POT, which referenced `src/settings/App.js`. So every payload the
+repository compiled was named after a path core never hashes, and the bundled
+Greek was the only thing hiding it. D38. **Corrected 21 September:** this
+paragraph and D38 both said translate.wordpress.org took those names from the
+POT and that no pack would have loaded in any locale. It does not, and one
+would have — see D38's own row, which now carries the measurement.
 
 ### The reply
 
@@ -807,12 +810,23 @@ line. The reasoning was right and is now observed rather than argued.
 
 - **Search results take up to 72 hours** to include the plugin, and the profile
   page the same. Nothing is wrong before then.
-- **Translations.** translate.wordpress.org builds its own originals by
-  extracting strings from `trunk/`, and `trunk/` contains `build/` and not
-  `src/` — which is exactly the naming the plugin now depends on (D38). The
-  repository's Greek is not uploaded automatically: importing it needs editor
-  rights for `el`, requested from the Polyglots team. Until then the strings are
-  there for anyone to translate and the plugin is simply untranslated.
+- **Translations. Observed 21 September 2026, and this bullet was the only
+  place in the repository that had the mechanism right.** translate.wordpress.org
+  builds its own originals by extracting strings from `trunk/`, and `trunk/`
+  contains `build/` and not `src/` — which is exactly the naming the plugin
+  depends on (D38). Both halves are now measured rather than reasoned: `svn ls`
+  gives `trunk/` six entries and no `languages/`, and
+  `translate.wordpress.org/projects/wp-plugins/spacery` holds **136 originals**
+  across Development and Stable, referencing the same ten files, with the same
+  per-file counts, as `languages/spacery.pot` — 74 `build/settings.js`,
+  32 `build/extension.js`, 16 `build/blocks/spacer/index.js`,
+  8 `build/blocks/spacer/block.json`, and 21 across the PHP. Four other places
+  said a pack is named from this repository's POT; they are corrected, and D38
+  records why the decision survives the correction. **What is left is the
+  import:** every locale is at 0%, and the repository's Greek is not uploaded
+  automatically — it needs editor rights for `el`, requested from the Polyglots
+  team. Until then the strings are there for anyone to translate and the plugin
+  is simply untranslated.
 - **`== Upgrade Notice ==`** is the one text 1.0.0 does not have and does not
   need. Add it at the first update that matters to an existing user; it is what
   shows in the update nag, so one sentence under 300 characters about why to

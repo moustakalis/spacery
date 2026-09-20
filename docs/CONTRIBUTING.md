@@ -156,10 +156,17 @@ per-bundle `.json`, so it only matters when a translation changed.
 
 `_load_script_textdomain_from_src()` looks for
 `<domain>-<locale>-<md5 of 'build/settings.js'>.json` in `WP_LANG_DIR/plugins`,
-and translate.wordpress.org names a language pack's files after the references
-in this repository's POT. So the POT has to reference the bundles, which is why
-`bin/make-pot.sh` scans the distributable and why `pnpm run i18n:pot` builds
-first.
+and `wp i18n make-json` names what it writes after the references in the `.po`,
+which come from this repository's POT. So the POT has to reference the bundles,
+which is why `bin/make-pot.sh` scans the distributable and why
+`pnpm run i18n:pot` builds first.
+
+**This is about the repository's own compiled Greek, not about a pack.**
+translate.wordpress.org never reads this POT — `/languages` ships nowhere — and
+extracts its own originals from `trunk/` instead. What names a real pack is the
+packaging list, which is why `trunk/` containing `build/` and not `src/` is the
+fact D38 actually rests on. Measured 21 September 2026, and the two agree file
+for file.
 
 Point it back at `src/` and every locale's JavaScript silently stops loading:
 the plugin works, the editor is simply in English, and nothing anywhere says so.
