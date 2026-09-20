@@ -12,6 +12,28 @@
 > Phase 6**, the first-days list: the 72-hour search index, translations, and
 > the `== Upgrade Notice ==` that 1.0.1 will want.
 >
+> **1.0.1 is prepared and not yet tagged (20 September).** It carries no code.
+> `readme.txt`'s title became `Spacery - Responsive Spacing and Spacer Block`
+> and its tags traded `block editor` for `gutenberg`, because the directory's
+> own search put Spacery outside the top twelve for `spacer`, `responsive
+> spacer`, `responsive spacing` and `breakpoints`, while ranking it first for
+> `spacery`. The plugin header keeps the name `Spacery`: `activatePlugin`
+> keys off its kebab-cased value, which `tests/e2e/extension.spec.ts` hard-codes
+> as `PLUGIN = 'spacery'`.
+>
+> Commits `1a7ec24`, `71b094a`, `80a6b30` are pushed; `ec1736e` is not.
+> **The local `1.0.1` tag points at `80a6b30` and must be moved** — that commit
+> predates the CHANGELOG entry the release guard requires, so tagging it fails
+> before Deploy. Note the repository's tags are `v`-prefixed (`v1.0.0`).
+>
+> Two things 1.0.1 taught, both missed on the first pass and both now the
+> reason this paragraph exists: `wp i18n make-pot` writes the plugin version
+> into the POT header, so **any** version bump makes `languages/spacery.pot`
+> stale and fails the `i18n: POT is current` job; and `release.yml` refuses a
+> tag whose `CHANGELOG.md` entry is missing or undated, which `readme.txt`'s
+> own changelog does not satisfy. §0's *Shipping an update* prompt already
+> said both. It was not read.
+>
 > Review ID `APPROVED spacery/nikosmoustakas/18Sep26/T2 19Sep26/4.2`.
 >
 > **The pre-review raised four things** (ID `AUTOPREREVIEW spacery/nikosmoustakas/18Sep26/T1`):
@@ -90,6 +112,39 @@ spacery.php or src/ changed. Rehearse with Actions → Release → Run workflow
 before tagging.
 
 Repo: ~/Documents/GitHub/spacery. I push, I tag.
+```
+
+**Translating:**
+
+```text
+Spacery — I want to work on translations.
+
+Read first:
+1. docs/submission.md — the header says where the plugin stands, including
+   whether a release is mid-flight.
+2. claude/spacery-status.md §1, and D38 in docs/PLAN.md's decision table. D38
+   is the one that matters here: JS translations would never have loaded from a
+   language pack, because the POT referenced src/ paths while core looks up
+   md5('build/settings.js'). Bundled handle-named payloads were hiding it.
+
+What is already true, so nothing is rebuilt that exists:
+
+- Nothing is bundled. Translations come from translate.wordpress.org; the Greek
+  translation lives in languages/ to seed it, and /languages is in .distignore
+  and out of package.json#files.
+- `pnpm run i18n:pot` builds first, then scans a scratch copy of build/,
+  includes/ and spacery.php — not src/.
+- `bin/make-translations.sh` keeps `make-json`'s md5-named output and asserts
+  the filenames against php -r 'echo md5($argv[1]);' of the three bundle paths.
+- `bin/install-language-pack.php` installs compiled Greek into WP_LANG_DIR for
+  testing a real language-pack load, and `bin/locale-check.php` exists too.
+- The tagline "Responsive controls at your breakpoints" is brand, not copy. It
+  is deliberately not translatable and stays out of the POT.
+- CI's `i18n: POT is current` job regenerates the POT and fails on any diff, so
+  a version bump alone breaks it.
+
+Repo: ~/Documents/GitHub/spacery. You prepare commits, I push and I tag, and
+tell me the exact commands to run.
 ```
 
 **A bug report, or WordPress.org writing again:**
