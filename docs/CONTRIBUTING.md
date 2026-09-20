@@ -187,6 +187,50 @@ side, `md5sum` it again on the other, compare, and only then run `make-pot.sh`.
 The same going back. Waiting longer is not the fix, because there is no length
 of wait that tells you the copy arrived.
 
+## Loading Greek into the MAMP playground, where there is no WP-CLI
+
+`bin/install-language-pack.php` and `bin/locale-check.php` are written for
+`wp eval-file`, and CI runs them under `wp-env`. **Neither can be run against the
+MAMP playground from a Claude session**: the device shell is a Linux VM with the
+folders mounted, MAMP's PHP and MySQL are on macOS, and `localhost` there is not
+reachable from here. That is not a reason to skip the test -- the whole thing is
+a file copy plus a setting, and both halves are reachable.
+
+1. **The pack is four files and a `cp`.** `WP_LANG_DIR` is
+   `wp-content/languages` unless `wp-config.php` overrides it (the playground
+   does not), so the destination is
+   `~/Dev/playground/wp-content/languages/plugins/`. It does not exist on a site
+   that has never installed a language; create it. Copy `spacery-el.mo` and the
+   three `spacery-el-<md5>.json` from `languages/`. The names are already right
+   -- `bin/make-translations.sh` asserted them when it wrote them -- and it is
+   worth recomputing the three md5s at the destination anyway, because a payload
+   under any other name is a file nothing opens and looks exactly like a working
+   one.
+
+2. **The site language is a browser action, and it downloads on save.**
+   Settings -> General -> Site Language -> Ελληνικά. Greek appears under
+   *Available* rather than *Installed*, and WordPress fetches core's pack when
+   the form is submitted. Do not try to write `WPLANG` directly:
+   `sanitize_option()` restricts it to `get_available_languages()`, which globs
+   `WP_LANG_DIR/*.mo`, and silently restores the previous value otherwise. That
+   is the same trap `bin/locale-check.php`'s header records for `wp option
+   update`.
+
+3. **Check both halves, and check the tagline.** The settings screen proves the
+   `.mo` through PHP (*Πηγή σημείων διακοπής*) and `build/settings.js`'s payload
+   through the browser (*Αποθήκευση αλλαγών*) -- the same pair `locale.spec.ts`
+   asserts. The editor proves the other two: open `post-new.php` and read
+   `wp.i18n.__( '<a string unique to that bundle>', 'spacery' )` back from the
+   console, which needs no block inserted. The payloads share strings, so pick
+   one that is unique to the bundle under test or the answer proves nothing --
+   diff the three JSON files' `locale_data.messages` keys to find one. And the
+   masthead tagline must stay **English**: it is a bare literal in `Brand.tsx`
+   and a Greek one there means somebody wrapped it in `__()`.
+
+**Run first on 21 September 2026, and it is the first time a real
+`WP_LANG_DIR/plugins` pack has been proved outside CI.** All four files loaded,
+all three bundles answered in Greek, and the tagline stayed English.
+
 ## Stage explicit paths, never a directory
 
 `git add languages` swept in a stray `spacery-el-spacery-spacer-editor-script
