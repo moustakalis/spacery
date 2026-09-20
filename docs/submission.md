@@ -823,10 +823,22 @@ line. The reasoning was right and is now observed rather than argued.
   8 `build/blocks/spacer/block.json`, and 21 across the PHP. Four other places
   said a pack is named from this repository's POT; they are corrected, and D38
   records why the decision survives the correction. **What is left is the
-  import:** every locale is at 0%, and the repository's Greek is not uploaded
-  automatically — it needs editor rights for `el`, requested from the Polyglots
-  team. Until then the strings are there for anyone to translate and the plugin
-  is simply untranslated.
+  import, and it needs no permission — an earlier version of this bullet said it
+  did.** The Polyglots handbook's GlotPress page is explicit that *any*
+  WordPress.org user can import a plugin translation file; what the import
+  cannot do is set the status. Every string arrives as **Waiting**, and it is
+  *approval* that needs a translation editor for `el`. So the order is: import
+  `languages/spacery-el.po` into both `stable/el/default/` and `dev/el/default/`
+  — 136 entries, 5 deliberate blanks (the plugin name, the author, the text
+  domain and two URLs), no obsolete and no fuzzy entries — and only then request
+  PTE from the Polyglots team, with the work already sitting there to be
+  reviewed. That order matters because several locale teams grant PTE only after
+  seeing a translator's contributions, so asking first is asking for the thing
+  the contributions are supposed to earn. Every locale is at 0% until a `el`
+  editor approves them, or grants Nick the right to approve his own.
+
+  The two **Readme** sub-projects are a separate string set — `readme.txt`, not
+  the plugin — and nothing in `languages/` covers them.
 - **`== Upgrade Notice ==`** is the one text 1.0.0 does not have and does not
   need. Add it at the first update that matters to an existing user; it is what
   shows in the update nag, so one sentence under 300 characters about why to
