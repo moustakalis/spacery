@@ -1,6 +1,6 @@
 # Submitting Spacery to WordPress.org — the runbook
 
-> **Released 19 September 2026.** `v1.0.0` is live at
+> **Released 19 September 2026. `v1.0.1` is the live version.** Spacery is at
 > `https://wordpress.org/plugins/spacery/`. Submitted 16 September, pended by
 > the automated pre-review on 18 September, corrected zip uploaded the same day,
 > approved 19 September, deployed the same night at `r3703665`. This line is the
@@ -9,30 +9,39 @@
 >
 > **Nothing in §1–§4 is live any more.** They are the record of how it got here,
 > kept because the next release walks the same ground. What is live is **§4's
-> Phase 6**, the first-days list: the 72-hour search index, translations, and
-> the `== Upgrade Notice ==` that 1.0.1 will want.
+> Phase 6**, the first-days list. Of it, the search index has happened and
+> **translations are the live item**. 1.0.1 deliberately shipped with no
+> `== Upgrade Notice ==`: that section drives the update nag, and spending it
+> on a metadata release devalues the one mechanism that matters when
+> something breaks.
 >
-> **1.0.1 is prepared and not yet tagged (20 September).** It carries no code.
-> `readme.txt`'s title became `Spacery - Responsive Spacing and Spacer Block`
-> and its tags traded `block editor` for `gutenberg`, because the directory's
-> own search put Spacery outside the top twelve for `spacer`, `responsive
-> spacer`, `responsive spacing` and `breakpoints`, while ranking it first for
-> `spacery`. The plugin header keeps the name `Spacery`: `activatePlugin`
-> keys off its kebab-cased value, which `tests/e2e/extension.spec.ts` hard-codes
-> as `PLUGIN = 'spacery'`.
+> **1.0.1 released 20 September**, `r3704615`, tagged `v1.0.1`. It carries no
+> code. `readme.txt`'s title became `Spacery - Responsive Spacing and Spacer
+> Block` and its tags traded `block editor` for `gutenberg`, because the
+> directory's own search put Spacery outside the top twelve for `spacer`,
+> `responsive spacer`, `responsive spacing` and `breakpoints` while ranking it
+> first for `spacery`. The baseline is in `claude/promotion-plan.md` §3c;
+> re-measure before concluding anything about the change.
 >
-> Commits `1a7ec24`, `71b094a`, `80a6b30` are pushed; `ec1736e` is not.
-> **The local `1.0.1` tag points at `80a6b30` and must be moved** — that commit
-> predates the CHANGELOG entry the release guard requires, so tagging it fails
-> before Deploy. Note the repository's tags are `v`-prefixed (`v1.0.0`).
+> **The plugin header keeps the name `Spacery`.** `activatePlugin` keys off its
+> kebab-cased value, which `tests/e2e/extension.spec.ts` hard-codes as
+> `PLUGIN = 'spacery'`. The readme title and the header therefore differ on
+> purpose. Changing one means changing that constant too.
 >
-> Two things 1.0.1 taught, both missed on the first pass and both now the
-> reason this paragraph exists: `wp i18n make-pot` writes the plugin version
-> into the POT header, so **any** version bump makes `languages/spacery.pot`
-> stale and fails the `i18n: POT is current` job; and `release.yml` refuses a
-> tag whose `CHANGELOG.md` entry is missing or undated, which `readme.txt`'s
-> own changelog does not satisfy. §0's *Shipping an update* prompt already
-> said both. It was not read.
+> **1.0.1 was tagged once before it could work, and the run failed.** Two
+> guards caught it, and both are worth knowing before the next release:
+>
+> - `wp i18n make-pot` writes the plugin version into the POT header, so **any**
+>   version bump makes `languages/spacery.pot` stale and fails the
+>   `i18n: POT is current` job. Regenerate it in the same commit.
+> - `release.yml` refuses a tag whose `CHANGELOG.md` entry is missing or
+>   undated. `readme.txt`'s own changelog does not satisfy it — they are two
+>   separate files and both need the entry.
+>
+> Both are stated in §0's *Shipping an update* prompt, which was not read. The
+> failure happened before the Deploy step, so nothing was half-published and
+> the re-run hazard below never came into play — recovery was deleting the tag,
+> pushing the fix, and tagging again.
 >
 > Review ID `APPROVED spacery/nikosmoustakas/18Sep26/T2 19Sep26/4.2`.
 >
