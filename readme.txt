@@ -1,6 +1,6 @@
-=== Spacery ===
+=== Spacery - Responsive Spacing and Spacer Block ===
 Contributors: nikosmoustakas
-Tags: spacer, responsive, spacing, breakpoints, block editor
+Tags: spacer, responsive, gutenberg, spacing, breakpoints
 Requires at least: 7.1
 Tested up to: 7.1
 Requires PHP: 8.2
