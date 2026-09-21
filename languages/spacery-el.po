@@ -30,8 +30,8 @@ msgid ""
 "Responsive padding, margin and spacer height on any block, at the "
 "breakpoints your design uses."
 msgstr ""
-"Αποκρίσιμα εσωτερικά και εξωτερικά περιθώρια και ύψος κενού σε κάθε μπλοκ, "
-"στα σημεία διακοπής που χρησιμοποιεί ο σχεδιασμός σας."
+"Γέμισμα, περιθώρια και ύψος διαχωριστή σε κάθε μπλοκ, στα σημεία διακοπής "
+"που χρησιμοποιεί ο σχεδιασμός σας."
 
 #. Author of the plugin
 #: spacery.php
@@ -136,8 +136,8 @@ msgstr "Ο καμβάς εξακολουθεί να προβάλλει %s."
 #: build/blocks/spacer/index.js:3 build/extension.js:3
 msgid "Responsive editing is off for this site, so the canvas does not follow."
 msgstr ""
-"Η αποκρίσιμη επεξεργασία είναι ανενεργή σε αυτόν τον ιστότοπο, οπότε ο "
-"καμβάς δεν ακολουθεί."
+"Η επεξεργασία ανά σημείο διακοπής είναι ανενεργή σε αυτόν τον ιστότοπο, "
+"οπότε ο καμβάς δεν ακολουθεί."
 
 #: build/blocks/spacer/index.js:3 build/extension.js:7
 msgid "Set here"
@@ -191,11 +191,11 @@ msgstr "Ορισμένα σε"
 
 #: build/extension.js:1
 msgid "Padding"
-msgstr "Εσωτερικό περιθώριο"
+msgstr "Γέμισμα"
 
 #: build/extension.js:1
 msgid "Margin"
-msgstr "Εξωτερικό περιθώριο"
+msgstr "Περιθώριο"
 
 #: build/extension.js:1
 msgid "Top"
@@ -300,7 +300,7 @@ msgstr "Κληρονομείται από %d διαφορετικά σημεία
 
 #: build/extension.js:10
 msgid "Spacery — this block has responsive values"
-msgstr "Spacery — αυτό το μπλοκ έχει αποκρίσιμες τιμές"
+msgstr "Spacery — αυτό το μπλοκ έχει τιμές ανά σημείο διακοπής"
 
 #. translators: 1: a CSS length. 2: a wider CSS length.
 #: build/settings.js:2
@@ -661,7 +661,7 @@ msgstr "Κάτι πήγε στραβά στην επικοινωνία με το
 #: build/blocks/spacer/block.json
 msgctxt "block title"
 msgid "Responsive Spacer"
-msgstr "Αποκρίσιμο Κενό"
+msgstr "Responsive Κενός Διαχωριστής"
 
 #: build/blocks/spacer/block.json
 msgctxt "block description"
@@ -672,7 +672,7 @@ msgstr ""
 #: build/blocks/spacer/block.json
 msgctxt "block keyword"
 msgid "spacer"
-msgstr "κενό"
+msgstr "διαχωριστής"
 
 #: build/blocks/spacer/block.json
 msgctxt "block keyword"
@@ -682,7 +682,7 @@ msgstr "διάστημα"
 #: build/blocks/spacer/block.json
 msgctxt "block keyword"
 msgid "responsive"
-msgstr "αποκρίσιμο"
+msgstr "responsive"
 
 #: build/blocks/spacer/block.json
 msgctxt "block keyword"

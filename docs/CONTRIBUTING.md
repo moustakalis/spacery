@@ -231,6 +231,40 @@ a file copy plus a setting, and both halves are reachable.
 `WP_LANG_DIR/plugins` pack has been proved outside CI.** All four files loaded,
 all three bundles answered in Greek, and the tagline stayed English.
 
+## Greek terminology: check the consistency tool before inventing a term
+
+`translate.wordpress.org/consistency/?search=<term>&set=el%2Fdefault` lists every
+Greek rendering of a string across every project, and
+`&project=1` narrows it to WordPress core. Read it before translating a term,
+because **Spacery's panel renders inches from core's own** (D34 puts it in the
+Styles tab after Dimensions) and a different word for the same CSS property
+reads as a bug.
+
+The rule is D39: **follow core wherever core has settled a term; keep English
+only where the corpus is empty.** What that settles today:
+
+| English | Greek | Why |
+|---|---|---|
+| Padding | `Γέμισμα` | core 17/17 |
+| Margin | `Περιθώριο` | core 14/14, and a locale glossary entry |
+| Spacing | `Διαστήματα` | core 11/11 |
+| Dimensions | `Διαστάσεις` | core 25/25 |
+| Spacer | `Κενός Διαχωριστής` | core 7/7 |
+| Width | `Πλάτος` | core 25/25, glossary |
+| Desktop / Tablet / Mobile | `Επιτραπέζιος` / `Ταμπλέτα` / `Κινητό` | core, unanimous |
+| Breakpoint | `σημείο διακοπής` | **no results in the whole corpus** — Spacery's own coinage |
+| Viewport | — | no results either; avoid the word |
+| Responsive | `responsive`, or rephrase to *ανά σημείο διακοπής* | the glossary's `προσαρμοζόμενη στις κινητές συσκευές` is five words and means *mobile devices*, which is not what Spacery does |
+
+Plus the terms the earlier pass chose and that nothing above contradicts:
+`σύνολο` a set, `χρησιμοποιείται` "is in use", `ιστότοπος` the site, `καμβάς`
+the canvas, `πρόσθετο` the plugin. Source names stay lowercase noun phrases,
+because they are interpolated into `Από: %s`.
+
+**Do not invent an adjective.** `αποκρίσιμο` was in the file until D39 and
+appears nowhere in the Greek WordPress corpus; a word no one else uses is a word
+no one recognises, and it cost nothing to drop.
+
 ## Stage explicit paths, never a directory
 
 `git add languages` swept in a stray `spacery-el-spacery-spacer-editor-script
