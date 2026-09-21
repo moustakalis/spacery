@@ -4,7 +4,7 @@ Tags: spacer, responsive, gutenberg, spacing, breakpoints
 Requires at least: 7.1
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -191,6 +191,13 @@ shipped.
 
 == Changelog ==
 
+= 1.0.2 =
+
+* Security: hand-written block markup could raise a fatal error on the page it
+  was on. Malformed values are dropped now, and only values the allowlist
+  accepted reach the stylesheet. Nothing an author can do in the editor was
+  affected, and no stored value changes.
+
 = 1.0.1 =
 
 * Directory listing only: the title names what the plugin does, and the tags
@@ -204,3 +211,8 @@ shipped.
 * An editor that follows the canvas, so the preview matches the rendered page.
 * Adopts values WordPress already sets responsively, when the breakpoints agree.
 * Settings screen, and every string ready for translation.
+
+== Upgrade Notice ==
+
+= 1.0.2 =
+Fixes a defect where hand-written block markup could raise a fatal error on the page holding it. Worth taking on any site where more than one person can edit posts.

@@ -71,15 +71,22 @@ final class Generator {
 		$rules   = array();
 
 		foreach ( self::materialize( $authored, $breakpoints ) as $slug => $styles ) {
-			$declarations = wp_style_engine_get_styles( $styles )['declarations'] ?? array();
+			$declarations = self::force(
+				wp_style_engine_get_styles( $styles )['declarations'] ?? array()
+			);
 
+			/*
+			 * After force(), not before: it drops declarations as well as
+			 * marking them, so a band whose every declaration was malformed has
+			 * nothing to emit and must not become an empty rule.
+			 */
 			if ( array() === $declarations ) {
 				continue;
 			}
 
 			$rules[] = array(
 				'selector'     => '.' . $class_name,
-				'declarations' => self::force( $declarations ),
+				'declarations' => $declarations,
 				'rules_group'  => $queries[ $slug ],
 			);
 		}
@@ -100,14 +107,35 @@ final class Generator {
 	 * same way. Every rule Spacery emits is a viewport override, so every one
 	 * needs it; there is no base rule here to spare, because the base is core's.
 	 *
-	 * @param array<string, string> $declarations Property => value.
+	 * **A declaration whose value is not a string is dropped here**, and that
+	 * is a guard rather than tidiness. `wp_style_engine_get_styles()` hands a
+	 * side's value straight back, so an attribute that nests one level too
+	 * deep -- `padding.top.x`, which the inspector cannot produce and anyone
+	 * who can edit a post can type -- yields an array where a length belongs.
+	 * Core drops that case downstream and says why:
+	 * `WP_Style_Engine_CSS_Declarations::add_declaration()` carries the comment
+	 * *"Bail early if value is not a string. Prevents fatal errors from
+	 * malformed block markup."* This method runs **before** that guard, and it
+	 * used to be an `array_map()` over a closure typed `string` under
+	 * `declare( strict_types=1 )` -- which turned the same input into an
+	 * uncaught `TypeError` inside `render_block`, and so into a fatal on every
+	 * page rendering that block. `docs/security-audit.md` F1.
+	 *
+	 * @param array<string, mixed> $declarations Property => value.
 	 * @return array<string, string>
 	 */
 	private static function force( array $declarations ): array {
-		return array_map(
-			static fn( string $value ): string => $value . ' !important',
-			$declarations
-		);
+		$forced = array();
+
+		foreach ( $declarations as $property => $value ) {
+			if ( ! is_string( $value ) ) {
+				continue;
+			}
+
+			$forced[ $property ] = $value . ' !important';
+		}
+
+		return $forced;
 	}
 
 	/**
@@ -156,15 +184,34 @@ final class Generator {
 		foreach ( $node as $key => $value ) {
 			if ( is_array( $value ) ) {
 				$value = self::prune( $value );
-			} elseif ( is_string( $value ) && ! self::is_value( $value ) ) {
+
+				if ( array() !== $value ) {
+					$pruned[ $key ] = $value;
+				}
+
 				continue;
 			}
 
-			if ( null === $value || '' === $value || array() === $value ) {
+			/*
+			 * A leaf is a string or it is nothing. `is_value()` is the whole
+			 * guard on what reaches a stylesheet and it can only read a string,
+			 * so a number, a boolean or a null went straight past it and
+			 * `flatten()` cast it back on the other side: `5` was emitted as
+			 * `padding-top:5`, which no browser applies and which the editor
+			 * preview never draws, because its own walk keeps string leaves
+			 * only. Dropping them here is what makes the two agree.
+			 */
+			if ( ! is_string( $value ) || ! self::is_value( $value ) ) {
 				continue;
 			}
 
-			$pruned[ $key ] = $value;
+			/*
+			 * Stored as it was judged. `is_value()` reads the trimmed value, so
+			 * the trimmed value is the one with a verdict attached to it --
+			 * emitting the original meant a trailing newline or NUL riding into
+			 * the stylesheet on the strength of a check that never saw it.
+			 */
+			$pruned[ $key ] = trim( $value );
 		}
 
 		ksort( $pruned );

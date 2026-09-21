@@ -8,6 +8,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 A version is dated on the day it is tagged, not the day it was written, and
 `release.yml` refuses a tag whose entry is still undated.
 
+## [1.0.2] - 2026-09-21
+
+### Fixed
+
+- **Security.** A hand-written `spacery` block attribute could raise an uncaught
+  `TypeError` inside `render_block`, which is a fatal on every page rendering
+  that block. A style value nested one level too deep -- `padding.top.x` --
+  reaches the Style Engine as an object where a length belongs, and
+  `Generator::force()` marked declarations through a closure typed `string`
+  under `declare( strict_types=1 )`. Malformed declarations are dropped now, the
+  way core's own `WP_Style_Engine_CSS_Declarations::add_declaration()` drops
+  them and for the reason its comment gives. The inspector cannot produce the
+  shape, so no author was affected by accident; anyone who can edit a post could
+  produce it on purpose. `docs/security-audit.md` F1.
+- Leaf values that are not strings no longer go around `Generator::is_value()`,
+  the allowlist that decides what may reach a stylesheet: `{"top": 5}` was
+  emitted as `padding-top:5`, which no browser applies and which the editor
+  preview never drew.
+- A value is emitted as it was judged. `is_value()` reads the trimmed value, so
+  the trimmed value is what is stored -- whitespace was riding into the
+  stylesheet on the strength of a check that had not seen it. Identical spacing
+  written with different whitespace now shares one generated class.
+
+### Added
+
+- `docs/security-audit.md`: a full audit against the WordPress Security API,
+  with what was measured rather than reasoned about, and what it was measured
+  with.
+
 ## [1.0.1] - 2026-09-20
 
 ### Changed

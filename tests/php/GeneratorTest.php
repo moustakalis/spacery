@@ -353,6 +353,128 @@ final class GeneratorTest extends TestCase {
 		$this->assertStringNotContainsString( 'red', $css );
 	}
 
+	// -- Malformed block markup -------------------------------------------
+
+	/**
+	 * Malformed attributes a person can type but the inspector cannot produce.
+	 *
+	 * The `spacery` attribute lives in the block comment delimiter, so it is
+	 * whatever the last person to edit that post wrote -- not what the panel
+	 * wrote. None of these reach a stylesheet; the point of the table is that
+	 * none of them throws on the way to being refused, because the thrower would
+	 * be `render_block` and the symptom a fatal on the published page.
+	 *
+	 * @return array<string, array{array<mixed>}>
+	 */
+	public static function malformed_attributes(): array {
+		return array(
+			// The one that fatalled: a side holding an object rather than a length.
+			'a value nested under a side'   => array(
+				array( 'mobile' => array( 'spacing' => array( 'padding' => array( 'top' => array( 'x' => '1px' ) ) ) ) ),
+			),
+			'two levels under a side'       => array(
+				array( 'mobile' => array( 'spacing' => array( 'margin' => array( 'left' => array( 'a' => array( 'b' => '2px' ) ) ) ) ) ),
+			),
+			/*
+			 * `flatten()` joins path segments with `/` and `place()` splits them
+			 * again, so a key carrying one arrives as two -- and the side ends up
+			 * holding an object exactly as above, from a key that looks harmless.
+			 */
+			'a slash inside a key'          => array(
+				array( 'mobile' => array( 'spacing' => array( 'padding' => array( 'to/p' => '10px' ) ) ) ),
+			),
+			'a number where a length goes'  => array(
+				array( 'mobile' => array( 'spacing' => array( 'padding' => array( 'top' => 5 ) ) ) ),
+			),
+			'a float where a length goes'   => array(
+				array( 'mobile' => array( 'spacing' => array( 'padding' => array( 'top' => 1.5 ) ) ) ),
+			),
+			'a boolean where a length goes' => array(
+				array( 'mobile' => array( 'spacing' => array( 'padding' => array( 'top' => true ) ) ) ),
+			),
+			'a null where a length goes'    => array(
+				array( 'mobile' => array( 'spacing' => array( 'padding' => array( 'top' => null ) ) ) ),
+			),
+		);
+	}
+
+	/**
+	 * A crafted attribute is refused, and refused without throwing.
+	 *
+	 * **This is the fatal `docs/security-audit.md` F1 records.** A side whose
+	 * value is an object survives `normalize()` -- it is an array, and arrays are
+	 * how style objects nest -- and `wp_style_engine_get_styles()` hands it back
+	 * as the declaration's value rather than refusing it. `force()` then marked
+	 * every declaration `!important` through a closure typed `string`, and with
+	 * `declare( strict_types=1 )` that is an uncaught `TypeError` raised inside
+	 * the `render_block` filter: a 500 on the published page, caused by anyone
+	 * who can edit it and fixable only by someone who can edit it back.
+	 *
+	 * Core refuses the same input one step further on, in
+	 * `WP_Style_Engine_CSS_Declarations::add_declaration()`, *"to prevent fatal
+	 * errors from malformed block markup"*. Spacery got there first, so Spacery
+	 * has to refuse it first.
+	 *
+	 * @param array<mixed> $attribute A crafted `spacery` attribute.
+	 */
+	#[DataProvider( 'malformed_attributes' )]
+	public function test_malformed_markup_is_refused_without_throwing( array $attribute ): void {
+		$this->assertNull(
+			$this->generator->generate( $attribute ),
+			'nothing here is a value, so nothing should reach a stylesheet'
+		);
+	}
+
+	/**
+	 * One malformed side must not take the sound ones with it.
+	 *
+	 * The block still renders, and it renders with the spacing that was actually
+	 * a length -- which is the same rule `test_a_refused_side_leaves_the_others_alone()`
+	 * states for unsafe values, applied to unsound shapes.
+	 */
+	public function test_a_malformed_side_leaves_the_others_alone(): void {
+		$styles = $this->generator->generate(
+			array(
+				'mobile' => array(
+					'spacing' => array(
+						'padding' => array(
+							'top'    => array( 'x' => '1px' ),
+							'bottom' => '20px',
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertNotNull( $styles );
+		$this->assertSame(
+			array( 'padding-bottom' => '20px !important' ),
+			$styles->rules[0]['declarations'],
+			'the sound side is emitted and the malformed one is gone'
+		);
+	}
+
+	/**
+	 * A value is emitted as it was judged.
+	 *
+	 * `is_value()` reads the trimmed value, so anything the trim removed was
+	 * never part of what it accepted. Emitting the original put whitespace --
+	 * and, since `trim()` strips it, a NUL byte -- into the stylesheet on the
+	 * strength of a check that had not seen it. Harmless in CSS, and wrong:
+	 * nothing downstream is what makes it safe.
+	 */
+	public function test_a_value_is_emitted_as_it_was_judged(): void {
+		$styles = $this->generator->generate(
+			array( 'mobile' => array( 'spacing' => array( 'padding' => array( 'top' => "  10px\n" ) ) ) )
+		);
+
+		$this->assertNotNull( $styles );
+		$this->assertSame(
+			array( 'padding-top' => '10px !important' ),
+			$styles->rules[0]['declarations']
+		);
+	}
+
 	// -- Exit criterion ----------------------------------------------------
 
 	/**
