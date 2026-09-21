@@ -59,6 +59,27 @@ hand from the Actions tab when you want to force it:
 gh workflow run assets.yml
 ```
 
+**`IGNORE_OTHER_FILES: true` is load-bearing, and its name undersells it.**
+Without it the action is not an assets action at all: seeing a `.distignore`,
+its `deploy.sh` rsyncs the **whole workspace** into `trunk/` with
+`--delete --delete-excluded`, and only then refuses to commit if anything but
+`readme.txt` changed there. The first run failed exactly that way. `build/` is
+gitignored and this workflow runs no build, so all thirteen bundles came back
+`!` missing in `trunk/` — and the line after the guard is
+`svn status | grep '^\!' | xargs svn rm`. **The guard was the only thing
+between that run and a commit deleting the plugin's JavaScript and CSS from the
+directory**, for every installed site, with no force-push and no undo. With the
+flag set, the script copies `readme.txt` into `trunk/` and rsyncs `assets/` into
+`assets/`, and touches nothing else.
+
+Two consequences worth knowing. The action **does** update `readme.txt` in
+`trunk/` and in `tags/<Stable tag>/`, by design — so listing copy can be fixed
+without a release, and an unintended `readme.txt` edit reaches users through
+this workflow rather than through `release.yml`. And the action's behaviour is
+worth re-reading rather than remembering: it is one file, fetched from
+`raw.githubusercontent.com/10up/action-wordpress-plugin-asset-update/stable/deploy.sh`,
+and reading it is what found all of the above.
+
 ## The Live Preview blueprint
 
 `assets/blueprints/blueprint.json` is what turns on the **Live Preview** link on
