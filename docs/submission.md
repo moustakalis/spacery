@@ -59,10 +59,24 @@
 > reviewer's queue once you reply, and response times depend on a volunteer's
 > availability — days to weeks. Do not ask for a status update inside a month.
 >
+> **Live Preview is the open item on the listing as of 21 September.** The
+> plugin's admin page on WordPress.org carries two notices. *Transfer This
+> Plugin* is not one: it is the standing ownership panel every plugin's owner
+> sees, it asks for nothing, and there is nothing to close. *Toggle Live
+> Preview* is real — it says *"Missing or invalid blueprint.json file"* because
+> SVN `assets/` has no `blueprints/blueprint.json`. The file now exists in this
+> repository; `docs/assets.md` covers what it does, how to try it before
+> committing, and why `.github/workflows/assets.yml` rather than `release.yml`
+> is what publishes it. **Committing it is only half:** a committer then has to
+> set the preview to public in the plugin's **Advanced** view, which is the
+> step the toggle button performs and which stays disabled until the file is
+> there.
+>
 > **If you are picking this up cold, go to the row that matches:**
 >
 > | If | Go to |
 > |---|---|
+> | A banner, screenshot or the Playground blueprint needs changing | `docs/assets.md`. **Not §4** — `action-wordpress-plugin-deploy` refuses to run once the version's tag exists, so `release.yml` cannot correct `assets/` after a release. `.github/workflows/assets.yml` can, on any push to `main` that touches it |
 > | Shipping a 1.0.x or 1.1 | **§4**, which is the release plan and has been walked once end to end. Read *What is irreversible* first. Note that **every path in it so far has run against an empty SVN repository** — an update exercises two things that never have, listed in that section |
 > | Something about the plugin itself needs changing | `docs/PLAN.md`'s decision table (D1–D38) first. Then §4, because a fix now reaches users through a release rather than through a zip |
 > | A user reports a bug, or WordPress.org writes again | `claude/spacery-status.md` for whether it is already known — §3 onward is a catalogue of what this plugin has got wrong and how each was found. Then the decision table |

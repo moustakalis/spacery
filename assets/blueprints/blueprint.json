@@ -1,0 +1,33 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "meta": {
+    "title": "Spacery",
+    "author": "nikosmoustakas",
+    "description": "Responsive padding, margin and spacer height at your own breakpoints. Opens a demo page in the block editor with Spacery values already set at four tiers.",
+    "categories": [
+      "Block Editor",
+      "Design"
+    ]
+  },
+  "landingPage": "/wp-admin/post.php?post=9000&action=edit",
+  "preferredVersions": {
+    "php": "8.2",
+    "wp": "latest"
+  },
+  "login": true,
+  "siteOptions": {
+    "blogname": "Spacery demo",
+    "blogdescription": "Responsive controls at your breakpoints",
+    "spacery_breakpoint_source": "custom"
+  },
+  "steps": [
+    {
+      "step": "runPHP",
+      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\n\n/*\n * The four tiers this demo is written against.\n *\n * Not `siteOptions`: a Blueprint v1 site option has to be a string, and this\n * is an array of rows. It is also not Spacery's own preset, even though the\n * two agree on `tablet` and `mobile`. The preset's widest tier stops at\n * 1280px, and a band is a *band* -- `@media (1280px < width <= 1280px)` is\n * nothing, so on a 1440px screen the demo page would have shown the base\n * value, which here is none, and a visitor's first look at the plugin would\n * have been a page with no spacing on it. `desktop` stops at 1920px so the\n * widest band covers an ordinary laptop, and a set typed out row by row is\n * the other half of what the plugin sells.\n */\nupdate_option(\n    'spacery_custom_breakpoints',\n    array(\n        array( 'slug' => 'desktop', 'label' => 'Desktop', 'max' => '1920px' ),\n        array( 'slug' => 'laptop',  'label' => 'Laptop',  'max' => '1280px' ),\n        array( 'slug' => 'tablet',  'label' => 'Tablet',  'max' => '782px' ),\n        array( 'slug' => 'mobile',  'label' => 'Mobile',  'max' => '480px' ),\n    )\n);\n\n$content = <<<'HTML'\n<!-- wp:paragraph -->\n<p><strong>Spacery — responsive controls at your breakpoints.</strong> This page is a demo. Click any block below, open the block settings sidebar, and find the <strong>Spacery</strong> panel. Every value there belongs to one breakpoint — Desktop up to 1920px, Laptop up to 1280px, Tablet up to 782px, Mobile up to 480px — and each band stops where the next one begins. Narrow your browser window, or use the editor’s device preview, to walk down through them.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:group {\"spacery\":{\"desktop\":{\"spacing\":{\"padding\":{\"top\":\"96px\",\"right\":\"64px\",\"bottom\":\"96px\",\"left\":\"64px\"}}},\"laptop\":{\"spacing\":{\"padding\":{\"top\":\"72px\",\"right\":\"48px\",\"bottom\":\"72px\",\"left\":\"48px\"}}},\"tablet\":{\"spacing\":{\"padding\":{\"top\":\"48px\",\"right\":\"32px\",\"bottom\":\"48px\",\"left\":\"32px\"}}},\"mobile\":{\"spacing\":{\"padding\":{\"top\":\"24px\",\"right\":\"16px\",\"bottom\":\"24px\",\"left\":\"16px\"}}}},\"layout\":{\"type\":\"constrained\"}} -->\n<div class=\"wp-block-group\"><!-- wp:paragraph -->\n<p>This group carries padding at all four breakpoints — 96px on Desktop, 72px on Laptop, 48px on Tablet, 24px on Mobile. Open the Spacery panel to see the four tiers, change one, and watch the canvas. The bands are disjoint by design: only one of them applies at any width, and above the widest breakpoint the block falls back to whatever core’s own Dimensions panel sets.</p>\n<!-- /wp:paragraph --></div>\n<!-- /wp:group -->\n\n<!-- wp:spacery/spacer {\"height\":\"120px\",\"spacery\":{\"tablet\":{\"dimensions\":{\"height\":\"64px\"}},\"mobile\":{\"dimensions\":{\"height\":\"24px\"}}}} -->\n<div class=\"wp-block-spacery-spacer\" style=\"height:120px\" aria-hidden=\"true\"></div>\n<!-- /wp:spacery/spacer -->\n\n<!-- wp:group {\"spacery\":{\"tablet\":{\"spacing\":{\"margin\":{\"top\":\"64px\"}}},\"mobile\":{\"spacing\":{\"margin\":{\"top\":\"16px\"}}}},\"layout\":{\"type\":\"constrained\"}} -->\n<div class=\"wp-block-group\"><!-- wp:paragraph -->\n<p>Above this group is a Responsive Spacer: 120px tall by default, 64px from Tablet down, 24px on Mobile. The core Spacer block has one height and no way to change it per breakpoint.</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>This group sets a top margin at Tablet only. Mobile inherits it until you override it — the Spacery panel tells you which tier a value came from, so you are never guessing. The breakpoints themselves are yours: open <strong>Spacery</strong> in the admin menu to rename them or move where each one stops.</p>\n<!-- /wp:paragraph --></div>\n<!-- /wp:group -->\nHTML;\n\n$id = wp_insert_post(\n    array(\n        'import_id'    => 9000,\n        'post_title'   => 'Spacery demo',\n        'post_name'    => 'spacery-demo',\n        'post_content' => $content,\n        'post_status'  => 'publish',\n        'post_type'    => 'page',\n        'post_author'  => 1,\n    ),\n    true\n);\n\nif ( is_wp_error( $id ) ) {\n    echo 'Spacery demo page failed: ' . $id->get_error_message();\n}\n",
+      "progress": {
+        "weight": 1,
+        "caption": "Creating the Spacery demo page"
+      }
+    }
+  ]
+}

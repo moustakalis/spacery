@@ -1,0 +1,41 @@
+name: Assets
+
+# The directory listing's artwork and its Playground blueprint live in
+# `assets/`, which is a *sibling* of `trunk/` in Subversion and carries no
+# version of its own. `release.yml` does push them, but only as part of a tag,
+# and `action-wordpress-plugin-deploy` refuses to run at all once
+# `tags/$VERSION` exists -- so once a version is published there is no way to
+# correct a banner, a screenshot or the blueprint from that workflow. This one
+# exists for exactly that: it touches `assets/` and nothing else, needs no
+# version bump, and can be run as often as the artwork changes.
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'assets/**'
+      - '.github/workflows/assets.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  assets:
+    name: Update WordPress.org assets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The blueprint is the one asset that can be *wrong* rather than merely
+      # ugly: WordPress.org disables the Live Preview toggle and says "Missing
+      # or invalid blueprint.json file" without telling you which. Cheaper to
+      # find out here.
+      - name: The blueprint is valid
+        run: python3 bin/check-blueprint.py
+
+      - uses: 10up/action-wordpress-plugin-asset-update@stable
+        env:
+          SLUG: spacery
+          ASSETS_DIR: assets
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}

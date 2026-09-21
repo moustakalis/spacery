@@ -40,6 +40,16 @@ jobs:
       - name: Release metadata agrees with itself
         run: python3 bin/check-release.py
 
+      # WordPress.org validates the Live Preview blueprint silently: a file it
+      # rejects disables the toggle and says only "Missing or invalid
+      # blueprint.json file", and the only way to try again is another
+      # Subversion commit. `--schema` checks it against Playground's own schema,
+      # which is what the directory reads it with.
+      - name: The Playground blueprint is valid
+        run: |
+          python3 -m pip install --quiet --break-system-packages jsonschema
+          python3 bin/check-blueprint.py --schema
+
       - name: PHPCS
         run: composer run lint
 
