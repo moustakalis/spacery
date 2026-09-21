@@ -37,5 +37,19 @@ jobs:
         env:
           SLUG: spacery
           ASSETS_DIR: assets
+          # Without this the action is not an assets action at all. Its
+          # `deploy.sh` sees `.distignore`, rsyncs the **whole workspace** into
+          # `trunk/` with `--delete --delete-excluded`, and then refuses to
+          # commit because something other than `readme.txt` changed there. It
+          # is right to refuse: `build/` is gitignored and this workflow runs no
+          # build, so every bundle in `trunk/` came back `!` missing, and the
+          # step after the guard is `svn rm` on each of them. The guard is the
+          # only thing that stopped a commit deleting the plugin's JavaScript
+          # from the directory.
+          #
+          # `true` takes the other branch, which copies `readme.txt` into
+          # `trunk/` and rsyncs `assets/` into `assets/` and touches nothing
+          # else -- which is what this workflow claims to do.
+          IGNORE_OTHER_FILES: true
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
