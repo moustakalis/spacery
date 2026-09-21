@@ -1,22 +1,35 @@
 # Submitting Spacery to WordPress.org — the runbook
 
-> **Released 19 September 2026. `v1.0.1` is the live version, and `1.0.2` is
-> committed and waiting to be tagged.** Spacery is at
+> **Released 19 September 2026. `v1.0.2` is the live version**, deployed
+> 21 September at `r3705502`. Spacery is at
 > `https://wordpress.org/plugins/spacery/`. Submitted 16 September, pended by
 > the automated pre-review on 18 September, corrected zip uploaded the same day,
 > approved 19 September, deployed the same night at `r3703665`. This line is the
 > one place that says where the plugin stands, so update it here and nowhere
 > else.
 >
-> **1.0.2 is a security release and is the next thing to ship.** A full audit
-> against the WordPress Security API, on 21 September, found that a hand-written
-> `spacery` block attribute could raise an uncaught `TypeError` inside
-> `render_block` — a fatal on every page holding that block, caused by anyone
-> who can edit it. `docs/security-audit.md` is the audit and F1 is the defect;
-> the fix, two smaller allowlist bypasses, ten regression tests and the whole
-> version bump are in one commit. **It is the first release to carry an
-> `== Upgrade Notice ==`**, which is what that section is for: 1.0.1 deliberately
-> spent nothing on a metadata release so this one would still be read.
+> **1.0.2 was a security release, and it shipped on the first run.** A full
+> audit against the WordPress Security API, on 21 September, found that a
+> hand-written `spacery` block attribute could raise an uncaught `TypeError`
+> inside `render_block` — a fatal on every page holding that block, caused by
+> anyone who can edit it. `docs/security-audit.md` is the audit and F1 is the
+> defect; the fix, two smaller allowlist bypasses, ten regression tests and the
+> whole version bump are in `8454823`. **It is the first release to carry an
+> `== Upgrade Notice ==`**, which is what that section is for: 1.0.1
+> deliberately spent nothing on a metadata release so this one would still be
+> read.
+>
+> **It is also the first deploy into a populated `trunk/`**, so
+> `rsync --delete` ran for the first time — §1's list of unexercised release
+> machinery is one shorter. Verified out of Subversion rather than from the
+> workflow's own summary: `tags/1.0.2` and `trunk/` carry identical file lists,
+> both identical in shape to `tags/1.0.1`, so nothing was deleted; the three
+> bundles are byte-identical to 1.0.1's, which is what an unchanged `src/`
+> should produce; `trunk/spacery.php` reads `1.0.2` in both places and
+> `readme.txt`'s `Stable tag` agrees; and `trunk/includes/Styles/Generator.php`
+> hashes the same as the committed file, so the fix is what actually shipped.
+> **`deploy.sh`'s "already published" early exit is still unexercised**, and is
+> the last thing in the release path that has never run.
 >
 > **Nothing in §1–§4 is live any more.** They are the record of how it got here,
 > kept because the next release walks the same ground. What is live is **§4's
