@@ -1,11 +1,22 @@
 # Submitting Spacery to WordPress.org — the runbook
 
-> **Released 19 September 2026. `v1.0.1` is the live version.** Spacery is at
+> **Released 19 September 2026. `v1.0.1` is the live version, and `1.0.2` is
+> committed and waiting to be tagged.** Spacery is at
 > `https://wordpress.org/plugins/spacery/`. Submitted 16 September, pended by
 > the automated pre-review on 18 September, corrected zip uploaded the same day,
 > approved 19 September, deployed the same night at `r3703665`. This line is the
 > one place that says where the plugin stands, so update it here and nowhere
 > else.
+>
+> **1.0.2 is a security release and is the next thing to ship.** A full audit
+> against the WordPress Security API, on 21 September, found that a hand-written
+> `spacery` block attribute could raise an uncaught `TypeError` inside
+> `render_block` — a fatal on every page holding that block, caused by anyone
+> who can edit it. `docs/security-audit.md` is the audit and F1 is the defect;
+> the fix, two smaller allowlist bypasses, ten regression tests and the whole
+> version bump are in one commit. **It is the first release to carry an
+> `== Upgrade Notice ==`**, which is what that section is for: 1.0.1 deliberately
+> spent nothing on a metadata release so this one would still be read.
 >
 > **Nothing in §1–§4 is live any more.** They are the record of how it got here,
 > kept because the next release walks the same ground. What is live is **§4's
