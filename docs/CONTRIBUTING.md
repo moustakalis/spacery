@@ -20,6 +20,12 @@ pnpm run i18n:build              # only when a string changed
 python3 bin/check-release.py     # whenever a file is added, renamed or removed
 ```
 
+**A version bump is a code change as far as the POT is concerned.** `wp i18n
+make-pot` writes the plugin version into `Project-Id-Version`, so bumping it and
+nothing else still fails the `i18n: POT is current` job — which is how `v1.0.1`
+came to be tagged before it could work. Regenerate in the same commit as the
+bump.
+
 E2E (`pnpm run test:e2e`) needs `wp-env` up. It is slow, and CI runs it, but it
 is worth running locally before touching anything the inspector renders.
 
@@ -88,6 +94,61 @@ second route, both cost a run to find:
   not carry this `package.json`.
 - Symlinking `src` and `tests` into it makes vite resolve every test through
   `/@fs/...` and report `Cannot find module` for all 17 files. Copy them.
+
+## The PHP suite runs in the cloud container too, through a shim
+
+`composer` cannot install here — packagist is refused by the egress policy — so
+this repo has said for weeks that "PHPUnit cannot run in this environment" and
+fallen back to loading `tests/php/bootstrap.php` in a throwaway script and
+asserting by hand. That is enough for one function and useless for a change that
+could move any of ten test classes.
+
+**The whole suite runs, against a ~60-line shim**, and it found nothing wrong
+that the hand-written scripts would have caught — which is the point: it says so
+about all 196 assertions rather than about the six you thought to write.
+
+Declare `PHPUnit\Framework\TestCase` with the assertions this suite actually
+uses, `PHPUnit\Framework\Attributes\DataProvider` as a one-property attribute,
+and a runner that reflects over `test_*` methods, resolves providers from **both**
+the attribute and the `@dataProvider` docblock (this suite uses both), and calls
+`setUp()` per case. Then:
+
+```bash
+# in the container, with includes/ + tests/php/ + tests/contract/core/ staged
+php harness/run-all.php     # requires the shim, bootstrap, style-engine, registry
+```
+
+Three things to get right, each of which reads as a test failure when it is
+really a shim failure:
+
+- **Make the assertion methods `static`.** PHPUnit allows `self::assertSame()`
+  and parts of this suite use it; an instance method there dies with "cannot be
+  called statically" on tests that are otherwise fine.
+- **Support `@dataProvider` as well as the attribute.** `BreakpointPatternsTest`
+  and `OptionsTest` use the docblock form, and without it their providers never
+  run — reported as "too few arguments", which looks like a broken test.
+- **Add assertions as they are missed, not by guessing.** A missing
+  `assertStringEndsWith` is an *undefined method* error on a passing test.
+
+It does not replace CI. It cannot see PHPCS, PHPStan, or a class-level collision
+like a helper named after a PHPUnit assertion — which is where every PHP CI
+failure in this repo has actually come from. What it buys is knowing that a
+change to `includes/` did not break the other nine classes, before you push.
+
+## No gate in this repo can reach a hand-written block attribute
+
+Worth stating on its own, because it is the shape `docs/security-audit.md` F1
+slipped through. The `spacery` attribute is `mixed`, so `tsc` has nothing to
+check. It is data, so eslint and PHPCS have nothing to check. The E2E suite
+drives the **inspector**, and the inspector can only produce well-formed
+attributes — so a shape that only a person typing into the code editor can
+produce is a shape nothing here has ever rendered.
+
+When you change anything between `$block['attrs']['spacery']` and the emitted
+stylesheet, add the hostile shape to `GeneratorTest::malformed_attributes()`
+rather than reasoning about it. Refusal is not the assertion that matters:
+**refusal without throwing** is, because the thrower is `render_block` and the
+symptom is a 500 on the published page.
 
 ## After a string changes, check the assertions from the tests' side
 

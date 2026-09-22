@@ -1,7 +1,10 @@
 # Submitting Spacery to WordPress.org — the runbook
 
 > **Released 19 September 2026. `v1.0.2` is the live version**, deployed
-> 21 September at `r3705502`. Spacery is at
+> 21 September at `r3705502`. **`docs/STATUS.md` is the long history** — what
+> this plugin has got wrong and how each was found — and the Project's
+> `claude/spacery-status.md` is a copy of it. This line is still the status;
+> that file is not. Spacery is at
 > `https://wordpress.org/plugins/spacery/`. Submitted 16 September, pended by
 > the automated pre-review on 18 September, corrected zip uploaded the same day,
 > approved 19 September, deployed the same night at `r3703665`. This line is the
