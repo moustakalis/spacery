@@ -70,36 +70,11 @@ add_action( 'spacery_booted', function ( Spacery\Plugin $plugin ) {
 
 ## theme.json
 
-A theme can hand Spacery a set directly:
-
-```json
-{
-  "settings": {
-    "custom": {
-      "spacery": {
-        "breakpoints": {
-          "desktop": "1280px",
-          "laptop": "1024px",
-          "tablet": "782px",
-          "mobile": "480px"
-        }
-      }
-    }
-  }
-}
-```
-
-Without that, Spacery reads `settings.viewport` (`mobile` and `tablet`), which
-is a valid theme.json setting a theme may declare. Either one makes the theme
-the default source, so adopting Spacery's wider tiers stays a deliberate act.
-
-**Note that core declares neither.** `settings.viewport` is absent from
-`wp-includes/theme.json` in WordPress 7.1, so on a site whose theme declares
-nothing — Twenty Twenty-Five included — there is no theme set to follow and the
-default source is Spacery's own preset. Its `tablet` and `mobile` are core's
-editor preview widths, so the boundaries still line up; they are written down in
-`Registry::CORE_DEFAULT_VIEWPORT` rather than read, because nothing publishes
-them in a form a plugin can read.
+A theme declares its own set under `settings.custom.spacery.breakpoints`, and
+Spacery also reads core's `settings.viewport`. How that is read, which set wins,
+how child themes merge, and why slugs must never change are in
+[`THEME-AUTHORS.md`](THEME-AUTHORS.md), which is the one description of it --
+this section used to be a second one.
 
 ## Options
 

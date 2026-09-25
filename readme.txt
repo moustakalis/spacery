@@ -78,6 +78,9 @@ The sets are never blended: values from two different intentions sitting side by
 produce a set nobody designed. Developers can override the result entirely with the
 `spacery_breakpoints` filter.
 
+Theme authors: a guide to declaring your breakpoints for Spacery in `theme.json` is at
+https://github.com/moustakalis/spacery/blob/main/docs/THEME-AUTHORS.md
+
 = How it fits with WordPress =
 
 WordPress 7.1 added responsive block styles with two theme-set breakpoints, mobile and

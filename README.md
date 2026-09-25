@@ -25,7 +25,9 @@ theme where it declares them.
 >    corrected once already and say why.
 > 3. [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) — the pre-push checklist,
 >    which exists because the same mistakes recurred.
-> 4. [`docs/FILTERS.md`](docs/FILTERS.md) — the developer API.
+> 4. [`docs/FILTERS.md`](docs/FILTERS.md) — the developer API, and
+>    [`docs/THEME-AUTHORS.md`](docs/THEME-AUTHORS.md) for declaring breakpoints
+>    in a theme.
 >
 > Screenshots, banners and icons live in `assets/` and are published to SVN
 > **separately from the zip**, so they can change during the queue without
@@ -43,7 +45,7 @@ Spacery covers what it leaves open:
   `tablet`, global-only. A design system with five tiers cannot be expressed.
 - **Breakpoints from your theme.** Spacery reads `settings.viewport` or a theme's own
   `settings.custom.spacery.breakpoints`, so the editor offers the breakpoints your CSS
-  already uses.
+  already uses. [`docs/THEME-AUTHORS.md`](docs/THEME-AUTHORS.md) is the guide.
 - **Same direction as core.** Desktop-first `max-width` tiers, matching WordPress exactly,
   so the two systems never disagree about what a breakpoint means.
 - **A responsive spacer.** `core/spacer` stores `height` as a plain attribute rather than
@@ -130,6 +132,7 @@ tests/{php,unit,e2e,contract}
 docs/PLAN.md             Architecture and roadmap
 docs/CONTRIBUTING.md     What to run before pushing, and the traps behind each check
 docs/FILTERS.md          Developer API
+docs/THEME-AUTHORS.md    Declaring breakpoints from a theme's theme.json
 docs/blockgap-spike.md   Why responsive blockGap is core's job, not Spacery's
 docs/asset-brief.md      Handoff for the WordPress.org icon, banner and screenshots
 ```

@@ -99,7 +99,7 @@ this up cold:
 | TypeScript | ~44 files under `src/` |
 | Tests | PHPUnit + core-contract suite, ~300 Vitest unit tests, 18 Playwright E2E |
 
-**1.0.3 is committed, not yet tagged**: PHP minimum 8.2 → 8.1, no code change, §3undetricies and D41.
+**1.0.3 is committed, not yet tagged**: PHP minimum 8.2 → 8.1, no code change, §3undetricies and D41; it also carries `docs/THEME-AUTHORS.md`, linked from `readme.txt` (§3tricies).
 
 **What is live now** is `docs/submission.md` §4 Phase 6: translations through
 translate.wordpress.org, and the Live Preview blueprint's last half — setting
@@ -1928,6 +1928,46 @@ tested, not what it requires. WordPress 7.1 stays because it is the API.
 The POT's `Project-Id-Version` was bumped by hand. No line in `includes/` or
 `spacery.php` moved, so that is the only line `make-pot` would have changed,
 and CI's i18n job checks it anyway.
+
+## 3tricies. The theme-author guide, and two things it found by running the code
+
+**25 September**, step 2 of `claude/installs-plan.md`: block theme developers
+are the audience chosen for the first installs, and one theme that declares a
+set is worth many sites. `docs/THEME-AUTHORS.md` is now the one description of
+the `theme.json` integration. `FILTERS.md`'s section became a pointer to it,
+because two descriptions of one mechanism is how this repo has made most of its
+false claims. `readme.txt` and `README.md` link to it.
+
+Every behaviour it describes was run, not read. The real `Registry`,
+`BreakpointSet` and `Breakpoint` were loaded in the cloud container with five
+stubs, with `wp_get_global_settings()` returning each example: shorthand, list
+form with labels and mixed units, `custom.spacery` alongside a disagreeing
+`settings.viewport`, viewport alone, a duplicate width across units
+(`800px`/`50rem`), thirteen tiers, an uppercase slug, and an owner who had chosen
+the preset. The three invalid sets each resolved to the preset while
+`default_source()` still said `theme`, which is the state the settings screen's
+"could not read" sentence exists for.
+
+**Two findings a theme author would have hit and nothing documented:**
+
+- **Tier labels from `theme.json` are never translated**, in either form.
+  `from_theme()` passes the custom set to `from_array()` without
+  `with_labels()`, so even a theme's `tablet` is the untranslated *Tablet*
+  while the same slug from `settings.viewport` gets Spacery's translated label.
+  This is correct, since `settings.custom` is not translatable, but it was
+  written down nowhere a theme author would look.
+- **Child themes and style variations merge with `array_replace_recursive()`**,
+  which was read in `class-wp-theme-json.php`'s `merge()`, and Spacery reads the
+  merged result. So a child theme can't *remove* a parent's tier, and in the list
+  form entries merge **by position**. A parent listing four tiers and a child
+  listing `wide` and `phone 480px` merge into a set where `phone` and `mobile`
+  are both 480px, and the whole set is refused. The guide tells child themes to
+  use the shorthand and keep the parent's slugs.
+
+Also confirmed in core's source rather than assumed: `settings.custom` is
+`null` in the schema, so the list form survives sanitisation untouched,
+`LATEST_SCHEMA` is 3, and the custom properties it produces are named
+`--wp--custom--spacery--breakpoints--<slug>`.
 
 ## 3c. The spacing extension had no editor preview — the biggest finding of the pass (built, §3novodecies)
 
