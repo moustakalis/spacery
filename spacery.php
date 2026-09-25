@@ -3,9 +3,9 @@
  * Plugin Name:       Spacery
  * Plugin URI:        https://github.com/moustakalis/spacery
  * Description:       Responsive padding, margin and spacer height on any block, at the breakpoints your design uses.
- * Version:           1.0.2
+ * Version:           1.0.3
  * Requires at least: 7.1
- * Requires PHP:      8.2
+ * Requires PHP:      8.1
  * Author:            Nickos Moustakas
  * Author URI:        https://github.com/moustakalis
  * License:           GPL-2.0-or-later
@@ -31,14 +31,14 @@ const PLUGIN_FILE = __FILE__;
  * Plugin version. Kept in sync with the header above and readme.txt by
  * `npm run sync-version`; the header is the source of truth.
  */
-const VERSION = '1.0.2';
+const VERSION = '1.0.3';
 
 /**
  * Minimum supported environment. Checked at load so an unsupported site gets an
  * admin notice rather than a fatal error.
  */
 const MIN_WP  = '7.1';
-const MIN_PHP = '8.2';
+const MIN_PHP = '8.1';
 
 require_once __DIR__ . '/includes/Autoloader.php';
 

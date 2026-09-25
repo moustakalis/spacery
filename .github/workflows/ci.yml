@@ -68,6 +68,25 @@ jobs:
       - name: PHPUnit (core contract)
         run: composer run test:contract
 
+  php-floor:
+    name: "PHP 8.1: the floor parses"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The plugin header says 8.1, so the shipped PHP has to parse on 8.1. The
+      # main PHP job cannot run there -- PHPUnit 11 requires 8.2 -- and the
+      # PHPCompatibility that composer installs predates 8.1, so without this
+      # nothing here would notice an 8.2-only construct. D41.
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          coverage: none
+
+      - name: PHP syntax check on 8.1
+        run: find spacery.php uninstall.php includes -name '*.php' -print0 | xargs -0 -n1 -P4 php -l
+
   js:
     name: "JS: lint, typecheck & build"
     runs-on: ubuntu-latest

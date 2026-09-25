@@ -3,8 +3,8 @@ Contributors: nikosmoustakas
 Tags: spacer, responsive, gutenberg, spacing, breakpoints
 Requires at least: 7.1
 Tested up to: 7.1
-Requires PHP: 8.2
-Stable tag: 1.0.2
+Requires PHP: 8.1
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,7 +53,7 @@ breakpoints, and you would rather set spacing in the inspector than in a stylesh
   Spacery deliberately does not ship a second implementation that would drift from the
   first.
 * **You are on the classic editor**, or a page builder that replaces the block editor.
-* **You cannot run WordPress 7.1 and PHP 8.2.** Spacery says so on activation rather
+* **You cannot run WordPress 7.1 and PHP 8.1.** Spacery says so on activation rather
   than half-working.
 
 One more thing worth knowing before you install: breakpoints are one set for the whole
@@ -191,6 +191,11 @@ shipped.
 
 == Changelog ==
 
+= 1.0.3 =
+
+* Runs on PHP 8.1. The minimum was 8.2, but nothing in the plugin needed it.
+  No code changed.
+
 = 1.0.2 =
 
 * Security: hand-written block markup could raise a fatal error on the page it
@@ -213,6 +218,9 @@ shipped.
 * Settings screen, and every string ready for translation.
 
 == Upgrade Notice ==
+
+= 1.0.3 =
+Spacery now runs on PHP 8.1 as well as 8.2 and newer. Nothing changes on a site that already runs it.
 
 = 1.0.2 =
 Fixes a defect where hand-written block markup could raise a fatal error on the page holding it. Worth taking on any site where more than one person can edit posts.

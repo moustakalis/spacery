@@ -1,7 +1,7 @@
 # Spacery — state of the repo
 
 **Read on:** 12 September 2026, from `~/Documents/GitHub/spacery` on `main`.
-**Revised:** 22 September 2026.
+**Revised:** 25 September 2026.
 **Companion to** [`PLAN.md`](PLAN.md) (architecture and decisions) and
 [`submission.md`](submission.md) (the runbook, and the one authoritative status
 line). This file is the state: what is built, what is known to be wrong, and
@@ -98,6 +98,8 @@ this up cold:
 | PHP | 18 classes under `includes/` |
 | TypeScript | ~44 files under `src/` |
 | Tests | PHPUnit + core-contract suite, ~300 Vitest unit tests, 18 Playwright E2E |
+
+**1.0.3 is committed, not yet tagged**: PHP minimum 8.2 → 8.1, no code change, §3undetricies and D41.
 
 **What is live now** is `docs/submission.md` §4 Phase 6: translations through
 translate.wordpress.org, and the Live Preview blueprint's last half — setting
@@ -1891,6 +1893,41 @@ exercised anywhere but the live site.
 **Shipped as 1.0.2** (`8454823`), with ten regression tests asserting each
 malformed shape is refused **without throwing** — the assertion that matters,
 because the thrower is `render_block` and the symptom is the published page.
+
+## 3undetricies. The PHP floor was a default, not a requirement (D41)
+
+**25 September**, out of an interview about why installs were low. 191
+downloads in the first week and fewer than ten active sites, with the new-plugins
+feed tailing off: a discovery problem, and `claude/installs-plan.md` is the plan
+for it. Checking whether the requirements were shrinking the pool turned this up.
+
+**D4 gave the reason for PHP 8.2 as "typed properties, enums, readonly"**, and
+those are PHP 7.4 and 8.1 features. The code uses no enums; its newest feature
+is readonly constructor properties, which is 8.1. So every site on 8.1 was being
+turned away for nothing. One sample puts that at about 18% of sites (Metorik,
+6,000+ WooCommerce stores, March 2026).
+
+**The check that proves it, and the one that cannot.** PHPCompatibility's
+development branch, cloned from GitHub into the cloud container (packagist is
+still refused), reports **nothing** over `spacery.php`, `uninstall.php` and
+`includes/` at `testVersion 8.1-8.5`. The same run at `8.0` flags the twelve
+readonly properties, so the sniff sees this code. Open-ended `8.1-` also
+reports a PHP 8.6 change to `trim()`'s default characters: that is about the
+future, not the floor, and was left alone. **The PHPCompatibility composer
+installs here is 9.x, which predates 8.1**, so the `testVersion` in
+`phpcs.xml.dist` has never been able to catch an 8.1 or 8.2 construct. It moved
+to `8.1-` for consistency, but it is not a gate. The gate is the new CI job
+`php-floor`, which runs `php -l` over the shipped PHP on 8.1. The main PHP job
+stays on 8.2 because PHPUnit 11 requires it.
+
+**Not done, and why:** 8.0 would mean rewriting nine `readonly` declarations to
+gain about 3% of sites, so it was declined. The Playground blueprint and
+`.wp-env.json` stay on 8.2, since they describe where the plugin is shown and
+tested, not what it requires. WordPress 7.1 stays because it is the API.
+
+The POT's `Project-Id-Version` was bumped by hand. No line in `includes/` or
+`spacery.php` moved, so that is the only line `make-pot` would have changed,
+and CI's i18n job checks it anyway.
 
 ## 3c. The spacing extension had no editor preview — the biggest finding of the pass (built, §3novodecies)
 

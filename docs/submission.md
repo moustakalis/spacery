@@ -11,6 +11,10 @@
 > one place that says where the plugin stands, so update it here and nowhere
 > else.
 >
+> **1.0.3 is committed and not yet tagged** (25 September). It lowers the PHP
+> minimum from 8.2 to 8.1 and changes no code — D41. Until `v1.0.3` is pushed
+> and deployed, 1.0.2 is what the directory serves.
+>
 > **1.0.2 was a security release, and it shipped on the first run.** A full
 > audit against the WordPress Security API, on 21 September, found that a
 > hand-written `spacery` block attribute could raise an uncaught `TypeError`

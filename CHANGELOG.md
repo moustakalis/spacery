@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 A version is dated on the day it is tagged, not the day it was written, and
 `release.yml` refuses a tag whose entry is still undated.
 
+## [1.0.3] - 2026-09-25
+
+### Changed
+
+- **The minimum PHP version is 8.1**, down from 8.2. The floor was set in
+  planning for "typed properties, enums, readonly", which are PHP 7.4 and 8.1
+  features, and nothing in the shipped code uses anything newer: checked with
+  PHPCompatibility's development branch at `testVersion 8.1`, which reports
+  nothing, while the same run at `8.0` flags the twelve readonly constructor
+  properties, so the check can see this code. CI now lints the shipped PHP on
+  8.1 as well. No code changed. `PLAN.md` D41.
+
 ## [1.0.2] - 2026-09-21
 
 ### Fixed

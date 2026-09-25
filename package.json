@@ -1,6 +1,6 @@
 {
 	"name": "spacery",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Responsive padding, margin and spacer height on any block, at the breakpoints your design uses.",
 	"author": "Nickos Moustakas (https://github.com/moustakalis)",
 	"license": "GPL-2.0-or-later",

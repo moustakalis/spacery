@@ -55,7 +55,7 @@ Spacery covers what it leaves open:
 | | |
 |---|---|
 | WordPress | 7.1+ |
-| PHP | 8.2+ |
+| PHP | 8.1+ |
 | Node | 22+ |
 
 ## Development
