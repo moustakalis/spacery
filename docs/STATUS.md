@@ -99,7 +99,7 @@ this up cold:
 | TypeScript | ~44 files under `src/` |
 | Tests | PHPUnit + core-contract suite, ~300 Vitest unit tests, 18 Playwright E2E |
 
-**1.0.3 is committed, not yet tagged**: PHP minimum 8.2 → 8.1, no code change, §3undetricies and D41; it also carries `docs/THEME-AUTHORS.md`, linked from `readme.txt` (§3tricies).
+**1.0.3 is live** (`r3713022`, 25 September): PHP minimum 8.2 → 8.1, no code change, §3undetricies and D41. `docs/THEME-AUTHORS.md` (§3tricies) landed on `main` *after* the tag, so the directory's `readme.txt` does not link it yet. The demo theme, Spacery Starter, is its own repository (§3untricies).
 
 **What is live now** is `docs/submission.md` §4 Phase 6: translations through
 translate.wordpress.org, and the Live Preview blueprint's last half — setting
@@ -1968,6 +1968,52 @@ Also confirmed in core's source rather than assumed: `settings.custom` is
 `null` in the schema, so the list form survives sanitisation untouched,
 `LATEST_SCHEMA` is 3, and the custom properties it produces are named
 `--wp--custom--spacery--breakpoints--<slug>`.
+
+## 3untricies. Spacery Starter, and running Spacery in WordPress Playground
+
+**25 September**, step 3 of `claude/installs-plan.md`. A Twenty Twenty-Five
+child theme, `~/Documents/GitHub/spacery-starter`, its own repository
+(`76fcb5f`, not pushed yet), built to WordPress.org's theme rules. It
+declares `settings.viewport` (782/480) and `custom.spacery.breakpoints`
+(1440/1080/782/480), and ships three patterns plus a page pattern whose
+spacing is set per tier. Its `blueprint.json` loads WordPress, Spacery from
+the directory and the theme from GitHub, and builds a front page out of the
+patterns.
+
+**WordPress Playground's CLI runs in the cloud container**, and it is a
+better test rig than anything this repo had for the front end.
+`npm i @wp-playground/cli` into a scratch directory, then `wp-playground-cli
+server --wp=7.1 --php=8.1 --login --mount=<plugin>:/wordpress/wp-content/plugins/spacery`,
+and drive it with `playwright-core` against `/opt/pw-browsers`. There's no
+MAMP, no device round trip, and a PHP version picked per run. Three things
+came out of it:
+
+- **Spacery 1.0.3 was exercised on PHP 8.1 for the first time**: it
+  activated with no requirements notice, rendered the settings screen, and
+  emitted correct CSS at every tier. D41 had CI's `php -l` and
+  PHPCompatibility; this is the runtime half.
+- **The pattern markup was generated, not hand-written.** `createBlock()` and
+  `serialize()` inside the running editor, then `parse()` again to confirm
+  every block is valid. Spacery's attribute serializes like any other,
+  because it is registered. Text went in as markers and was swapped for
+  `esc_html_e()` afterwards.
+- **The first design was wrong, and only measuring without the plugin showed
+  it.** With fixed `rem` bases the hero had **144px** of top padding on a
+  400px phone once Spacery was off. The bases are now Twenty Twenty-Five's
+  fluid presets. A second measurement then caught a base *smaller* than the
+  desktop tier above it (90px at 1600 against 96px at 1300), so desktop is
+  5.5rem. `THEME-AUTHORS.md` now says both things: fluid bases, and each base
+  at least as large as the widest tier.
+
+Measured at 1600/1300/1000/700/400 with Spacery on and off. Every tier
+lands, inheritance fills the gaps, and every block validates in the editor
+with or without the plugin. **Theme Check passes**; its one warning is the
+parent's text domain, which every child theme inherits. It flagged
+`full-site-editing` as a block-theme-only tag, and that tag was dropped.
+
+**A trap worth knowing:** WordPress caches a theme's pattern files when the
+theme is activated, so a `patterns/` folder added afterwards registers
+nothing and reports nothing. Switch themes away and back.
 
 ## 3c. The spacing extension had no editor preview — the biggest finding of the pass (built, §3novodecies)
 

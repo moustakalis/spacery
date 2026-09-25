@@ -11,9 +11,13 @@
 > one place that says where the plugin stands, so update it here and nowhere
 > else.
 >
-> **1.0.3 is committed and not yet tagged** (25 September). It lowers the PHP
-> minimum from 8.2 to 8.1 and changes no code — D41. Until `v1.0.3` is pushed
-> and deployed, 1.0.2 is what the directory serves.
+> **1.0.3 is live** — deployed 25 September at `r3713022` from `v1.0.3`
+> (`09ed304`). It lowers the PHP minimum from 8.2 to 8.1 and changes no code —
+> D41. Checked out of Subversion: `trunk/` and `tags/1.0.3` carry identical
+> file lists, the same shape as 1.0.2's, and the bundles are byte-identical to
+> 1.0.2's. The theme-author guide landed on `main` after the tag, so its link in
+> `readme.txt` reaches the directory only through the Assets workflow or the
+> next release.
 >
 > **1.0.2 was a security release, and it shipped on the first run.** A full
 > audit against the WordPress Security API, on 21 September, found that a

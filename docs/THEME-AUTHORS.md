@@ -51,8 +51,8 @@ with the same shape as core's:
 
 **Above the widest tier, the block's own value applies.** That's the value set
 in core's Dimensions panel. In the set above, a 1440px screen gets it, so
-design your base values for your widest layout and let the tiers refine it
-downwards. A value set at one tier also applies to every narrower tier until
+make each base value at least as large as your widest tier's, or spacing
+will grow as the screen narrows past it. A value set at one tier also applies to every narrower tier until
 one of them sets its own.
 
 ## The rules a set has to follow
@@ -189,10 +189,13 @@ Spacery writes nothing into post markup. Its values live in the block comment
 delimiter, so a site without the plugin renders your theme with each block's
 base value and no Spacery tiers. That's the case to design for:
 
-- **Base values carry the design.** They're the widest layout, as above, and
-  they're all a visitor sees without the plugin. Whatever still needs to
-  collapse on small screens without Spacery belongs in your stylesheet, as it
-  would today.
+- **Make base values fluid.** A base value is all a visitor sees without the
+  plugin, at every width. A fixed `9rem` that looks right on a desktop is
+  144px of padding on a phone. A fluid preset such as Twenty Twenty-Five's
+  `var:preset|spacing|80`, `clamp(70px, 10vw, 140px)`, scales without the
+  plugin and still serves as the widest tier's value with it.
+  [Spacery Starter](https://github.com/moustakalis/spacery-starter) is built
+  this way, and its README lists every value and what was measured.
 - **Recommend it; don't require it.** The `custom.spacery` key is inert when
   Spacery isn't active. A theme that declares it loses nothing without the
   plugin and gains four tiers with it.
